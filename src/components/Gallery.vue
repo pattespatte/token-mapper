@@ -4,21 +4,28 @@
  *
  * Two modes:
  *   - Browse (one set loaded): grid of TokenCards for the browse set,
- *     filtered by the active category. Selection state stored for the
- *     Phase 12 Inspector.
- *   - Compare (both sets loaded): FilterBar + grid of DiffCards from
- *     useDiff.filteredDiff, honouring the active bucket filter.
+ *     filtered by category AND search AND filter chips. Selection state
+ *     stored for the Inspector.
+ *   - Compare (both sets loaded): FilterBar + SearchBar + grid of DiffCards
+ *     from useDiff.filteredDiff, honouring the active bucket filter AND
+ *     search.
  *
  * The `compare` prop is the switch — derived from useTokenSets.isComparing
  * by the parent (App.vue).
+ *
+ * `/` keyboard shortcut: focuses the search input from anywhere outside a
+ * text-editable element. Wired here (document-level listener) rather than in
+ * SearchBar so the shortcut works regardless of focus.
  */
 
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useGallery } from '@/composables/useGallery'
 import { useDiff } from '@/composables/useDiff'
 import TokenCard from './TokenCard.vue'
 import DiffCard from './DiffCard.vue'
 import FilterBar from './FilterBar.vue'
+import SearchBar from './SearchBar.vue'
+import FilterChips from './FilterChips.vue'
 
 const props = defineProps<{
   /** When true, render the compare-mode layout. */
@@ -29,6 +36,7 @@ const {
   browseSet,
   visibleTokens,
   selectedTokenPath,
+  selectedDiffPath,
   activeCategory,
 } = useGallery()
 const { filteredDiff } = useDiff()
@@ -58,6 +66,15 @@ function handleSelect(path: string): void {
   }
 }
 
+/** Compare-mode DiffCard click → toggles the DiffInspector selection. */
+function handleDiffSelect(path: string): void {
+  if (selectedDiffPath.value === path) {
+    selectedDiffPath.value = null
+  } else {
+    selectedDiffPath.value = path
+  }
+}
+
 /* ----------------------------- Compare mode ------------------------------ */
 
 const compareHeading = computed(() => {
@@ -65,10 +82,46 @@ const compareHeading = computed(() => {
   // for v1 — the FilterBar already shows counts prominently.
   return 'Comparison'
 })
+
+/* ------------------------- `/` search shortcut --------------------------- */
+
+/** True when the current keyboard focus is in a text-editable element. */
+function isFocusInTextField(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  const tag = target.tagName.toLowerCase()
+  return tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable
+}
+
+/** Document-level `/` handler: focus the search input from anywhere. */
+function onDocumentKeydown(event: KeyboardEvent): void {
+  if (event.key !== '/') return
+  if (isFocusInTextField(event.target)) return
+  // Ignore modifier combos (Cmd+/, Ctrl+/, etc.) — those belong to the
+  // browser or the user agent.
+  if (event.metaKey || event.ctrlKey || event.altKey) return
+  const input = document.querySelector<HTMLInputElement>('#dtv-searchbar-input')
+  if (input === null) return
+  event.preventDefault()
+  input.focus()
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', onDocumentKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', onDocumentKeydown)
+})
 </script>
 
 <template>
   <div class="dtv-gallery">
+    <!-- Shared search bar (both modes). FilterChips is browse-only. -->
+    <div class="dtv-gallery__search-row">
+      <SearchBar />
+      <FilterChips v-if="!compare" />
+    </div>
+
     <!-- BROWSE MODE -->
     <div v-if="!compare" class="dtv-gallery__browse">
       <h1 class="dtv-gallery__heading">{{ browseHeading }}</h1>
@@ -85,7 +138,7 @@ const compareHeading = computed(() => {
         v-else-if="browseCards.length === 0"
         class="dtv-gallery__empty"
       >
-        No tokens in this category.
+        No tokens match the current filters.
       </p>
 
       <div v-else class="dtv-gallery__grid">
@@ -118,6 +171,8 @@ const compareHeading = computed(() => {
           v-for="d in filteredDiff"
           :key="`${d.bucket}-${d.path}`"
           :diff="d"
+          :class="{ 'dtv-diffcard--selected': selectedDiffPath === d.path }"
+          @select="handleDiffSelect"
         />
       </div>
     </div>
@@ -127,6 +182,13 @@ const compareHeading = computed(() => {
 <style scoped>
 .dtv-gallery {
   padding: var(--dtv-spacing-lg);
+}
+
+.dtv-gallery__search-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dtv-spacing-sm);
+  margin-bottom: var(--dtv-spacing-md);
 }
 
 .dtv-gallery__heading {

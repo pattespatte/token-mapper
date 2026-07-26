@@ -8,9 +8,16 @@
  *   - `activeFilter` — Ref<'all' | DiffBucket>. Bound to the FilterBar in
  *     compare mode.
  *   - `filteredDiff` — ComputedRef<TokenDiff[]>. The single flat list the
- *     Gallery renders in compare mode, honouring `activeFilter`.
+ *     Gallery renders in compare mode, honouring `activeFilter` AND the
+ *     shared search query.
  *   - `counts` — ComputedRef<Record<DiffBucket, number>>. For the FilterBar
  *     badges.
+ *
+ * Search is the only filter that applies in compare mode (per the PRD:
+ * browse-mode filter chips are browse-only; compare mode keeps its bucket
+ * FilterBar). A TokenDiff matches the query when EITHER side matches —
+ * designers search by either the value they had (A) or the value they're
+ * moving to (B).
  *
  * Module-scoped filter state so it survives set reloads within a session.
  */
@@ -18,6 +25,7 @@
 import { ref, computed, type ComputedRef, type Ref } from 'vue'
 import { diff as diffFn } from '@/pipeline/diff'
 import { useTokenSets } from './useTokenSets'
+import { useSearch } from './useSearch'
 import type { DiffBucket, DiffResult, TokenDiff } from '@/types/diff'
 
 /** Module-scoped: the active filter survives set reloads within a session. */
@@ -25,6 +33,7 @@ const activeFilter: Ref<'all' | DiffBucket> = ref('all')
 
 export function useDiff() {
   const { setA, setB, isComparing } = useTokenSets()
+  const search = useSearch()
 
   /** Classified diff, or null when not both sets are loaded. */
   const diff: ComputedRef<DiffResult | null> = computed(() => {
@@ -51,17 +60,28 @@ export function useDiff() {
   })
 
   /**
-   * Flat list of TokenDiffs for the Gallery, honouring the active filter.
-   * When filter is 'all', concatenates all four buckets (matching first for
-   * visual stability — matching is the "everything's fine" baseline).
+   * Flat list of TokenDiffs for the Gallery, honouring the active bucket
+   * filter AND the shared search query. Bucket filter applies first (it
+   * selects which DiffCards are even shown), then search narrows within.
+   *
+   * A TokenDiff matches the query when EITHER side matches — designers
+   * search by either the value they had (A) or the value they're moving
+   * to (B). For `missing` (only A present) and `extra` (only B present),
+   * the present side carries the search.
    */
   const filteredDiff: ComputedRef<TokenDiff[]> = computed(() => {
     const d = diff.value
     if (d === null) return []
-    if (activeFilter.value === 'all') {
-      return [...d.matching, ...d.changed, ...d.missing, ...d.extra]
-    }
-    return d[activeFilter.value]
+    const matchesQuery = search.matchPredicate.value
+    const bucketList: TokenDiff[] =
+      activeFilter.value === 'all'
+        ? [...d.matching, ...d.changed, ...d.missing, ...d.extra]
+        : d[activeFilter.value]
+    return bucketList.filter((td) => {
+      if (td.a !== undefined && matchesQuery(td.a)) return true
+      if (td.b !== undefined && matchesQuery(td.b)) return true
+      return false
+    })
   })
 
   return {
@@ -69,5 +89,7 @@ export function useDiff() {
     activeFilter,
     filteredDiff,
     counts,
+    // Exposed so Gallery / SearchBar share the singleton query state.
+    search,
   }
 }

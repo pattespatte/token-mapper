@@ -24,6 +24,7 @@ import Toolbar from '@/components/Toolbar.vue'
 import Gallery from '@/components/Gallery.vue'
 import ValidationPanel from '@/components/ValidationPanel.vue'
 import Inspector from '@/components/Inspector.vue'
+import DiffInspector from '@/components/DiffInspector.vue'
 import { useTokenSets } from '@/composables/useTokenSets'
 import { useGallery } from '@/composables/useGallery'
 import { useSidebar } from '@/composables/useSidebar'
@@ -69,6 +70,8 @@ watch(
 
     <!-- Inspector overlays everything when a browse-mode token is selected -->
     <Inspector />
+    <!-- DiffInspector overlays everything when a compare-mode card is clicked -->
+    <DiffInspector />
   </div>
 </template>
 

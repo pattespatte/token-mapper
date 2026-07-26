@@ -23,14 +23,20 @@ import type { TokenSet } from '@/types/token'
 // works on the static GitHub Pages deployment with no network calls.
 import demoFoundation from '@/data/demo/foundation.json'
 import demoSemantic from '@/data/demo/semantic.json'
+import demoComposition from '@/data/demo/composition.json'
 
 /**
  * Demo files wrapped as InputFile[] for the pipeline. Re-serialised from the
  * imported JSON so the parser's filename-in-error-messages path still works.
+ * Three files exercise: primitive colors/dimensions (foundation), semantic
+ * aliases that cross-reference them (semantic), and the composite types
+ * shadow/border/gradient (composition) — including aliases back into the
+ * foundation palette.
  */
 const DEMO_FILES: InputFile[] = [
   { name: 'foundation.json', content: JSON.stringify(demoFoundation) },
   { name: 'semantic.json', content: JSON.stringify(demoSemantic) },
+  { name: 'composition.json', content: JSON.stringify(demoComposition) },
 ]
 
 /** Module-scoped singleton state. Shared across every call of useTokenSets. */

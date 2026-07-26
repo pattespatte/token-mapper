@@ -1,0 +1,80 @@
+{
+  "shadow": {
+    "sm": {
+      "$description": "Subtle elevation for cards at rest.",
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0",
+        "offsetY": "1px",
+        "blur": "2px",
+        "color": "rgba(17, 24, 39, 0.05)"
+      }
+    },
+    "md": {
+      "$description": "Default card elevation on hover.",
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0",
+        "offsetY": "4px",
+        "blur": "6px",
+        "spread": "-1px",
+        "color": "rgba(17, 24, 39, 0.1)"
+      }
+    },
+    "focus-ring": {
+      "$description": "Two-layer focus ring: inner glow plus outer halo.",
+      "$type": "shadow",
+      "$value": [
+        {
+          "offsetX": "0",
+          "offsetY": "0",
+          "blur": "0",
+          "spread": "2px",
+          "color": "{color.background}"
+        },
+        {
+          "offsetX": "0",
+          "offsetY": "0",
+          "blur": "0",
+          "spread": "4px",
+          "color": "{color.accent}"
+        }
+      ]
+    }
+  },
+  "border": {
+    "default": {
+      "$description": "Default 1px solid border.",
+      "$type": "border",
+      "$value": { "width": "{spacing.sm}", "style": "solid", "color": "{color.gray.400}" }
+    },
+    "strong": {
+      "$description": "Heavier border for emphasised containers.",
+      "$type": "border",
+      "$value": { "width": "2px", "style": "solid", "color": "{color.gray.700}" }
+    },
+    "dashed": {
+      "$description": "Dashed border for placeholders / drop targets.",
+      "$type": "border",
+      "$value": { "width": "1px", "style": "dashed", "color": "{color.text-muted}" }
+    }
+  },
+  "gradient": {
+    "brand": {
+      "$description": "Brand accent gradient, indigo 500 → 700.",
+      "$type": "gradient",
+      "$value": [
+        { "color": "{color.indigo.500}", "position": "0%" },
+        { "color": "{color.indigo.700}", "position": "100%" }
+      ]
+    },
+    "surface": {
+      "$description": "Soft surface gradient, top-to-bottom lightening.",
+      "$type": "gradient",
+      "$value": [
+        { "color": "{color.gray.100}", "position": "0%" },
+        { "color": "{color.gray.50}", "position": "100%" }
+      ]
+    }
+  }
+}

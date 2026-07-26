@@ -14,6 +14,11 @@
  * The two-column layout only applies when both sides are renderable; for
  * missing/extra we still keep the two-column grid for visual alignment so
  * the gallery doesn't jump around as the filter changes.
+ *
+ * Clicking the card (or focusing it and pressing Enter/Space) emits `select`
+ * with the token path, opening the A/B DiffInspector. The copy button inside
+ * the header stops propagation so clicking copy doesn't also open the
+ * inspector — that would be annoying.
  */
 
 import { ref, onUnmounted } from 'vue'
@@ -23,6 +28,10 @@ import TokenVisual from './TokenVisual.vue'
 
 const props = defineProps<{
   diff: TokenDiff
+}>()
+
+const emit = defineEmits<{
+  (e: 'select', path: string): void
 }>()
 
 const copied = ref(false)
@@ -42,6 +51,23 @@ async function copyPath(): Promise<void> {
   }
 }
 
+/** Card click handler — opens the DiffInspector for this token. */
+function onSelect(): void {
+  emit('select', props.diff.path)
+}
+
+/**
+ * Keyboard activation for the card-as-button. Browsers fire `click` on
+ * native buttons for Enter/Space already, but the `<article role="button">`
+ * pattern needs explicit handling.
+ */
+function onCardKeydown(event: KeyboardEvent): void {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    onSelect()
+  }
+}
+
 onUnmounted(() => {
   if (copyResetTimer !== null) clearTimeout(copyResetTimer)
 })
@@ -51,7 +77,11 @@ onUnmounted(() => {
   <article
     class="dtv-diffcard"
     :class="`dtv-diffcard--${diff.bucket}`"
-    :aria-label="`Token ${diff.path}, ${diff.bucket}`"
+    :aria-label="`Token ${diff.path}, ${diff.bucket}. Activate to open inspector.`"
+    role="button"
+    tabindex="0"
+    @click="onSelect"
+    @keydown="onCardKeydown"
   >
     <header class="dtv-diffcard__header">
       <code class="dtv-diffcard__path" :title="diff.path">{{ diff.path }}</code>
@@ -68,7 +98,7 @@ onUnmounted(() => {
         type="button"
         class="dtv-diffcard__copy"
         :aria-label="copied ? 'Path copied' : `Copy ${diff.path}`"
-        @click="copyPath"
+        @click.stop="copyPath"
       >
         {{ copied ? '✓' : '⧉' }}
       </button>
@@ -102,6 +132,22 @@ onUnmounted(() => {
   border: 1px solid var(--dtv-color-border);
   border-radius: var(--dtv-radius-md);
   border-left: 3px solid var(--dtv-color-border-strong);
+  /* Card-as-button affordance: cursor + focus ring. */
+  cursor: pointer;
+}
+
+.dtv-diffcard:hover {
+  background-color: var(--dtv-color-surface-muted);
+}
+
+.dtv-diffcard:focus-visible {
+  outline: 2px solid var(--dtv-color-accent);
+  outline-offset: 2px;
+}
+
+.dtv-diffcard--selected {
+  border-color: var(--dtv-color-accent);
+  box-shadow: 0 0 0 2px var(--dtv-color-accent);
 }
 
 /*
