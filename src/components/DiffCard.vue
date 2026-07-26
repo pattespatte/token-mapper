@@ -21,8 +21,9 @@
  * inspector — that would be annoying.
  */
 
-import { ref, onUnmounted } from 'vue'
+import { onUnmounted } from 'vue'
 import type { TokenDiff } from '@/types/diff'
+import { useClipboard } from '@/composables/useClipboard'
 import DiffBadge from './DiffBadge.vue'
 import TokenVisual from './TokenVisual.vue'
 
@@ -34,21 +35,10 @@ const emit = defineEmits<{
   (e: 'select', path: string): void
 }>()
 
-const copied = ref(false)
-let copyResetTimer: ReturnType<typeof setTimeout> | null = null
+const { copied, copy: copyToClipboard, cleanup: cleanupClipboard } = useClipboard()
 
 async function copyPath(): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(props.diff.path)
-    copied.value = true
-    if (copyResetTimer !== null) clearTimeout(copyResetTimer)
-    copyResetTimer = setTimeout(() => {
-      copied.value = false
-      copyResetTimer = null
-    }, 1200)
-  } catch {
-    // Clipboard may be unavailable; fail silently.
-  }
+  await copyToClipboard(props.diff.path)
 }
 
 /** Card click handler — opens the DiffInspector for this token. */
@@ -69,7 +59,7 @@ function onCardKeydown(event: KeyboardEvent): void {
 }
 
 onUnmounted(() => {
-  if (copyResetTimer !== null) clearTimeout(copyResetTimer)
+  cleanupClipboard()
 })
 </script>
 
@@ -93,6 +83,13 @@ onUnmounted(() => {
         aria-hidden="true"
         >→</span
       >
+      <!-- One-line delta summary from the explainer (Tier 2). Compact chip
+           rendered only for `changed` tokens with an explanation. -->
+      <span
+        v-if="diff.bucket === 'changed' && diff.explanation"
+        class="dtv-diffcard__delta"
+        :title="`What changed: ${diff.explanation.summary}`"
+      >{{ diff.explanation.summary }}</span>
       <DiffBadge :bucket="diff.bucket" />
       <button
         type="button"
@@ -329,6 +326,25 @@ onUnmounted(() => {
   flex-shrink: 0;
   font-size: var(--dtv-font-size-md);
   color: var(--dtv-color-text-subtle);
+}
+
+/*
+ * One-line delta summary chip (Tier 2). Matches the typography of the path
+ * but is coloured to draw the eye to "what changed" without competing with
+ * the bucket badge. `warning` palette aligns with the `changed` bucket.
+ */
+.dtv-diffcard__delta {
+  flex-shrink: 0;
+  padding: 1px var(--dtv-spacing-xs);
+  font-family: var(--dtv-font-family-mono);
+  font-size: var(--dtv-font-size-sm);
+  color: var(--dtv-color-warning);
+  background-color: var(--dtv-color-surface-muted);
+  border-radius: var(--dtv-radius-sm);
+  white-space: nowrap;
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /*

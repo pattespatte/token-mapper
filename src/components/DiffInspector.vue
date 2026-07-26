@@ -26,10 +26,12 @@
 
 import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useGallery } from '@/composables/useGallery'
+import { useClipboard } from '@/composables/useClipboard'
 import { getRenderer } from '@/renderers/registry'
 import type { ResolvedToken } from '@/types/token'
 
 const { selectedDiff, clearDiffSelection } = useGallery()
+const { copied, copy: copyToClipboard, cleanup: cleanupClipboard } = useClipboard()
 
 const dialogRef = ref<HTMLDivElement | null>(null)
 const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -82,23 +84,9 @@ function sideViewOf(token: ResolvedToken | undefined): SideView | null {
 const sideA = computed(() => sideViewOf(diff.value?.a))
 const sideB = computed(() => sideViewOf(diff.value?.b))
 
-/** Copy state for the path button. */
-const copied = ref(false)
-let copyResetTimer: ReturnType<typeof setTimeout> | null = null
-
 async function copyPath(): Promise<void> {
   if (diff.value === null) return
-  try {
-    await navigator.clipboard.writeText(diff.value.path)
-    copied.value = true
-    if (copyResetTimer !== null) clearTimeout(copyResetTimer)
-    copyResetTimer = setTimeout(() => {
-      copied.value = false
-      copyResetTimer = null
-    }, 1200)
-  } catch {
-    // Clipboard may be unavailable; fail silently.
-  }
+  await copyToClipboard(diff.value.path)
 }
 
 /**
@@ -188,7 +176,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
-  if (copyResetTimer !== null) clearTimeout(copyResetTimer)
+  cleanupClipboard()
 })
 </script>
 
@@ -228,6 +216,32 @@ onUnmounted(() => {
       </header>
 
       <div class="dtv-inspector__body dtv-diffinspector__body">
+        <!-- Tier 2: "What changed" details list, shown only for changed
+             tokens whose explainer produced a details array. Sits above
+             the side-by-side A/B layout so the headline diff is the first
+             thing the reader sees after opening the inspector. -->
+        <section
+          v-if="diff.bucket === 'changed' && diff.explanation?.details?.length"
+          class="dtv-diffinspector__changed"
+        >
+          <h3 class="dtv-inspector__heading">What changed</h3>
+          <dl class="dtv-diffinspector__changed-list">
+            <div
+              v-for="(d, i) in diff.explanation.details"
+              :key="`${d.label}-${i}`"
+              class="dtv-diffinspector__changed-row"
+            >
+              <dt>{{ d.label }}</dt>
+              <dd>
+                <code v-if="d.before">{{ d.before }}</code>
+                <span v-else class="dtv-diffinspector__changed-empty">—</span>
+                <span class="dtv-diffinspector__changed-arrow" aria-hidden="true">→</span>
+                <code>{{ d.after }}</code>
+              </dd>
+            </div>
+          </dl>
+        </section>
+
         <!-- Side-by-side: matching / changed -->
         <div v-if="isSideBySide" class="dtv-diffinspector__sides">
           <section v-if="sideA" class="dtv-diffinspector__side dtv-diffinspector__side--a">
@@ -364,6 +378,63 @@ onUnmounted(() => {
 
 .dtv-diffinspector__body {
   gap: var(--dtv-spacing-md);
+}
+
+/*
+ * Tier 2 "What changed" section — field-by-field diff list shown above
+ * the side-by-side A/B layout for `changed` tokens. Reuses the heading
+ * typography of the existing inspector sections for visual consistency.
+ */
+.dtv-diffinspector__changed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dtv-spacing-xs);
+  padding: var(--dtv-spacing-sm) var(--dtv-spacing-md);
+  background-color: var(--dtv-color-surface-muted);
+  border: 1px solid var(--dtv-color-border);
+  border-left: 3px solid var(--dtv-color-warning);
+  border-radius: var(--dtv-radius-md);
+}
+
+.dtv-diffinspector__changed-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--dtv-spacing-xs) var(--dtv-spacing-md);
+  font-size: var(--dtv-font-size-sm);
+}
+
+.dtv-diffinspector__changed-row {
+  display: contents;
+}
+
+.dtv-diffinspector__changed-row dt {
+  color: var(--dtv-color-text-subtle);
+  font-family: var(--dtv-font-family-mono);
+}
+
+.dtv-diffinspector__changed-row dd {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--dtv-spacing-xs);
+  color: var(--dtv-color-text);
+  font-family: var(--dtv-font-family-mono);
+}
+
+.dtv-diffinspector__changed-row dd code {
+  font-family: inherit;
+  word-break: break-all;
+}
+
+.dtv-diffinspector__changed-arrow {
+  color: var(--dtv-color-text-subtle);
+}
+
+.dtv-diffinspector__changed-empty {
+  color: var(--dtv-color-text-subtle);
+  font-style: italic;
 }
 
 .dtv-diffinspector__sides {

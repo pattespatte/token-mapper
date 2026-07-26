@@ -24,6 +24,7 @@
 
 import { ref, computed, type ComputedRef, type Ref } from 'vue'
 import { diff as diffFn } from '@/pipeline/diff'
+import { explainDiff } from '@/pipeline/explainDiff'
 import { useTokenSets } from './useTokenSets'
 import { useSearch } from './useSearch'
 import type { DiffBucket, DiffResult, TokenDiff } from '@/types/diff'
@@ -35,11 +36,41 @@ export function useDiff() {
   const { setA, setB, isComparing } = useTokenSets()
   const search = useSearch()
 
-  /** Classified diff, or null when not both sets are loaded. */
-  const diff: ComputedRef<DiffResult | null> = computed(() => {
+  /**
+   * Raw engine output — deep-equality classification into 4 buckets. This
+   * stays single-responsibility; the public `diff` below enriches it with
+   * per-token `explanation` for `changed` entries.
+   */
+  const rawDiff: ComputedRef<DiffResult | null> = computed(() => {
     if (!isComparing.value) return null
     if (setA.value === null || setB.value === null) return null
     return diffFn(setA.value.resolved, setB.value.resolved)
+  })
+
+  /**
+   * Enriched diff — same shape as `rawDiff` but with `explanation` attached
+   * to every `changed` entry. Both sides are guaranteed present for `changed`
+   * tokens (the engine's contract), so the explainer always gets a valid pair.
+   *
+   * Recomputes only when rawDiff invalidates (set reload), not on every
+   * keystroke — fine for typical set sizes. The explainer is pure and never
+   * throws, so this derivation can't break the rest of the diff UI.
+   */
+  const diff: ComputedRef<DiffResult | null> = computed(() => {
+    const raw = rawDiff.value
+    if (raw === null) return null
+    return {
+      matching: raw.matching,
+      // Attach explanation to each changed token. New array — engine output
+      // is structurally shared for the unchanged buckets.
+      changed: raw.changed.map((td) =>
+        td.a !== undefined && td.b !== undefined
+          ? { ...td, explanation: explainDiff(td.a, td.b) }
+          : td
+      ),
+      missing: raw.missing,
+      extra: raw.extra,
+    }
   })
 
   /** Token counts per bucket, for FilterBar badges. Zero when not comparing. */

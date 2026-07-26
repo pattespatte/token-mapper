@@ -179,4 +179,74 @@ describe('DiffInspector', () => {
     await w.get('.dtv-inspector__close').trigger('click')
     expect(clearDiffSelection).toHaveBeenCalledTimes(1)
   })
+
+  /* -------------------------- Tier 2: explanation --------------------------- */
+
+  it('shows "What changed" details when explanation has details', async () => {
+    const diff = makeBothDiff('changed')
+    diff.explanation = {
+      summary: '+4px',
+      details: [
+        { label: 'value', before: '16px', after: '20px' },
+        { label: 'delta', before: '', after: '+4px' },
+      ],
+    }
+    selectedDiff = computed(() => diff)
+    const w = mountFresh()
+    await flushPromises()
+    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(true)
+    expect(w.get('.dtv-inspector__heading').text()).toBe('What changed')
+    const rows = w.findAll('.dtv-diffinspector__changed-row')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]!.get('dt').text()).toBe('value')
+    expect(rows[0]!.findAll('code')[0]!.text()).toBe('16px')
+    expect(rows[0]!.findAll('code')[1]!.text()).toBe('20px')
+  })
+
+  it('hides "What changed" section when explanation has no details', async () => {
+    const diff = makeBothDiff('changed')
+    diff.explanation = { summary: 'Δ23' } // summary-only, no details array
+    selectedDiff = computed(() => diff)
+    const w = mountFresh()
+    await flushPromises()
+    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(false)
+  })
+
+  it('hides "What changed" section when explanation is undefined', async () => {
+    // Even though bucket is 'changed', no explanation attached.
+    selectedDiff = computed(() => makeBothDiff('changed'))
+    const w = mountFresh()
+    await flushPromises()
+    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(false)
+  })
+
+  it('hides "What changed" section for matching tokens', async () => {
+    const diff = makeBothDiff('matching')
+    diff.explanation = {
+      summary: 'identical',
+      details: [{ label: 'noop', before: 'x', after: 'x' }],
+    }
+    selectedDiff = computed(() => diff)
+    const w = mountFresh()
+    await flushPromises()
+    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(false)
+  })
+
+  it('renders "—" placeholder for empty before-value in details', async () => {
+    const diff = makeBothDiff('changed')
+    diff.explanation = {
+      summary: '+4px',
+      details: [{ label: 'delta', before: '', after: '+4px' }],
+    }
+    selectedDiff = computed(() => diff)
+    const w = mountFresh()
+    await flushPromises()
+    const row = w.findAll('.dtv-diffinspector__changed-row')[0]!
+    // before is empty → placeholder shown, before-<code> absent.
+    expect(row.get('.dtv-diffinspector__changed-empty').text()).toBe('—')
+    // after still has its <code>.
+    const codes = row.findAll('code')
+    expect(codes).toHaveLength(1)
+    expect(codes[0]!.text()).toBe('+4px')
+  })
 })

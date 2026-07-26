@@ -26,9 +26,11 @@
 
 import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useGallery } from '@/composables/useGallery'
+import { useClipboard } from '@/composables/useClipboard'
 import { getRenderer } from '@/renderers/registry'
 
 const { selectedToken, clearSelection } = useGallery()
+const { copied, copy: copyToClipboard, cleanup: cleanupClipboard } = useClipboard()
 
 const dialogRef = ref<HTMLDivElement | null>(null)
 const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -81,23 +83,9 @@ const hasAliasChain = computed(
   () => token.value !== null && token.value.aliasChain.length > 0
 )
 
-/** Copy state for the path button. */
-const copied = ref(false)
-let copyResetTimer: ReturnType<typeof setTimeout> | null = null
-
 async function copyPath(): Promise<void> {
   if (token.value === null) return
-  try {
-    await navigator.clipboard.writeText(token.value.path)
-    copied.value = true
-    if (copyResetTimer !== null) clearTimeout(copyResetTimer)
-    copyResetTimer = setTimeout(() => {
-      copied.value = false
-      copyResetTimer = null
-    }, 1200)
-  } catch {
-    // Clipboard may be unavailable; fail silently.
-  }
+  await copyToClipboard(token.value.path)
 }
 
 /**
@@ -201,7 +189,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
-  if (copyResetTimer !== null) clearTimeout(copyResetTimer)
+  cleanupClipboard()
 })
 </script>
 

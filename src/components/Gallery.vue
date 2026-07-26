@@ -26,6 +26,7 @@ import DiffCard from './DiffCard.vue'
 import FilterBar from './FilterBar.vue'
 import SearchBar from './SearchBar.vue'
 import FilterChips from './FilterChips.vue'
+import ExportMenu from './ExportMenu.vue'
 
 const props = defineProps<{
   /** When true, render the compare-mode layout. */
@@ -157,6 +158,7 @@ onUnmounted(() => {
       <div class="dtv-gallery__compare-header">
         <h1 class="dtv-gallery__heading">{{ compareHeading }}</h1>
         <FilterBar />
+        <ExportMenu />
       </div>
 
       <p
