@@ -1,0 +1,9 @@
+{
+  "color": {
+    "background": { "$description": "Default page background.", "$type": "color", "$value": "{color.gray.50}" },
+    "text": { "$description": "Default body text.", "$type": "color", "$value": "{color.gray.900}" },
+    "text-muted": { "$description": "Secondary text and captions.", "$type": "color", "$value": "{color.gray.400}" },
+    "accent": { "$description": "Primary accent for links and actions.", "$type": "color", "$value": "{color.indigo.500}" },
+    "accent-strong": { "$description": "Hover/active state for the accent.", "$type": "color", "$value": "{color.indigo.700}" }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "color": {
+    "gray": {
+      "50": { "$description": "", "$type": "color", "$value": "#f9fafb" },
+      "100": { "$description": "", "$type": "color", "$value": "#f3f4f6" },
+      "400": { "$description": "", "$type": "color", "$value": "#9ca3af" },
+      "700": { "$description": "", "$type": "color", "$value": "#374151" },
+      "900": { "$description": "", "$type": "color", "$value": "#111827" }
+    },
+    "indigo": {
+      "500": { "$description": "", "$type": "color", "$value": "#6366f1" },
+      "700": { "$description": "", "$type": "color", "$value": "#4338ca" }
+    }
+  },
+  "spacing": {
+    "sm": { "$description": "", "$type": "dimension", "$value": "8px" },
+    "md": { "$description": "", "$type": "dimension", "$value": "16px" },
+    "lg": { "$description": "", "$type": "dimension", "$value": "24px" }
+  },
+  "radius": {
+    "sm": { "$description": "", "$type": "dimension", "$value": "4px" },
+    "md": { "$description": "", "$type": "dimension", "$value": "8px" }
+  }
+}
