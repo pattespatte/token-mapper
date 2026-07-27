@@ -174,7 +174,8 @@ function toggleFacet(value: string): void {
   cursor: pointer;
 }
 
-.dtv-filterchips__chip:hover {
+.dtv-filterchips__chip:hover:not(.dtv-filterchips__chip--active) {
+  color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
 
