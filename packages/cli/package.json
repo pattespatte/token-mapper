@@ -1,0 +1,24 @@
+{
+  "name": "@dtcg-mapper/cli",
+  "version": "0.0.0",
+  "description": "Command-line diff tool for W3C design tokens.",
+  "type": "module",
+  "bin": {
+    "dtcg-mapper": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dtcg-mapper/core": "*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "vitest": "^4.1.10",
+    "typescript": "~6.0.2"
+  }
+}

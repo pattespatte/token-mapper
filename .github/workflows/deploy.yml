@@ -33,10 +33,10 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npm test
+        run: npm test --workspace app
 
       - name: Build
-        run: npm run build
+        run: npm run build --workspace app
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
@@ -44,7 +44,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: dist
+          path: app/dist
 
   deploy:
     needs: build
