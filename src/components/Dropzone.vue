@@ -127,7 +127,7 @@ async function handleFiles(files: File[]): Promise<void> {
       </span>
 
       <span v-if="currentSet === null && !isLoading" class="dtv-dropzone__empty">
-        Drop JSON here or click to choose
+        Drop JSON or CSS here or click to choose
       </span>
 
       <span v-else-if="isLoading" class="dtv-dropzone__loading" aria-live="polite">
@@ -160,10 +160,10 @@ async function handleFiles(files: File[]): Promise<void> {
     <input
       ref="inputRef"
       type="file"
-      accept="application/json,.json"
+      accept=".json,.css,application/json,text/css"
       multiple
       class="dtv-dropzone__input"
-      :aria-label="`Choose JSON files for Set ${setId}`"
+      :aria-label="`Choose JSON or CSS files for Set ${setId}`"
       tabindex="-1"
       @change="onInputChange"
     />

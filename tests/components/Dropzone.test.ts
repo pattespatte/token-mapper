@@ -67,7 +67,7 @@ describe('Dropzone', () => {
     const wrapper = mount(Dropzone, {
       props: { setId: 'A', hint: 'your design system' },
     })
-    expect(wrapper.text()).toContain('Drop JSON here')
+    expect(wrapper.text()).toContain('Drop JSON or CSS here')
   })
 
   it('calls addFiles with the right setId and the chosen files', async () => {

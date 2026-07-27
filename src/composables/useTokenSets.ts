@@ -14,29 +14,35 @@
  */
 
 import { ref, computed, type ComputedRef, type Ref } from 'vue'
-import { parseFiles, type InputFile } from '@/pipeline/parse'
+import { parseFiles, type InputFile, type ParseResult } from '@/pipeline/parse'
+import { parseCss } from '@/ingest/cssCustomProperties'
 import { validate } from '@/pipeline/validate'
 import { resolve } from '@/pipeline/resolve'
-import type { TokenSet } from '@/types/token'
+import type { TokenMap, TokenSet } from '@/types/token'
+import type { ValidationIssue } from '@/types/validation'
 // Bundled demo dataset — small, generic, non-proprietary. Imported at build
 // time (Vite handles JSON via resolveJsonModule) so the "Load demo" button
 // works on the static GitHub Pages deployment with no network calls.
+// The CSS demo uses Vite's `?raw` suffix to import file contents as a string.
 import demoFoundation from '@/data/demo/foundation.json'
 import demoSemantic from '@/data/demo/semantic.json'
 import demoComposition from '@/data/demo/composition.json'
+import demoCompositionCss from '@/data/demo/composition.css?raw'
 
 /**
  * Demo files wrapped as InputFile[] for the pipeline. Re-serialised from the
  * imported JSON so the parser's filename-in-error-messages path still works.
- * Three files exercise: primitive colors/dimensions (foundation), semantic
- * aliases that cross-reference them (semantic), and the composite types
- * shadow/border/gradient (composition) — including aliases back into the
- * foundation palette.
+ * Four files exercise: primitive colors/dimensions (foundation.json),
+ * semantic aliases that cross-reference them (semantic.json), the composite
+ * types shadow/border/gradient (composition.json), and CSS custom-properties
+ * with var() references + type inference (composition.css) — the Tier 3
+ * importer's headline demo.
  */
 const DEMO_FILES: InputFile[] = [
   { name: 'foundation.json', content: JSON.stringify(demoFoundation) },
   { name: 'semantic.json', content: JSON.stringify(demoSemantic) },
   { name: 'composition.json', content: JSON.stringify(demoComposition) },
+  { name: 'composition.css', content: demoCompositionCss },
 ]
 
 /** Module-scoped singleton state. Shared across every call of useTokenSets. */
@@ -69,12 +75,58 @@ function refFor(setId: 'A' | 'B'): Ref<TokenSet | null> {
  * Pure-ish: no I/O. Callers convert browser File objects (or inline demo
  * content) to InputFile[] at the edges.
  */
+/**
+ * Route each input file to its parser based on extension, then merge into
+ * one `TokenMap`. `.css` → `parseCss`, `.json` → `parseFiles`, anything
+ * else → `UNSUPPORTED_FILE_TYPE` issue. First occurrence of a path wins
+ * across all files (mirrors parseFiles' multi-file merge behaviour).
+ */
+function parseInputs(inputs: readonly InputFile[]): ParseResult {
+  const tokens: TokenMap = new Map()
+  const issues: ValidationIssue[] = []
+
+  for (const input of inputs) {
+    const ext = input.name.toLowerCase().split('.').pop() ?? ''
+    let result: ParseResult
+    if (ext === 'css') {
+      result = parseCss(input.name, input.content)
+    } else if (ext === 'json') {
+      result = parseFiles([input])
+    } else {
+      issues.push({
+        path: input.name,
+        severity: 'error',
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message: `${input.name}: unsupported file type ".${ext}". Only .json and .css are accepted.`,
+      })
+      continue
+    }
+
+    // Merge — first occurrence wins, duplicates emit DUPLICATE_PATH.
+    for (const [path, token] of result.tokens) {
+      if (tokens.has(path)) {
+        issues.push({
+          path,
+          severity: 'warning',
+          code: 'DUPLICATE_PATH',
+          message: `Duplicate token path "${path}" — earlier definition kept.`,
+        })
+      } else {
+        tokens.set(path, token)
+      }
+    }
+    issues.push(...result.issues)
+  }
+
+  return { tokens, issues }
+}
+
 function buildSet(
   id: 'A' | 'B',
   inputs: readonly InputFile[],
   label: string
 ): TokenSet {
-  const { tokens, issues: parseIssues } = parseFiles(inputs)
+  const { tokens, issues: parseIssues } = parseInputs(inputs)
   const validationIssues = validate(tokens)
   const resolved = resolve(tokens)
 

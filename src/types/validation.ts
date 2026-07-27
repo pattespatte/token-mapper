@@ -33,6 +33,8 @@ export type ValidationCode =
   | 'DANGLING_REFERENCE'
   | 'CYCLIC_REFERENCE'
   | 'REFERENCE_TOO_DEEP'
+  // File-level (router-emitted)
+  | 'UNSUPPORTED_FILE_TYPE'
 
 /**
  * A single validation issue tied to a token path (or, for file-level issues
