@@ -13,6 +13,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Resolve the workspace package to its TypeScript source so Vite
+      // (dev server + production build) runs against source — not the
+      // built dist/, which is gitignored and absent on CI after `npm ci`.
+      '@dtcg-mapper/core': fileURLToPath(
+        new URL('../packages/core/src/index.ts', import.meta.url)
+      ),
     },
   },
 })
