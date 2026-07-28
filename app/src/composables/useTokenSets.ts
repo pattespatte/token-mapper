@@ -161,10 +161,33 @@ export function useTokenSets() {
         content: await file.text(),
       }))
     )
+    addInputs(setId, newInputs)
+  }
+
+  /**
+   * Add pre-parsed {@link InputFile}s to a slot. Used by the share-link and
+   * localStorage loaders, which already have file contents as strings (no
+   * `File` object to read). Same append-then-rebuild semantics as
+   * {@link addFiles} — uploads never replace.
+   *
+   * Synchronous (no `File.text()` await) so callers can load and observe the
+   * resulting `setA`/`setB` mutation in the same tick.
+   */
+  function addInputs(setId: 'A' | 'B', inputs: readonly InputFile[]): void {
+    if (inputs.length === 0) return
     const sources = sourcesFor(setId)
-    sources.push(...newInputs)
-    const built = buildSet(setId, sources, labelForSources(sources))
-    refFor(setId).value = built
+    sources.push(...inputs)
+    refFor(setId).value = buildSet(setId, sources, labelForSources(sources))
+  }
+
+  /**
+   * Read-only view of the accumulated source files for a slot. Used by the
+   * share and persistence layers to snapshot what's loaded without exposing
+   * the mutable backing array. Returns a defensive shallow copy so callers
+   * can't mutate internal state.
+   */
+  function getSources(setId: 'A' | 'B'): readonly InputFile[] {
+    return [...sourcesFor(setId)]
   }
 
   /** Empty a slot and discard its accumulated sources. No-op if already empty. */
@@ -194,6 +217,8 @@ export function useTokenSets() {
     setA,
     setB,
     addFiles,
+    addInputs,
+    getSources,
     loadDemo,
     clearSet,
     isComparing,

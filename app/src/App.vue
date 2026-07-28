@@ -17,7 +17,7 @@
  * through the Gallery component, which takes a `compare` prop.
  */
 
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Toolbar from '@/components/Toolbar.vue'
@@ -28,21 +28,95 @@ import DiffInspector from '@/components/DiffInspector.vue'
 import { useTokenSets } from '@/composables/useTokenSets'
 import { useGallery } from '@/composables/useGallery'
 import { useSidebar } from '@/composables/useSidebar'
+import { useShare } from '@/composables/useShare'
+import { usePersistence } from '@/composables/usePersistence'
 
 const { isComparing, setA, setB } = useTokenSets()
 const { resetCategory } = useGallery()
 const { sidebarWidth } = useSidebar()
+const { readFromUrl, loadFromHash } = useShare()
+const { restoreFromStorage, saveState } = usePersistence()
 
 const validationOpen = ref(false)
 
+/**
+ * Signal that changes whenever the loaded source list changes. The label is
+ * a stable string derived from the accumulated filenames, so it shifts on
+ * every upload, append, or clear — exactly the events that should trigger a
+ * category reset (below) and a debounced persistence save (further below).
+ */
+const setSignal = () => [setA.value?.label, setB.value?.label]
+
 // When the browse set changes (new upload or clear), reset the category
 // filter so we don't end up showing an empty category the user didn't pick.
-watch(
-  () => [setA.value?.label, setB.value?.label],
-  () => {
-    resetCategory()
+watch(setSignal, () => {
+  resetCategory()
+})
+
+/**
+ * Debounced auto-save of the loaded sets to localStorage. The 300ms delay
+ * coalesces rapid uploads (e.g. dropping foundation.json then semantic.json
+ * in quick succession) into a single write. Manual debounce via `setTimeout`
+ * — no new dependency. The timer is cleared on unmount to avoid a write
+ * after the component is gone.
+ */
+const SAVE_DEBOUNCE_MS = 300
+let saveTimer: ReturnType<typeof setTimeout> | null = null
+watch(setSignal, () => {
+  if (saveTimer !== null) clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    saveState()
+    saveTimer = null
+  }, SAVE_DEBOUNCE_MS)
+})
+
+/**
+ * First-mount restore, with the documented precedence:
+ *
+ *   1. **URL hash wins.** If the page was opened with a `#…` share hash,
+ *      decode it and populate the slots from the hash. Skip localStorage.
+ *      A teammate's shared link should override your last session.
+ *   2. **localStorage fallback.** No hash → try restoring the last-saved
+ *      session so a page reload picks up where you left off.
+ *   3. **Empty.** Neither present → dropzones stay blank.
+ *
+ * The guard `setA.value !== null` defends against double-loading if some
+ * future code path populates a slot before this effect runs.
+ *
+ * After a successful hash load, the hash is stripped via
+ * `history.replaceState` so a refresh gives a clean URL — the loaded sets
+ * now live in the session and will be persisted to localStorage by the
+ * auto-save watch above.
+ */
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  if (setA.value !== null) return
+
+  // 1. Share-link hash.
+  const hash = readFromUrl()
+  if (hash !== null) {
+    const result = loadFromHash(hash)
+    if (result.loaded !== 'none') {
+      history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search
+      )
+      return
+    }
+    // Hash was present but didn't decode — fall through to localStorage.
   }
-)
+
+  // 2. localStorage.
+  restoreFromStorage()
+})
+
+onUnmounted(() => {
+  if (saveTimer !== null) {
+    clearTimeout(saveTimer)
+    saveTimer = null
+  }
+})
 </script>
 
 <template>

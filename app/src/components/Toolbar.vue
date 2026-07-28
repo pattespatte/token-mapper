@@ -13,9 +13,26 @@
  */
 
 import { useTokenSets } from '@/composables/useTokenSets'
+import { usePersistence } from '@/composables/usePersistence'
 import Dropzone from './Dropzone.vue'
 
 const { loadDemo, clearSet, setA, setB } = useTokenSets()
+const { clearState } = usePersistence()
+
+/**
+ * Clear both runtime slots and the persisted localStorage snapshot, so the
+ * next session starts completely fresh — otherwise a reload would restore
+ * the just-cleared data.
+ *
+ * Runtime state is cleared first; then storage. If the storage clear fails
+ * (it won't — it's try/caught internally) the runtime is already clean, so
+ * the user-visible outcome is still "everything is gone".
+ */
+function clearAll(): void {
+  clearSet('A')
+  clearSet('B')
+  clearState()
+}
 
 /** Status message shown above the dropzones. */
 function modeStatus(): string {
@@ -46,7 +63,7 @@ function modeStatus(): string {
         type="button"
         class="dtv-toolbar__button"
         :disabled="setA === null && setB === null"
-        @click="() => { clearSet('A'); clearSet('B') }"
+        @click="clearAll"
       >
         Clear all
       </button>
