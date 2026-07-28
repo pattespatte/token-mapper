@@ -64,6 +64,48 @@ The slot shows the accumulated filename list (with a tooltip of the full list wh
 
 ---
 
+## Sharing and persisting token sets
+
+Loaded token sets carry across sessions and teammates without a backend. Two complementary mechanisms, both client-side only — files never leave the browser.
+
+### Share links (URL hash)
+
+The loaded sets can be encoded into the page's URL fragment. Opening such a URL auto-loads the encoded sets into the right slots and then strips the hash, leaving a clean address bar.
+
+A share link looks like:
+
+```
+https://pattespatte.github.io/token-mapper/#H4sIAAAAAAAAA6WSz2rEIBDGX0WmPY…QCAAA
+```
+
+The hash is a gzip-compressed, base64url-encoded JSON snapshot of the form:
+
+```json
+{
+  "version": 1,
+  "sets": {
+    "A": [{ "name": "foundation.json", "content": "…" }, { "name": "semantic.json", "content": "…" }],
+    "B": [{ "name": "base.json", "content": "…" }]
+  }
+}
+```
+
+**Size limit.** URLs longer than ~32 000 characters get truncated by some chat clients, email previewers, and proxies. The encoder refuses to produce a share link above that ceiling — for larger sets, use the Markdown or JSON export from the export menu instead. In practice, a typical multi-file design system (foundation + semantic, a few hundred tokens) encodes to well under 1 000 characters.
+
+**Precedence on load.** When the page opens, the loader checks in this order: (1) a share hash in the URL wins; (2) otherwise the last-saved session is restored from localStorage; (3) otherwise the dropzones start empty. So a teammate's share link overrides your previous session — that's deliberate.
+
+> **Status.** Opening a share link works today — drop a `#…` hash onto the URL and the sets auto-load on page open. A **"Copy share link" button** in the toolbar is landing in an upcoming release; until then, share links are produced programmatically (e.g. via the `useShare()` composable from devtools or a downstream integration) rather than through the UI.
+
+### Session persistence (localStorage)
+
+Every change to the loaded sets is auto-saved to `localStorage` under the key `token-mapper:v1` (debounced 300 ms after the last upload). Reloading the page restores both slots exactly as you left them — including multi-file merges, aliases, and validation state.
+
+Clicking **Clear all** wipes both the runtime slots *and* the stored snapshot, so the next session starts completely empty. (Closing a tab without loading anything does **not** overwrite a previously-saved session — saving an empty state is skipped on purpose.)
+
+Persistence degrades silently in environments where `localStorage` is unavailable or blocked (Safari private mode, sandboxed iframes, disabled-storage configurations). The app keeps working; it just won't restore on the next visit.
+
+---
+
 ## Exporting tokens from Figma
 
 The app does not call the Figma API. Use a Figma plugin to export your design tokens as W3C DTCG JSON:
