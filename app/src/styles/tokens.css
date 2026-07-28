@@ -65,8 +65,41 @@
     0 1px 3px rgba(10, 13, 18, 0.1);
 }
 
+/*
+ * Dark palette — applied in two cases:
+ *
+ *   1. The user has explicitly chosen dark via the header toggle
+ *      (`<html data-theme="dark">`, written by App.vue from useTheme).
+ *      This wins over the OS preference.
+ *
+ *   2. The OS prefers dark AND the user hasn't explicitly chosen
+ *      (no `data-theme` attribute — e.g. on the very first paint before
+ *      JS runs, or in a future 'auto' mode).
+ *
+ * The selector cascade:
+ *   - `:root[data-theme='dark']`               → user chose dark (any OS)
+ *   - `@media (prefers-color-scheme: dark)
+ *      :root:not([data-theme='light'])`        → OS dark, user hasn't forced light
+ *
+ * Explicit light (`[data-theme='light']`) re-pins the light palette declared
+ * above, overriding an OS-dark preference. The `:not([data-theme='light'])`
+ * guard is what makes "user chose light on a dark-OS device" actually stick.
+ */
+:root[data-theme='dark'] {
+  --dtv-color-bg: #0a0d12;
+  --dtv-color-surface: #181d27;
+  --dtv-color-surface-muted: #252b37;
+  --dtv-color-border: #414651;
+  --dtv-color-border-strong: #535862;
+  --dtv-color-text: #f5f5f5;
+  --dtv-color-text-muted: #d5d7da;
+  --dtv-color-text-subtle: #a4a7ae;
+  --dtv-color-accent: #f5d0d8;
+  --dtv-color-accent-muted: #2a1a1e;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --dtv-color-bg: #0a0d12;
     --dtv-color-surface: #181d27;
     --dtv-color-surface-muted: #252b37;

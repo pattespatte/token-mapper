@@ -30,12 +30,14 @@ import { useGallery } from '@/composables/useGallery'
 import { useSidebar } from '@/composables/useSidebar'
 import { useShare } from '@/composables/useShare'
 import { usePersistence } from '@/composables/usePersistence'
+import { useTheme } from '@/composables/useTheme'
 
 const { isComparing, setA, setB } = useTokenSets()
 const { resetCategory } = useGallery()
 const { sidebarWidth } = useSidebar()
 const { readFromUrl, loadFromHash } = useShare()
 const { restoreFromStorage, saveState } = usePersistence()
+const { theme, initThemeFromStorage } = useTheme()
 
 const validationOpen = ref(false)
 
@@ -71,6 +73,22 @@ watch(setSignal, () => {
 })
 
 /**
+ * Reflect the theme choice onto `<html data-theme="…">`. `immediate: true`
+ * applies the stored choice on first render so there's no flash of the wrong
+ * palette when the user had previously chosen dark. The CSS that consumes
+ * this attribute lives in `tokens.css` (along with the OS-preference fallback
+ * for the case where the user hasn't picked yet).
+ */
+watch(
+  theme,
+  (t) => {
+    if (typeof document === 'undefined') return
+    document.documentElement.dataset['theme'] = t
+  },
+  { immediate: true }
+)
+
+/**
  * First-mount restore, with the documented precedence:
  *
  *   1. **URL hash wins.** If the page was opened with a `#…` share hash,
@@ -90,6 +108,12 @@ watch(setSignal, () => {
  */
 onMounted(() => {
   if (typeof window === 'undefined') return
+
+  // Apply persisted theme choice before any rendering work — the
+  // watcher above already ran once with the default 'light', this corrects
+  // it from storage if the user had chosen dark.
+  initThemeFromStorage()
+
   if (setA.value !== null) return
 
   // 1. Share-link hash.
