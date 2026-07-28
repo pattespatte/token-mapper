@@ -73,17 +73,29 @@ watch(setSignal, () => {
 })
 
 /**
- * Reflect the theme choice onto `<html data-theme="…">`. `immediate: true`
- * applies the stored choice on first render so there's no flash of the wrong
- * palette when the user had previously chosen dark. The CSS that consumes
- * this attribute lives in `tokens.css` (along with the OS-preference fallback
- * for the case where the user hasn't picked yet).
+ * Reflect the theme mode onto the `<html>` element.
+ *
+ *   - `'light'` / `'dark'` → set `data-theme`, forcing that palette over the
+ *     OS preference. `immediate: true` applies the stored choice on first
+ *     render so there's no flash of the wrong palette.
+ *   - `'system'` → *delete* the `data-theme` attribute, handing control to
+ *     the `@media (prefers-color-scheme: dark)` branch in `tokens.css`. The
+ *     media query re-evaluates automatically when the OS theme changes, so
+ *     system mode follows the OS live with no JS listener required.
+ *
+ * The default mode is `'system'`, meaning a first-time visitor (no stored
+ * choice) renders with no attribute — the CSS media query applies on the very
+ * first paint, before this watcher even runs, so there's no flash for them.
  */
 watch(
   theme,
   (t) => {
     if (typeof document === 'undefined') return
-    document.documentElement.dataset['theme'] = t
+    if (t === 'system') {
+      delete document.documentElement.dataset['theme']
+    } else {
+      document.documentElement.dataset['theme'] = t
+    }
   },
   { immediate: true }
 )
@@ -109,9 +121,9 @@ watch(
 onMounted(() => {
   if (typeof window === 'undefined') return
 
-  // Apply persisted theme choice before any rendering work — the
-  // watcher above already ran once with the default 'light', this corrects
-  // it from storage if the user had chosen dark.
+  // Apply persisted theme choice before any rendering work — the watcher
+  // above already ran once with the default 'system', this corrects it from
+  // storage if the user had chosen light or dark.
   initThemeFromStorage()
 
   if (setA.value !== null) return

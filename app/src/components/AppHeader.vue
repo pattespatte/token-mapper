@@ -3,17 +3,43 @@
  * AppHeader — top bar with the project name, tagline, repo link, and the
  * theme toggle.
  *
- * The theme toggle flips the whole app between light and dark via `useTheme`.
- * It overrides the OS `prefers-color-scheme` setting: once the user picks,
- * that choice wins on every visit (persisted to localStorage). The icon
- * shows the state you'll switch *to* — moon when light (click for dark),
- * sun when dark (click for light) — matching the dynamic aria-label.
+ * The toggle cycles three modes via `useTheme`:
+ *   `light → dark → system → light` (wraps).
+ *
+ * - `light` / `dark` override the OS `prefers-color-scheme` (and persist).
+ * - `system` hands control back to the browser — the app follows the OS
+ *   setting live.
+ *
+ * The icon shows the mode you'll switch *to* on the next click (the target),
+ * matching the dynamic `aria-label`:
+ *   - currently light   → moon      (click for dark)
+ *   - currently dark    → contrast  (click for system)
+ *   - currently system  → sun       (click for light)
+ *
+ * There's no `aria-pressed` — it's binary and can't represent three states.
+ * The descriptive `aria-label` conveys both the current mode and the next
+ * action to assistive tech.
  */
 
-import { useTheme } from '@/composables/useTheme'
+import { computed } from 'vue'
+import { useTheme, type Theme } from '@/composables/useTheme'
 
 const REPO_URL = 'https://github.com/pattespatte/token-mapper'
 const { theme, toggleTheme } = useTheme()
+
+/** The cycle order — kept in sync with `useTheme.CYCLE`. */
+const CYCLE: readonly Theme[] = ['light', 'dark', 'system']
+
+/** The mode the next click will activate (drives the icon + aria-label). */
+const nextTheme = computed<Theme>(
+  () => CYCLE[(CYCLE.indexOf(theme.value) + 1) % CYCLE.length]!
+)
+
+/** Human label for the current mode, shown in the tooltip. */
+const currentLabel = computed(() => {
+  if (theme.value === 'system') return 'system (follows OS)'
+  return theme.value
+})
 </script>
 
 <template>
@@ -28,23 +54,22 @@ const { theme, toggleTheme } = useTheme()
         aria-label="View source on GitHub"
       >GitHub</a>
       <!--
-        Icon = target state (what you'll switch to). Moon in light mode means
-        "click for dark"; sun in dark mode means "click for light". The
+        Icon = target state (the mode the next click switches to). The
         aria-label spells out the action so it's unambiguous for SR users.
+        There's no aria-pressed: it's binary and can't represent three modes.
       -->
       <button
         type="button"
         class="dtv-header__theme-toggle"
-        :aria-pressed="theme === 'dark'"
-        :aria-label="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
-        :title="`Theme: ${theme}. Click to switch.`"
+        :aria-label="`Switch to ${nextTheme} theme`"
+        :title="`Theme: ${currentLabel}. Click to switch.`"
         @click="toggleTheme"
       >
         <!-- Inline SVG keeps the icon crisp at small sizes and inherits
              currentColor. Emoji (☀️/🌙) render inconsistently across
              platforms; a vector glyph is more reliable. -->
         <svg
-          v-if="theme === 'light'"
+          v-if="nextTheme === 'dark'"
           aria-hidden="true"
           width="16"
           height="16"
@@ -57,6 +82,22 @@ const { theme, toggleTheme } = useTheme()
         >
           <!-- Moon: click to enter dark -->
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg
+          v-else-if="nextTheme === 'system'"
+          aria-hidden="true"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <!-- Contrast circle (half-filled): click to follow the OS -->
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+          <path d="M12 2v20a10 10 0 0 0 0-20z" fill="currentColor" stroke="none" />
         </svg>
         <svg
           v-else
@@ -142,11 +183,6 @@ const { theme, toggleTheme } = useTheme()
 .dtv-header__theme-toggle:focus-visible {
   outline: 2px solid var(--dtv-color-accent);
   outline-offset: 2px;
-}
-
-.dtv-header__theme-toggle[aria-pressed='true'] {
-  color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
 }
 
 .dtv-header__tagline {

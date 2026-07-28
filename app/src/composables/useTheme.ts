@@ -1,40 +1,51 @@
 /**
- * useTheme — whole-app light/dark theme toggle.
+ * useTheme — whole-app theme mode toggle (light / dark / system).
  *
- * A user-controlled choice between light and dark UI, overriding the OS
- * `prefers-color-scheme` setting. The choice drives the `data-theme`
- * attribute on `<html>`, which `tokens.css` consumes to swap the full
- * `--dtv-color-*` palette (backgrounds, surfaces, text, borders, accents).
+ * A user-controlled choice between three modes:
  *
- * Override semantics:
- *   - `theme === 'light'`  → `<html data-theme="light">`  → light palette forced
- *   - `theme === 'dark'`   → `<html data-theme="dark">`   → dark palette forced
+ *   - `'light'`   → `<html data-theme="light">`  → light palette forced
+ *   - `'dark'`    → `<html data-theme="dark">`   → dark palette forced
+ *   - `'system'`  → no `data-theme` attribute    → follows the OS
+ *                   `prefers-color-scheme` setting, live
  *
- * The OS preference is honoured only when the user hasn't picked (i.e. on
- * the very first visit, before the toggle has been clicked). See
- * `tokens.css` for the cascade that implements this.
+ * The two explicit choices override the OS preference. The `'system'` mode
+ * hands control back to the browser: `App.vue` *deletes* the `data-theme`
+ * attribute, so the `@media (prefers-color-scheme: dark)` branch in
+ * `tokens.css` governs — and re-evaluates automatically when the OS theme
+ * changes, with no JS listener required.
+ *
+ * The toggle cycles `light → dark → system → light` (wraps). New visitors
+ * default to `'system'`, so a fresh install matches the OS from the first
+ * paint (before JS runs, the attribute is absent and the CSS media query
+ * already applies — no flash of the wrong palette).
  *
  * Persistence: the choice is stored under `localStorage['token-mapper:theme']`
- * so it survives reloads. Like `usePersistence`, all storage access is
- * feature-detected and try/caught — the composable never throws and works
+ * as the raw mode string (no JSON). Like `usePersistence`, all storage access
+ * is feature-detected and try/caught — the composable never throws and works
  * in environments without `localStorage`.
  *
  * Side-effect policy: the composable does **not** write to
  * `document.documentElement` itself. `App.vue` calls `initThemeFromStorage()`
- * once on mount and owns the `data-theme` attribute write, so the DOM
+ * once on mount and owns the `data-theme` attribute write/delete, so the DOM
  * touch-point lives in one auditable place.
  */
 
 import { ref, type Ref } from 'vue'
 
-/** The two whole-app themes. Defaults to `'light'` on first load. */
-export type Theme = 'light' | 'dark'
+/** Order the toggle cycles through. Index wraps with modulo. */
+const CYCLE: readonly Theme[] = ['light', 'dark', 'system']
 
-/** localStorage key. Namespaced; not versioned (an 'auto' option would be additive). */
+/** The three whole-app theme modes. Defaults to `'system'` on first load. */
+export type Theme = 'light' | 'dark' | 'system'
+
+/** localStorage key. Namespaced; not versioned. */
 const STORAGE_KEY = 'token-mapper:theme'
 
 /** Module-scoped singleton state — every caller sees the same theme. */
-const theme: Ref<Theme> = ref('light')
+const theme: Ref<Theme> = ref('system')
+
+/** Modes considered valid when read back from storage. */
+const VALID_THEMES: readonly Theme[] = ['light', 'dark', 'system']
 
 export function useTheme() {
   /**
@@ -46,15 +57,19 @@ export function useTheme() {
     writeStorage(next)
   }
 
-  /** Flip between light and dark. */
+  /**
+   * Advance one step through `light → dark → system → light`. Wraps with
+   * modulo on the {@link CYCLE} so it stays correct if the order ever changes.
+   */
   function toggleTheme(): void {
-    setTheme(theme.value === 'light' ? 'dark' : 'light')
+    const next = CYCLE[(CYCLE.indexOf(theme.value) + 1) % CYCLE.length]!
+    setTheme(next)
   }
 
   /**
    * Read the persisted theme from storage into the runtime ref. Called once
    * on app mount by `App.vue`. Falls back to the current ref value (default
-   * `'light'`) when storage is empty, corrupt, or holds an unknown value —
+   * `'system'`) when storage is empty, corrupt, or holds an unknown value —
    * never throws, never sets an invalid theme.
    */
   function initThemeFromStorage(): void {
@@ -77,8 +92,8 @@ export function useTheme() {
 
   /**
    * Read and validate the stored theme. Returns `null` when storage is
-   * unavailable, the key is absent, or the stored value isn't `'light'` or
-   * `'dark'`. Never throws.
+   * unavailable, the key is absent, or the stored value isn't one of the
+   * known modes (`'light'`, `'dark'`, `'system'`). Never throws.
    */
   function readStorage(): Theme | null {
     if (!isStorageAvailable()) return null
@@ -88,7 +103,7 @@ export function useTheme() {
     } catch {
       return null
     }
-    if (raw === 'light' || raw === 'dark') return raw
+    if (VALID_THEMES.includes(raw as Theme)) return raw as Theme
     return null
   }
 

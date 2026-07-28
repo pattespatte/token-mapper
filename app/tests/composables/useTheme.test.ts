@@ -11,7 +11,7 @@ import { useTheme } from '@/composables/useTheme'
  *      the default without throwing; unavailable storage degrades silently.
  *
  * Singleton caveat: `theme` is module-scoped, so test order leaks across
- * cases unless we explicitly reset. Each test resets to 'light' and clears
+ * cases unless we explicitly reset. Each test resets to 'system' and clears
  * localStorage in `beforeEach`.
  */
 
@@ -23,10 +23,10 @@ describe('useTheme', () => {
   beforeEach(() => {
     // Reset singleton state to the documented default, then wipe storage so
     // each test starts from a clean persistence state. Order matters:
-    // setTheme('light') writes 'light' to localStorage as a side-effect, so
+    // setTheme('system') writes 'system' to localStorage as a side-effect, so
     // the clear() must come AFTER to leave storage empty for tests that
     // need to assert on absence.
-    setTheme('light')
+    setTheme('system')
     localStorage.clear()
   })
 
@@ -39,11 +39,11 @@ describe('useTheme', () => {
   /* -------------------------------------------------------------------- */
 
   describe('default state', () => {
-    it('defaults to "light" on first import', () => {
-      // The module-scoped ref initialises to 'light' regardless of any
+    it('defaults to "system" on first import', () => {
+      // The module-scoped ref initialises to 'system' regardless of any
       // prior localStorage state — initThemeFromStorage is what applies
       // stored state, and it must be called explicitly.
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
     })
   })
 
@@ -59,11 +59,15 @@ describe('useTheme', () => {
       expect(theme.value).toBe('light')
     })
 
-    it('toggleTheme flips light → dark → light', () => {
+    it('toggleTheme cycles light → dark → system → light', () => {
+      setTheme('light')
       expect(theme.value).toBe('light')
       toggleTheme()
       expect(theme.value).toBe('dark')
       toggleTheme()
+      expect(theme.value).toBe('system')
+      toggleTheme()
+      // Wraps back to the start of the cycle.
       expect(theme.value).toBe('light')
     })
   })
@@ -76,8 +80,8 @@ describe('useTheme', () => {
     it('setTheme writes the choice to localStorage', () => {
       setTheme('dark')
       expect(localStorage.getItem(STORAGE_KEY)).toBe('dark')
-      setTheme('light')
-      expect(localStorage.getItem(STORAGE_KEY)).toBe('light')
+      setTheme('system')
+      expect(localStorage.getItem(STORAGE_KEY)).toBe('system')
     })
 
     it('writes under the namespaced key only', () => {
@@ -89,18 +93,29 @@ describe('useTheme', () => {
     it('initThemeFromStorage restores the persisted theme into the ref', () => {
       // Simulate a fresh page load: storage has 'dark', ref starts at default.
       localStorage.setItem(STORAGE_KEY, 'dark')
-      // setTheme('light') ran in beforeEach, so the ref currently disagrees
+      // setTheme('system') ran in beforeEach, so the ref currently disagrees
       // with storage — exactly the state initThemeFromStorage resolves.
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
       initThemeFromStorage()
       expect(theme.value).toBe('dark')
     })
 
+    it('initThemeFromStorage restores "system" too', () => {
+      // Put the ref in a known non-system state. setTheme persists as a side
+      // effect, so the storage write must come AFTER it (otherwise 'dark'
+      // would overwrite 'system').
+      setTheme('dark')
+      expect(theme.value).toBe('dark')
+      localStorage.setItem(STORAGE_KEY, 'system')
+      initThemeFromStorage()
+      expect(theme.value).toBe('system')
+    })
+
     it('initThemeFromStorage leaves the ref unchanged when storage is empty', () => {
       expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
       initThemeFromStorage()
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
     })
   })
 
@@ -113,15 +128,15 @@ describe('useTheme', () => {
       localStorage.setItem(STORAGE_KEY, 'green')
       initThemeFromStorage()
       // Unknown values must not corrupt the ref — silently keep the default.
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
     })
 
     it('initThemeFromStorage ignores corrupt (non-string) stored JSON', () => {
-      // The validator only accepts the literal strings 'light' | 'dark'.
+      // The validator only accepts the literal strings 'light' | 'dark' | 'system'.
       // A JSON-encoded object must be rejected, not parsed.
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: 'dark' }))
       initThemeFromStorage()
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
     })
 
     it('setTheme does not throw when localStorage.setItem raises', () => {
@@ -139,7 +154,7 @@ describe('useTheme', () => {
         throw new DOMException('SecurityError')
       })
       expect(() => initThemeFromStorage()).not.toThrow()
-      expect(theme.value).toBe('light')
+      expect(theme.value).toBe('system')
       spy.mockRestore()
     })
 

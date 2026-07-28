@@ -12,11 +12,15 @@ import { useTheme } from '@/composables/useTheme'
  * reset in `beforeEach` to prevent test-order coupling (the same caveat
  * documented in useTheme.test.ts).
  *
- * Covers the whole-app theme toggle:
- *   - Renders the button with the correct initial aria-pressed.
- *   - Clicking the button flips aria-pressed (light ↔ dark).
- *   - The toggle label updates to name the action you'll switch *to*.
- *   - The sun/moon SVG swaps with the theme (moon in light, sun in dark).
+ * The toggle cycles light → dark → system → light. The icon + aria-label
+ * always describe the *target* (the mode the next click switches to), not
+ * the current mode:
+ *   - currently light   → moon icon,   "switch to dark"
+ *   - currently dark    → contrast,    "switch to system"
+ *   - currently system  → sun icon,    "switch to light"
+ *
+ * There's no `aria-pressed` (binary, can't represent three states) — the
+ * descriptive aria-label is the accessible name instead.
  */
 
 describe('AppHeader', () => {
@@ -26,11 +30,13 @@ describe('AppHeader', () => {
     setTheme('light')
   })
 
-  it('renders the theme toggle button with aria-pressed=false when light', () => {
+  it('renders the theme toggle button', () => {
     const wrapper = mount(AppHeader)
     const toggle = wrapper.find('.dtv-header__theme-toggle')
     expect(toggle.exists()).toBe(true)
-    expect(toggle.attributes('aria-pressed')).toBe('false')
+    // No aria-pressed: it's binary and can't represent three modes. The
+    // descriptive aria-label conveys state to assistive tech instead.
+    expect(toggle.attributes('aria-pressed')).toBeUndefined()
   })
 
   it('renders the moon SVG in light mode (target = dark)', () => {
@@ -43,46 +49,53 @@ describe('AppHeader', () => {
     expect(svg.html()).toMatch(/A\d/) // arc command present → moon
   })
 
-  it('clicking the toggle flips theme to dark and aria-pressed to true', async () => {
+  it('clicking cycles light → dark → system → light', async () => {
     const wrapper = mount(AppHeader)
     const toggle = wrapper.find('.dtv-header__theme-toggle')
     expect(theme.value).toBe('light')
 
     await toggle.trigger('click')
-
     expect(theme.value).toBe('dark')
-    expect(toggle.attributes('aria-pressed')).toBe('true')
-  })
-
-  it('second click flips back to light and restores the moon icon', async () => {
-    const wrapper = mount(AppHeader)
-    const toggle = wrapper.find('.dtv-header__theme-toggle')
 
     await toggle.trigger('click')
-    expect(theme.value).toBe('dark')
-    // In dark mode → sun (circle element present).
+    expect(theme.value).toBe('system')
+
+    await toggle.trigger('click')
+    // Wraps back to the start.
+    expect(theme.value).toBe('light')
+  })
+
+  it('the icon reflects the target mode at each step of the cycle', async () => {
+    const wrapper = mount(AppHeader)
+    setTheme('light')
+    // light → target dark → moon (arc command, no <circle>).
+    expect(wrapper.find('svg').html()).toMatch(/A\d/)
+
+    await wrapper.find('.dtv-header__theme-toggle').trigger('click')
+    // dark → target system → contrast glyph (a <path> with a fill, no arc 'A…').
+    const systemIcon = wrapper.find('svg').html()
+    expect(systemIcon).toMatch(/fill="currentColor"/)
+    expect(systemIcon).not.toMatch(/A\d/)
+
+    await wrapper.find('.dtv-header__theme-toggle').trigger('click')
+    // system → target light → sun (<circle> present).
     expect(wrapper.find('svg').html()).toMatch(/<circle/)
-
-    await toggle.trigger('click')
-    expect(theme.value).toBe('light')
-    expect(toggle.attributes('aria-pressed')).toBe('false')
-    // Back to moon (arc command present, no <circle>).
-    expect(wrapper.find('svg').html()).not.toMatch(/<circle/)
   })
 
-  it('the aria-label names the action you will switch to', async () => {
+  it('the aria-label names the mode you will switch to', async () => {
     const wrapper = mount(AppHeader)
     const toggle = wrapper.find('.dtv-header__theme-toggle')
 
-    // In light mode → label offers "switch to dark".
-    expect(toggle.attributes('aria-label')).toContain('dark')
-    expect(toggle.attributes('aria-label')).not.toContain('light')
+    // light → offers "switch to dark".
+    expect(toggle.attributes('aria-label')).toBe('Switch to dark theme')
 
     await toggle.trigger('click')
+    // dark → offers "switch to system".
+    expect(toggle.attributes('aria-label')).toBe('Switch to system theme')
 
-    // In dark mode → label offers "switch to light".
-    expect(toggle.attributes('aria-label')).toContain('light')
-    expect(toggle.attributes('aria-label')).not.toContain('dark')
+    await toggle.trigger('click')
+    // system → offers "switch to light".
+    expect(toggle.attributes('aria-label')).toBe('Switch to light theme')
   })
 
   it('renders the project name and tagline', () => {
