@@ -125,7 +125,10 @@ function modeStatus(): string {
   border-radius: var(--dtv-radius-md);
 }
 
-.dtv-toolbar__button:hover:not(:disabled) {
+.dtv-toolbar__button:hover:not(:disabled):not(.dtv-toolbar__button--primary) {
+  /* Explicit color on hover for unambiguous contrast (mirrors 47026f1).
+     Excludes --primary, which keeps its accent background on hover. */
+  color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
 

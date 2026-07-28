@@ -134,6 +134,8 @@ onUnmounted(() => {
 }
 
 .dtv-diffcard:hover {
+  /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
+  color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
 

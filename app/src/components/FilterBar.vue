@@ -80,7 +80,10 @@ function setFilter(value: 'all' | DiffBucket): void {
   cursor: pointer;
 }
 
-.dtv-filterbar__button:hover {
+.dtv-filterbar__button:hover:not(.dtv-filterbar__button--active) {
+  /* Explicit color on hover for unambiguous contrast (mirrors 47026f1).
+     Excludes --active, whose white-on-color treatment shouldn't be overridden. */
+  color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
 

@@ -225,7 +225,10 @@ const toggleLabel = computed(() =>
   cursor: pointer;
 }
 
-.dtv-sidebar__item:hover {
+.dtv-sidebar__item:hover:not(.dtv-sidebar__item--active) {
+  /* Explicit color on hover for unambiguous contrast (mirrors 47026f1).
+     Excludes --active, whose accent-on-muted treatment shouldn't be overridden. */
+  color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
 

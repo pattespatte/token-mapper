@@ -150,7 +150,12 @@ async function copyJson(): Promise<void> {
   cursor: pointer;
 }
 
-.dtv-export-menu__button:hover:not(:disabled) {
+.dtv-export-menu__button:hover:not(:disabled):not(.dtv-export-menu__button--primary) {
+  /* Explicit color mirrors the 47026f1 fix on FilterChips: a hover state that
+     changes background must also redeclare color so the text treatment is
+     unambiguous rather than left to the cascade. Excludes --primary because
+     the primary button keeps its accent background on hover (see below). */
+  color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
 
