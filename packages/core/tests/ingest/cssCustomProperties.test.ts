@@ -209,14 +209,42 @@ describe('parseCss — type inference', () => {
     expect(tokens.get('s')?.type).toBe('dimension')
   })
 
-  it('leaves $type undefined for bare numbers (no unit)', () => {
-    const { tokens } = parseCss('t.css', ':root { --n: 42; }')
-    expect(tokens.get('n')?.type).toBeUndefined()
+  it('infers $type=dimension for modern units (lh, dvh, cqi)', () => {
+    const { tokens } = parseCss('t.css', ':root { --s: 4lh; }')
+    expect(tokens.get('s')?.type).toBe('dimension')
   })
 
-  it('leaves $type undefined for unrecognised strings', () => {
-    const { tokens } = parseCss('t.css', ':root { --f: Inter, sans-serif; }')
-    expect(tokens.get('f')?.type).toBeUndefined()
+  it('infers $type=fontFamily for a font stack with a generic terminator', () => {
+    const { tokens } = parseCss('t.css', ':root { --f: "Inter", sans-serif; }')
+    expect(tokens.get('f')?.type).toBe('fontFamily')
+  })
+
+  it('infers $type=fontWeight for a bare weight integer', () => {
+    const { tokens } = parseCss('t.css', ':root { --w: 400; }')
+    expect(tokens.get('w')?.type).toBe('fontWeight')
+  })
+
+  it('infers $type=number for a bare decimal (never a weight)', () => {
+    const { tokens } = parseCss('t.css', ':root { --n: 1.5; }')
+    expect(tokens.get('n')?.type).toBe('number')
+  })
+
+  it('infers $type=shadow for a box-shadow value', () => {
+    const { tokens } = parseCss('t.css', ':root { --sh: 0 0 20px rgba(0,0,0,0.3); }')
+    expect(tokens.get('sh')?.type).toBe('shadow')
+  })
+
+  it('infers $type=duration for a time value', () => {
+    const { tokens } = parseCss('t.css', ':root { --d: 200ms; }')
+    expect(tokens.get('d')?.type).toBe('duration')
+  })
+
+  it('leaves $type undefined for genuinely unrecognised values', () => {
+    // Composite transition (multi-token), shorthand, and CSS globals remain
+    // untyped — these are the documented out-of-scope categories.
+    const { tokens } = parseCss('t.css', ':root { --x: all 400ms ease; --y: Arial; }')
+    expect(tokens.get('x')?.type).toBeUndefined()
+    expect(tokens.get('y')?.type).toBeUndefined() // bare unquoted name — ambiguous
   })
 })
 
