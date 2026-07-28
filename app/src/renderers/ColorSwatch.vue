@@ -10,12 +10,18 @@
  *   - the W3C draft structured color object — rendered via the swatch using
  *     a best-effort conversion when colorSpace is srgb
  *
- * Translucent colors render over a checkerboard background so alpha is
- * visible. Non-string values (malformed) fall back to a placeholder swatch
- * with a question mark and don't crash the gallery.
+ * Swatch layout:
+ *   - Opaque colors fill the whole square solid (no chess) — maximum color
+ *     impact, the way you'd see the color in a picker.
+ *   - Translucent colors (alpha < 1) render as a 50/50 split: the left half
+ *     is the solid opaque hue, the right half is the translucent color over a
+ *     checkerboard so the alpha is visible. Conventional design-tool behavior.
+ *
+ * Non-string values (malformed) fall back to a placeholder swatch with a
+ * question mark and don't crash the gallery.
  */
 
-import { computed } from 'vue'
+import { computed, type CSSProperties } from 'vue'
 import type { ResolvedToken } from '@dtcg-mapper/core'
 import {
   isStructuredColor,
@@ -28,25 +34,17 @@ const props = defineProps<{
   token: ResolvedToken
 }>()
 
-/**
- * Resolved swatch CSS colour. Uses the value directly when it's a string the
- * browser understands; falls back to a CSS keyword for unsupported shapes so
- * the gallery never shows a broken transparent square.
- */
-const swatchColor = computed<string>(() => {
+/** RGBA channels in 0–255 / 0–1, or null when the value can't be parsed. */
+const channels = computed<[number, number, number, number] | null>(() => {
   const v = props.token.resolvedValue
-  if (typeof v === 'string') return v
+  // Structured color: only srgb with ≥3 components is convertible here.
   if (isStructuredColor(v)) {
-    // Best-effort: only srgb with 3 components + optional alpha is convertible
-    // to an rgb() string here. Other colorSpaces fall through to the keyword.
     const { colorSpace, components, alpha } = v
     if (
       colorSpace === 'srgb' &&
       Array.isArray(components) &&
       components.length >= 3
     ) {
-      // Guard each index explicitly — noUncheckedIndexedAccess makes
-      // components[i] possibly undefined.
       const r = components[0]
       const g = components[1]
       const b = components[2]
@@ -61,20 +59,75 @@ const swatchColor = computed<string>(() => {
         // is invalid CSS the browser silently ignores.
         const clamp = (n: number, min = 0, max = 1) =>
           Math.min(max, Math.max(min, n))
-        const cr = Math.round(clamp(r) * 255)
-        const cg = Math.round(clamp(g) * 255)
-        const cb = Math.round(clamp(b) * 255)
-        const a = clamp(typeof alpha === 'number' ? alpha : 1)
-        return `rgba(${cr}, ${cg}, ${cb}, ${a})`
+        return [
+          Math.round(clamp(r) * 255),
+          Math.round(clamp(g) * 255),
+          Math.round(clamp(b) * 255),
+          clamp(typeof alpha === 'number' ? alpha : 1),
+        ]
       }
     }
+    return null
+  }
+  // String form: normalise via the canvas parser so rgb()/hsl()/oklch()/named
+  // colors all resolve to a hex we can pull alpha from.
+  if (typeof v === 'string') {
+    const hex = normalizeToHex(v)
+    return hex === null ? null : parseHex(hex)
+  }
+  return null
+})
+
+/** True when the resolved color has alpha < 1 (gates the split + chess). */
+const isTranslucent = computed(() => {
+  const c = channels.value
+  return c !== null && c[3] < 1
+})
+
+/**
+ * The CSS color string for the translucent half — the original resolved
+ * value when it's a string the browser understands, otherwise the rgba()
+ * built from parsed channels. Falls back to `'transparent'` for unsupported
+ * shapes so the gallery never shows a broken square.
+ */
+const translucentColor = computed<string>(() => {
+  const v = props.token.resolvedValue
+  if (typeof v === 'string') return v
+  const c = channels.value
+  if (c !== null) {
+    const [r, g, b, a] = c
+    return `rgba(${r}, ${g}, ${b}, ${a})`
   }
   return 'transparent'
 })
 
+/**
+ * The opaque form of the hue (alpha forced to 1). Paints the solid left half
+ * for translucent colors, and the whole square for opaque colors. Falls back
+ * to the translucent color string when channels can't be parsed — so a CSS
+ * color function we can't normalise still renders via the browser's parser.
+ */
+const opaqueColor = computed<string>(() => {
+  const c = channels.value
+  if (c !== null) {
+    const [r, g, b] = c
+    return `rgb(${r}, ${g}, ${b})`
+  }
+  return translucentColor.value
+})
+
+/** Inline style for the swatch element. */
+const swatchStyle = computed<CSSProperties>(() => ({
+  // The translucent color paints the right half (over the chess). The opaque
+  // color covers the left half via the ::before pseudo-element in <style>,
+  // fed through the --dtv-swatch-opaque custom property.
+  backgroundColor: translucentColor.value,
+  '--dtv-swatch-opaque': opaqueColor.value,
+}))
+
 /** Whether the value is a parseable string or structured color. */
 const isRenderable = computed(
-  () => swatchColor.value !== 'transparent' || typeof props.token.resolvedValue === 'string'
+  () => translucentColor.value !== 'transparent' || typeof props.token.resolvedValue === 'string'
 )
 
 /** Hex form for the value label. Falls back to the raw value if not hex. */
@@ -109,8 +162,11 @@ const hslLabel = computed<string>(() => {
   <div class="dtv-color">
     <div
       class="dtv-color__swatch"
-      :class="{ 'dtv-color__swatch--placeholder': !isRenderable }"
-      :style="{ backgroundColor: swatchColor }"
+      :class="{
+        'dtv-color__swatch--translucent': isTranslucent,
+        'dtv-color__swatch--placeholder': !isRenderable,
+      }"
+      :style="swatchStyle"
       :aria-label="`Color swatch for ${token.path}: ${hexLabel}`"
       role="img"
     >
@@ -141,16 +197,24 @@ const hslLabel = computed<string>(() => {
 }
 
 .dtv-color__swatch {
+  position: relative;
   width: 64px;
   height: 64px;
   border-radius: var(--dtv-radius-md);
   flex-shrink: 0;
   border: 1px solid var(--dtv-color-border);
-  /*
-   * Checkerboard background so translucent colours are visibly translucent.
-   * Rendered behind the swatch's backgroundColor via background-blend-mode
-   * (or visible whenever backgroundColor has alpha < 1).
-   */
+  /* overflow:hidden keeps the ::before's solid half inside the rounded box. */
+  overflow: hidden;
+}
+
+/*
+ * Translucent variant: a 50/50 split. The element's backgroundColor (the
+ * translucent color, bound inline) paints the right half over the chess; the
+ * ::before paints the left half with the opaque hue so the pure color reads
+ * at full impact. The chess sits behind, visible only on the right half
+ * where ::before doesn't cover it.
+ */
+.dtv-color__swatch--translucent {
   background-image:
     linear-gradient(45deg, var(--dtv-color-border) 25%, transparent 25%),
     linear-gradient(-45deg, var(--dtv-color-border) 25%, transparent 25%),
@@ -158,6 +222,15 @@ const hslLabel = computed<string>(() => {
     linear-gradient(-45deg, transparent 75%, var(--dtv-color-border) 75%);
   background-size: 12px 12px;
   background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+}
+
+/* Solid left half for translucent swatches. opacityColor is passed via a
+   custom property so scoped CSS can consume it without `v-bind` churn. */
+.dtv-color__swatch--translucent::before {
+  content: '';
+  position: absolute;
+  inset: 0 50% 0 0;
+  background-color: var(--dtv-swatch-opaque, transparent);
 }
 
 .dtv-color__swatch--placeholder {
