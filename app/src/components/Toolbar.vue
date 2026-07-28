@@ -2,9 +2,10 @@
 /**
  * Toolbar — top-of-content controls.
  *
- * Holds the two upload Dropzones (Set A, Set B), the "Load demo" button, and
- * per-slot clear buttons. Shows a status line indicating browse vs compare
- * mode based on whether both slots are populated.
+ * Holds the two upload Dropzones (Set A, Set B), the "Load demo" button, the
+ * "Clear all" button, and the ShareMenu (Copy link / Open in tab / Clear URL).
+ * Shows a status line indicating browse vs compare mode based on whether both
+ * slots are populated.
  *
  * The "mode toggle" mentioned in the plan is implicit rather than an explicit
  * switch: with one set loaded we're in browse mode, with two we're in compare
@@ -15,6 +16,7 @@
 import { useTokenSets } from '@/composables/useTokenSets'
 import { usePersistence } from '@/composables/usePersistence'
 import Dropzone from './Dropzone.vue'
+import ShareMenu from './ShareMenu.vue'
 
 const { loadDemo, clearSet, setA, setB } = useTokenSets()
 const { clearState } = usePersistence()
@@ -67,6 +69,13 @@ function modeStatus(): string {
       >
         Clear all
       </button>
+      <!--
+        ShareMenu is always rendered (even with no sets loaded) so its
+        buttons stay in a stable position. The "Load a set first" inline
+        message handles the empty case; "Clear URL" auto-disables when
+        there's no hash.
+      -->
+      <ShareMenu />
     </div>
 
     <p class="dtv-toolbar__status" aria-live="polite">
