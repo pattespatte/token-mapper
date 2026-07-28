@@ -29,6 +29,11 @@ export { parseCss } from './ingest/cssCustomProperties'
 export {
   isValidColor,
   isValidDimension,
+  isValidFontFamily,
+  isValidFontWeight,
+  isValidNumber,
+  isValidShadow,
+  isValidDuration,
   inferType,
 } from './utils/cssTypeInference'
 export {
