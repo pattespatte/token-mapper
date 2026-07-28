@@ -13,6 +13,12 @@ dist-ssr
 coverage
 *.local
 
+# Lockfiles — npm is the source of truth (CI runs `npm ci`).
+# bun.lockb appears when running `bun add` locally; ignore it so it doesn't
+# drift against package-lock.json. See AGENTS.md "bun add desyncs" note.
+bun.lockb
+bun.lock
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
