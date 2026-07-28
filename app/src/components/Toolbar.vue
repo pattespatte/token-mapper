@@ -56,9 +56,12 @@ function modeStatus(): string {
     <div class="dtv-toolbar__actions">
       <button
         type="button"
-        class="dtv-toolbar__button dtv-toolbar__button--primary"
+        class="dtv-toolbar__button"
         @click="loadDemo"
       >
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z" />
+        </svg>
         Load demo
       </button>
       <button
@@ -67,6 +70,12 @@ function modeStatus(): string {
         :disabled="setA === null && setB === null"
         @click="clearAll"
       >
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6" />
+          <path d="M14 11v6" />
+        </svg>
         Clear all
       </button>
       <!--
@@ -125,6 +134,9 @@ function modeStatus(): string {
 }
 
 .dtv-toolbar__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dtv-spacing-xs);
   padding: var(--dtv-spacing-xs) var(--dtv-spacing-md);
   font-size: var(--dtv-font-size-sm);
   font-weight: var(--dtv-font-weight-medium);
@@ -132,11 +144,11 @@ function modeStatus(): string {
   background-color: var(--dtv-color-surface);
   border: 1px solid var(--dtv-color-border-strong);
   border-radius: var(--dtv-radius-md);
+  cursor: pointer;
 }
 
-.dtv-toolbar__button:hover:not(:disabled):not(.dtv-toolbar__button--primary) {
-  /* Explicit color on hover for unambiguous contrast (mirrors 47026f1).
-     Excludes --primary, which keeps its accent background on hover. */
+.dtv-toolbar__button:hover:not(:disabled) {
+  /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
   color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
 }
@@ -144,17 +156,6 @@ function modeStatus(): string {
 .dtv-toolbar__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.dtv-toolbar__button--primary {
-  color: var(--dtv-color-bg);
-  background-color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
-}
-
-.dtv-toolbar__button--primary:hover:not(:disabled) {
-  background-color: var(--dtv-color-accent);
-  filter: brightness(1.1);
 }
 
 .dtv-toolbar__status {

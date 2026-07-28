@@ -3,7 +3,9 @@
  * ShareMenu — share-link controls for the loaded token sets.
  *
  * Two sibling buttons in a flat row (matches ExportMenu's "no dropdown"
- * convention — simpler and more discoverable than a collapsed menu):
+ * convention — simpler and more discoverable than a collapsed menu). Each
+ * carries a leading outlined icon; both buttons share the same surface
+ * styling (no primary/accent variant) — the icon differentiates the action.
  *
  *   - Copy link → encode sets, write hash to URL, copy URL to clipboard
  *   - Clear URL → strip the hash via history.replaceState
@@ -127,9 +129,13 @@ onUnmounted(() => {
   <div class="dtv-share-menu" role="group" aria-label="Share loaded token sets">
     <button
       type="button"
-      class="dtv-share-menu__button dtv-share-menu__button--primary"
+      class="dtv-share-menu__button"
       @click="onCopyLink"
     >
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+      </svg>
       Copy link
     </button>
     <button
@@ -138,6 +144,11 @@ onUnmounted(() => {
       :disabled="!hasHashInUrl"
       @click="onClearUrl"
     >
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Eraser: clears the hash from the URL -->
+        <path d="M20 20H7L3 16c-.78-.78-.78-2.05 0-2.83l9.17-9.17a2 2 0 0 1 2.83 0l5.83 5.83a2 2 0 0 1 0 2.83L13 20" />
+        <line x1="18" y1="12" x2="9" y2="21" />
+      </svg>
       Clear URL
     </button>
     <span
@@ -164,6 +175,9 @@ onUnmounted(() => {
 }
 
 .dtv-share-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dtv-spacing-xs);
   padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
   font-size: var(--dtv-font-size-sm);
   font-weight: var(--dtv-font-weight-medium);
@@ -174,7 +188,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.dtv-share-menu__button:hover:not(:disabled):not(.dtv-share-menu__button--primary) {
+.dtv-share-menu__button:hover:not(:disabled) {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
   color: var(--dtv-color-text);
   background-color: var(--dtv-color-surface-muted);
@@ -188,18 +202,6 @@ onUnmounted(() => {
 .dtv-share-menu__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* Primary "Copy link" gets the accent treatment so the most-common action
-   stands out from the secondary button (mirrors ExportMenu). */
-.dtv-share-menu__button--primary {
-  color: var(--dtv-color-bg);
-  background-color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
-}
-
-.dtv-share-menu__button--primary:hover:not(:disabled) {
-  filter: brightness(1.1);
 }
 
 .dtv-share-menu__message {
