@@ -3,7 +3,7 @@
  * Toolbar — top-of-content controls.
  *
  * Holds the two upload Dropzones (Set A, Set B), the "Load demo" button, the
- * "Clear all" button, and the ShareMenu (Copy link / Open in tab / Clear URL).
+ * "Clear all" button, and the ShareMenu (Copy link / Clear URL).
  * Shows a status line indicating browse vs compare mode based on whether both
  * slots are populated.
  *

@@ -2,11 +2,10 @@
 /**
  * ShareMenu — share-link controls for the loaded token sets.
  *
- * Three sibling buttons in a flat row (matches ExportMenu's "no dropdown"
+ * Two sibling buttons in a flat row (matches ExportMenu's "no dropdown"
  * convention — simpler and more discoverable than a collapsed menu):
  *
  *   - Copy link → encode sets, write hash to URL, copy URL to clipboard
- *   - Open in tab → encode, write hash, open the URL in a new tab
  *   - Clear URL → strip the hash via history.replaceState
  *
  * Reads `useShare` (which in turn reads `useTokenSets`) for state. Inline
@@ -18,14 +17,14 @@
  * failure gets a specific inline note; the buttons stay enabled so the user
  * can retry after loading more (or fewer) files.
  *
- * Transient feedback (success / clipboard-failed / popup-blocked) auto-clears
- * after ~1.5s via a single shared timer.
+ * Transient feedback (success / clipboard-failed) auto-clears after ~1.5s
+ * via a single shared timer.
  */
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useShare } from '@/composables/useShare'
 
-const { encodeCurrentState, writeToUrl, copyShareLink } = useShare()
+const { copyShareLink } = useShare()
 
 const COPY_FEEDBACK_MS = 1500
 let feedbackTimer: ReturnType<typeof setTimeout> | null = null
@@ -37,7 +36,6 @@ let feedbackTimer: ReturnType<typeof setTimeout> | null = null
 type Message =
   | { kind: 'copied' }
   | { kind: 'clipboard-failed' }
-  | { kind: 'popup-blocked' }
   | { kind: 'empty' }
   | { kind: 'too-large' }
 
@@ -80,28 +78,6 @@ async function onCopyLink(): Promise<void> {
   }
 }
 
-/**
- * "Open in new tab": encode → write to URL → `window.open(href, '_blank')`.
- * Popup blockers cause `window.open` to return null; the link is in the URL
- * bar either way.
- */
-function onOpenInTab(): void {
-  const enc = encodeCurrentState()
-  if (!enc.ok) {
-    setMessage({ kind: enc.reason })
-    return
-  }
-  writeToUrl(enc.hash)
-  refreshHashPresence()
-  if (typeof window === 'undefined') return
-  const win = window.open(window.location.href, '_blank', 'noopener')
-  if (win === null) {
-    setMessage({ kind: 'popup-blocked' })
-  }
-  // No success message on open-in-tab success: the new tab opening is the
-  // feedback. Showing "✓ Link copied" would be misleading (nothing copied).
-}
-
 /** "Clear URL": strip the hash via `history.replaceState`. */
 function onClearUrl(): void {
   if (typeof window === 'undefined') return
@@ -121,7 +97,6 @@ const messageText = computed<string>(() => {
   switch (message.value?.kind) {
     case 'copied': return '✓ Link copied'
     case 'clipboard-failed': return "Couldn't copy — link is in the address bar"
-    case 'popup-blocked': return 'Popup blocked — link is in the address bar'
     case 'empty': return 'Load a set first'
     case 'too-large': return 'Sets too large for a URL — use export instead'
     default: return ''
@@ -156,13 +131,6 @@ onUnmounted(() => {
       @click="onCopyLink"
     >
       Copy link
-    </button>
-    <button
-      type="button"
-      class="dtv-share-menu__button"
-      @click="onOpenInTab"
-    >
-      Open in tab
     </button>
     <button
       type="button"
@@ -223,7 +191,7 @@ onUnmounted(() => {
 }
 
 /* Primary "Copy link" gets the accent treatment so the most-common action
-   stands out from the two secondary buttons (mirrors ExportMenu). */
+   stands out from the secondary button (mirrors ExportMenu). */
 .dtv-share-menu__button--primary {
   color: var(--dtv-color-bg);
   background-color: var(--dtv-color-accent);
