@@ -39,7 +39,14 @@ const { readFromUrl, loadFromHash } = useShare()
 const { restoreFromStorage, saveState } = usePersistence()
 const { theme, initThemeFromStorage } = useTheme()
 
-const validationOpen = ref(false)
+/**
+ * Per-set validation-panel expand state. Independent so each set's panel
+ * can be opened/closed on its own — in compare mode the two side-by-side
+ * panels don't force-couple. In browse mode only the loaded set's panel
+ * renders, so the other ref is simply unused.
+ */
+const validationOpenA = ref(false)
+const validationOpenB = ref(false)
 
 /**
  * Signal that changes whenever the loaded source list changes. The label is
@@ -172,8 +179,28 @@ onUnmounted(() => {
 
         <Gallery :compare="isComparing" />
 
-        <div v-if="!isComparing" class="dtv-app__validation">
-          <ValidationPanel v-model:open="validationOpen" />
+        <!--
+          Validation panels — one per loaded set. Browse mode (a single set
+          loaded) renders just that set's panel. Compare mode renders A and B
+          side by side, so each set's issues read independently. The panel is
+          always present once a set is loaded; an empty set simply renders no
+          panel (no slot to validate).
+        -->
+        <div
+          v-if="setA !== null || setB !== null"
+          class="dtv-app__validation"
+          :class="{ 'dtv-app__validation--split': isComparing }"
+        >
+          <ValidationPanel
+            v-if="setA !== null"
+            set-id="A"
+            v-model:open="validationOpenA"
+          />
+          <ValidationPanel
+            v-if="setB !== null && isComparing"
+            set-id="B"
+            v-model:open="validationOpenB"
+          />
         </div>
       </section>
     </main>
@@ -224,6 +251,28 @@ onUnmounted(() => {
 
 .dtv-app__validation {
   padding: 0 var(--dtv-spacing-lg) var(--dtv-spacing-lg);
+}
+
+/* Compare mode: A | B side by side, mirroring the gallery's two columns.
+   Each panel flexes equally so they share the row; the gap matches the
+   gallery's compare layout. */
+.dtv-app__validation--split {
+  display: flex;
+  gap: var(--dtv-spacing-md);
+  align-items: flex-start;
+}
+
+.dtv-app__validation--split > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* On narrow viewports the two panels stack rather than squeeze — a 50/50
+   split is unreadable below ~600px. */
+@media (max-width: 600px) {
+  .dtv-app__validation--split {
+    flex-direction: column;
+  }
 }
 
 /* Responsive — hide sidebar under 900px (category filter on narrow

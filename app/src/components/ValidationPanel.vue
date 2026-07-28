@@ -1,22 +1,25 @@
 <script setup lang="ts">
 /**
- * ValidationPanel — list of validation issues for the active set.
+ * ValidationPanel — list of validation issues for one loaded set.
  *
  * Shown after the visual gallery (per the PRD). Toggled open/closed via a
- * prop; the parent (Toolbar) controls visibility. Issues are grouped by
- * severity — errors first, then warnings — and each row shows path, code,
- * and message.
+ * prop; the parent controls visibility. Issues are grouped by severity —
+ * errors first, then warnings — and each row shows path, code, and message.
  *
- * Reads from useGallery's browseSet (the single-set browse case). The
- * compare case doesn't surface a per-set validation panel in v1; that's a
- * future enhancement.
+ * Reads the set named by the `setId` prop directly from `useTokenSets`, so
+ * the same panel serves both modes:
+ *   - Browse mode: App.vue renders one instance for whichever set is loaded.
+ *   - Compare mode: App.vue renders one instance per loaded set (A | B),
+ *     side by side, so each set's validation reads independently.
  */
 
 import { computed } from 'vue'
-import { useGallery } from '@/composables/useGallery'
+import { useTokenSets } from '@/composables/useTokenSets'
 import type { ValidationIssue } from '@dtcg-mapper/core'
 
 const props = defineProps<{
+  /** Which slot's issues to show. */
+  setId: 'A' | 'B'
   /** Whether the panel is expanded. When false, only the header summary shows. */
   open: boolean
 }>()
@@ -25,9 +28,13 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const { browseSet } = useGallery()
+const { setA, setB } = useTokenSets()
 
-const issues = computed<ValidationIssue[]>(() => browseSet.value?.validation ?? [])
+const activeSet = computed(() => (props.setId === 'A' ? setA.value : setB.value))
+
+const setLabel = computed(() => (props.setId === 'A' ? 'Set A' : 'Set B'))
+
+const issues = computed<ValidationIssue[]>(() => activeSet.value?.validation ?? [])
 
 const errorCount = computed(
   () => issues.value.filter((i) => i.severity === 'error').length
@@ -61,7 +68,7 @@ function toggle(): void {
       aria-controls="dtv-validation-body"
       @click="toggle"
     >
-      <span class="dtv-validation__title">Validation</span>
+      <span class="dtv-validation__title">Validation <span class="dtv-validation__set">· {{ setLabel }}</span></span>
       <span v-if="errorCount > 0" class="dtv-validation__badge dtv-validation__badge--error">
         {{ errorCount }} error{{ errorCount === 1 ? '' : 's' }}
       </span>
@@ -124,6 +131,12 @@ function toggle(): void {
 
 .dtv-validation__title {
   font-weight: var(--dtv-font-weight-semibold);
+}
+
+/* "· Set A/B" suffix — secondary weight so "Validation" leads visually. */
+.dtv-validation__set {
+  font-weight: var(--dtv-font-weight-regular);
+  color: var(--dtv-color-text-subtle);
 }
 
 .dtv-validation__badge {

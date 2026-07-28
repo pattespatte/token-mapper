@@ -93,8 +93,18 @@ function setFilter(value: 'all' | DiffBucket): void {
 }
 
 /* Active-state colours match DiffBadge for consistency. */
+/*
+ * "All" uses --dtv-color-text as its background, which in dark mode is
+ * near-white (#f5f5f5) — so the default #ffffff active text is invisible
+ * against it. Override to --dtv-color-bg, which is the page background and
+ * thus inverts with the theme: white in light mode (#ffffff text still
+ * reads on the dark --dtv-color-text), dark in dark mode (#0a0d12 text on
+ * the near-white background). The semantic buckets keep #ffffff since their
+ * saturated backgrounds stay distinct in both modes.
+ */
 .dtv-filterbar__button--all.dtv-filterbar__button--active {
   background-color: var(--dtv-color-text);
+  color: var(--dtv-color-bg);
 }
 
 .dtv-filterbar__button--matching.dtv-filterbar__button--active {
