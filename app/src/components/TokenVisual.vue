@@ -22,13 +22,13 @@ const renderer = computed(() => getRenderer(props.token.type))
 </script>
 
 <template>
-  <div class="dtv-visual">
+  <div class="dtm-visual">
     <component :is="renderer" :token="token" />
   </div>
 </template>
 
 <style scoped>
-.dtv-visual {
+.dtm-visual {
   min-height: 64px;
 }
 </style>

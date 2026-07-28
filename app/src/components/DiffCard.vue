@@ -65,21 +65,21 @@ onUnmounted(() => {
 
 <template>
   <article
-    class="dtv-diffcard"
-    :class="`dtv-diffcard--${diff.bucket}`"
+    class="dtm-diffcard"
+    :class="`dtm-diffcard--${diff.bucket}`"
     :aria-label="`Token ${diff.path}, ${diff.bucket}. Activate to open inspector.`"
     role="button"
     tabindex="0"
     @click="onSelect"
     @keydown="onCardKeydown"
   >
-    <header class="dtv-diffcard__header">
-      <code class="dtv-diffcard__path" :title="diff.path">{{ diff.path }}</code>
+    <header class="dtm-diffcard__header">
+      <code class="dtm-diffcard__path" :title="diff.path">{{ diff.path }}</code>
       <!-- Arrow hint shown only for changed tokens; lives in the header so it
            doesn't steal a body grid column from the side-by-side visuals. -->
       <span
         v-if="diff.bucket === 'changed'"
-        class="dtv-diffcard__arrow"
+        class="dtm-diffcard__arrow"
         aria-hidden="true"
         >→</span
       >
@@ -87,13 +87,13 @@ onUnmounted(() => {
            rendered only for `changed` tokens with an explanation. -->
       <span
         v-if="diff.bucket === 'changed' && diff.explanation"
-        class="dtv-diffcard__delta"
+        class="dtm-diffcard__delta"
         :title="`What changed: ${diff.explanation.summary}`"
       >{{ diff.explanation.summary }}</span>
       <DiffBadge :bucket="diff.bucket" />
       <button
         type="button"
-        class="dtv-diffcard__copy"
+        class="dtm-diffcard__copy"
         :aria-label="copied ? 'Path copied' : `Copy ${diff.path}`"
         @click.stop="copyPath"
       >
@@ -101,109 +101,109 @@ onUnmounted(() => {
       </button>
     </header>
 
-    <div class="dtv-diffcard__body" :class="`dtv-diffcard__body--${diff.bucket}`">
+    <div class="dtm-diffcard__body" :class="`dtm-diffcard__body--${diff.bucket}`">
       <!-- Set A column -->
-      <div class="dtv-diffcard__side dtv-diffcard__side--a">
-        <span class="dtv-diffcard__sidelabel">A</span>
+      <div class="dtm-diffcard__side dtm-diffcard__side--a">
+        <span class="dtm-diffcard__sidelabel">A</span>
         <TokenVisual v-if="diff.a" :token="diff.a" />
-        <p v-else class="dtv-diffcard__absent">not in set A</p>
+        <p v-else class="dtm-diffcard__absent">not in set A</p>
       </div>
 
       <!-- Set B column -->
-      <div class="dtv-diffcard__side dtv-diffcard__side--b">
-        <span class="dtv-diffcard__sidelabel">B</span>
+      <div class="dtm-diffcard__side dtm-diffcard__side--b">
+        <span class="dtm-diffcard__sidelabel">B</span>
         <TokenVisual v-if="diff.b" :token="diff.b" />
-        <p v-else class="dtv-diffcard__absent">not in set B</p>
+        <p v-else class="dtm-diffcard__absent">not in set B</p>
       </div>
     </div>
   </article>
 </template>
 
 <style scoped>
-.dtv-diffcard {
+.dtm-diffcard {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-md);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
-  border-left: 3px solid var(--dtv-color-border-strong);
+  gap: var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-md);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
+  border-left: 3px solid var(--dtm-color-border-strong);
   /* Card-as-button affordance: cursor + focus ring. */
   cursor: pointer;
 }
 
-.dtv-diffcard:hover {
+.dtm-diffcard:hover {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-diffcard:focus-visible {
-  outline: 2px solid var(--dtv-color-accent);
+.dtm-diffcard:focus-visible {
+  outline: 2px solid var(--dtm-color-accent);
   outline-offset: 2px;
 }
 
-.dtv-diffcard--selected {
-  border-color: var(--dtv-color-accent);
-  box-shadow: 0 0 0 2px var(--dtv-color-accent);
+.dtm-diffcard--selected {
+  border-color: var(--dtm-color-accent);
+  box-shadow: 0 0 0 2px var(--dtm-color-accent);
 }
 
 /*
  * Coloured left border per bucket — at-a-glance scanning without the badge.
  * Matches DiffBadge colours.
  */
-.dtv-diffcard--matching {
-  border-left-color: var(--dtv-color-success);
+.dtm-diffcard--matching {
+  border-left-color: var(--dtm-color-success);
 }
 
-.dtv-diffcard--changed {
-  border-left-color: var(--dtv-color-warning);
+.dtm-diffcard--changed {
+  border-left-color: var(--dtm-color-warning);
 }
 
-.dtv-diffcard--missing {
-  border-left-color: var(--dtv-color-error);
+.dtm-diffcard--missing {
+  border-left-color: var(--dtm-color-error);
 }
 
-.dtv-diffcard--extra {
-  border-left-color: var(--dtv-color-info);
+.dtm-diffcard--extra {
+  border-left-color: var(--dtm-color-info);
 }
 
-.dtv-diffcard__header {
+.dtm-diffcard__header {
   display: flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-diffcard__path {
+.dtm-diffcard__path {
   flex: 1;
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-muted);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-muted);
   word-break: break-all;
   line-height: 1.3;
 }
 
-.dtv-diffcard__copy {
+.dtm-diffcard__copy {
   flex-shrink: 0;
-  padding: 2px var(--dtv-spacing-xs);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  padding: 2px var(--dtm-spacing-xs);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
   line-height: 1;
 }
 
-.dtv-diffcard__copy:hover {
-  color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
+.dtm-diffcard__copy:hover {
+  color: var(--dtm-color-accent);
+  border-color: var(--dtm-color-accent);
 }
 
-.dtv-diffcard__body {
+.dtm-diffcard__body {
   display: grid;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
   /*
    * stretch (the default) so both sides end up the same height: a swatch
    * card and a "not in set X" placeholder align row-for-row, and the
@@ -227,16 +227,16 @@ onUnmounted(() => {
  * minmax(0,1fr) (instead of bare 1fr) prevents the track from blowing out
  * when a side's min-content (e.g. a wide swatch) exceeds its share.
  */
-.dtv-diffcard__body--matching,
-.dtv-diffcard__body--changed {
+.dtm-diffcard__body--matching,
+.dtm-diffcard__body--changed {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
-.dtv-diffcard__body--missing {
+.dtm-diffcard__body--missing {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
-.dtv-diffcard__body--extra {
+.dtm-diffcard__body--extra {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
@@ -246,11 +246,11 @@ onUnmounted(() => {
  * the label on the same baseline as the content's top region and lets the
  * content area stretch to the side's full height.
  */
-.dtv-diffcard__side {
+.dtm-diffcard__side {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
   min-width: 0;
 }
 
@@ -259,21 +259,21 @@ onUnmounted(() => {
  * neutral (not coloured per side) so it doesn't fight the bucket-coloured
  * left border / DiffBadge; the letter itself carries the A-vs-B meaning.
  */
-.dtv-diffcard__sidelabel {
+.dtm-diffcard__sidelabel {
   flex-shrink: 0;
   align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 1.5em;
-  padding: 2px var(--dtv-spacing-xs);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
-  border: 1px solid var(--dtv-color-border);
-  font-family: var(--dtv-font-family-mono);
+  padding: 2px var(--dtm-spacing-xs);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
+  border: 1px solid var(--dtm-color-border);
+  font-family: var(--dtm-font-family-mono);
   line-height: 1.3;
 }
 
@@ -281,19 +281,19 @@ onUnmounted(() => {
  * The visual/absent wrapper fills the side's remaining width and full
  * height so an inner block can grow to match the opposite side.
  */
-.dtv-diffcard__side > :not(.dtv-diffcard__sidelabel) {
+.dtm-diffcard__side > :not(.dtm-diffcard__sidelabel) {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.dtv-diffcard__absent {
+.dtm-diffcard__absent {
   margin: 0;
-  padding: var(--dtv-spacing-md);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  padding: var(--dtm-spacing-md);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   font-style: italic;
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-md);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-md);
   text-align: center;
   /*
    * min-height keeps a lonely absent side readable; the flex-grow above lets
@@ -312,22 +312,22 @@ onUnmounted(() => {
  * carried the divider there; it has moved to the header, so `changed` now
  * shares side B's divider treatment.)
  */
-.dtv-diffcard__body--matching .dtv-diffcard__side--b,
-.dtv-diffcard__body--missing .dtv-diffcard__side--b,
-.dtv-diffcard__body--extra .dtv-diffcard__side--b,
-.dtv-diffcard__body--changed .dtv-diffcard__side--b {
-  border-inline-start: 1px solid var(--dtv-color-border);
-  padding-inline-start: var(--dtv-spacing-sm);
+.dtm-diffcard__body--matching .dtm-diffcard__side--b,
+.dtm-diffcard__body--missing .dtm-diffcard__side--b,
+.dtm-diffcard__body--extra .dtm-diffcard__side--b,
+.dtm-diffcard__body--changed .dtm-diffcard__side--b {
+  border-inline-start: 1px solid var(--dtm-color-border);
+  padding-inline-start: var(--dtm-spacing-sm);
 }
 
 /*
  * Arrow now lives in the header between the path and the badge — a small
  * inline glyph that hints at the A→B delta without stealing body width.
  */
-.dtv-diffcard__arrow {
+.dtm-diffcard__arrow {
   flex-shrink: 0;
-  font-size: var(--dtv-font-size-md);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-md);
+  color: var(--dtm-color-text-subtle);
 }
 
 /*
@@ -335,14 +335,14 @@ onUnmounted(() => {
  * but is coloured to draw the eye to "what changed" without competing with
  * the bucket badge. `warning` palette aligns with the `changed` bucket.
  */
-.dtv-diffcard__delta {
+.dtm-diffcard__delta {
   flex-shrink: 0;
-  padding: 1px var(--dtv-spacing-xs);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-warning);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
+  padding: 1px var(--dtm-spacing-xs);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-warning);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
   white-space: nowrap;
   max-width: 12ch;
   overflow: hidden;
@@ -356,12 +356,12 @@ onUnmounted(() => {
  * label and don't benefit from stacking; `matching` has two equal sides.
  */
 @media (max-width: 480px) {
-  .dtv-diffcard__body--changed,
-  .dtv-diffcard__body--matching {
+  .dtm-diffcard__body--changed,
+  .dtm-diffcard__body--matching {
     grid-template-columns: 1fr;
   }
 
-  .dtv-diffcard__arrow {
+  .dtm-diffcard__arrow {
     display: none;
   }
 
@@ -370,14 +370,14 @@ onUnmounted(() => {
    * rule above side B; flip the border to the block axis and reposition the
    * padding so the layout breathes correctly.
    */
-  .dtv-diffcard__body--matching .dtv-diffcard__side--b,
-  .dtv-diffcard__body--missing .dtv-diffcard__side--b,
-  .dtv-diffcard__body--extra .dtv-diffcard__side--b,
-  .dtv-diffcard__body--changed .dtv-diffcard__side--b {
+  .dtm-diffcard__body--matching .dtm-diffcard__side--b,
+  .dtm-diffcard__body--missing .dtm-diffcard__side--b,
+  .dtm-diffcard__body--extra .dtm-diffcard__side--b,
+  .dtm-diffcard__body--changed .dtm-diffcard__side--b {
     border-inline-start: none;
-    border-block-start: 1px solid var(--dtv-color-border);
+    border-block-start: 1px solid var(--dtm-color-border);
     padding-inline-start: 0;
-    padding-block-start: var(--dtv-spacing-sm);
+    padding-block-start: var(--dtm-spacing-sm);
   }
 }
 </style>

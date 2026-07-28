@@ -120,9 +120,9 @@ const opaqueColor = computed<string>(() => {
 const swatchStyle = computed<CSSProperties>(() => ({
   // The translucent color paints the right half (over the chess). The opaque
   // color covers the left half via the ::before pseudo-element in <style>,
-  // fed through the --dtv-swatch-opaque custom property.
+  // fed through the --dtm-swatch-opaque custom property.
   backgroundColor: translucentColor.value,
-  '--dtv-swatch-opaque': opaqueColor.value,
+  '--dtm-swatch-opaque': opaqueColor.value,
 }))
 
 /** Whether the value is a parseable string or structured color. */
@@ -159,29 +159,29 @@ const hslLabel = computed<string>(() => {
 </script>
 
 <template>
-  <div class="dtv-color">
+  <div class="dtm-color">
     <div
-      class="dtv-color__swatch"
+      class="dtm-color__swatch"
       :class="{
-        'dtv-color__swatch--translucent': isTranslucent,
-        'dtv-color__swatch--placeholder': !isRenderable,
+        'dtm-color__swatch--translucent': isTranslucent,
+        'dtm-color__swatch--placeholder': !isRenderable,
       }"
       :style="swatchStyle"
       :aria-label="`Color swatch for ${token.path}: ${hexLabel}`"
       role="img"
     >
-      <span v-if="!isRenderable" class="dtv-color__question">?</span>
+      <span v-if="!isRenderable" class="dtm-color__question">?</span>
     </div>
-    <dl class="dtv-color__values">
-      <div class="dtv-color__row">
+    <dl class="dtm-color__values">
+      <div class="dtm-color__row">
         <dt>hex</dt>
         <dd>{{ hexLabel }}</dd>
       </div>
-      <div v-if="rgbLabel" class="dtv-color__row">
+      <div v-if="rgbLabel" class="dtm-color__row">
         <dt>rgb</dt>
         <dd>{{ rgbLabel }}</dd>
       </div>
-      <div v-if="hslLabel" class="dtv-color__row">
+      <div v-if="hslLabel" class="dtm-color__row">
         <dt>hsl</dt>
         <dd>{{ hslLabel }}</dd>
       </div>
@@ -190,19 +190,19 @@ const hslLabel = computed<string>(() => {
 </template>
 
 <style scoped>
-.dtv-color {
+.dtm-color {
   display: flex;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
   align-items: flex-start;
 }
 
-.dtv-color__swatch {
+.dtm-color__swatch {
   position: relative;
   width: 64px;
   height: 64px;
-  border-radius: var(--dtv-radius-md);
+  border-radius: var(--dtm-radius-md);
   flex-shrink: 0;
-  border: 1px solid var(--dtv-color-border);
+  border: 1px solid var(--dtm-color-border);
   /* overflow:hidden keeps the ::before's solid half inside the rounded box. */
   overflow: hidden;
 }
@@ -214,62 +214,62 @@ const hslLabel = computed<string>(() => {
  * at full impact. The chess sits behind, visible only on the right half
  * where ::before doesn't cover it.
  */
-.dtv-color__swatch--translucent {
+.dtm-color__swatch--translucent {
   background-image:
-    linear-gradient(45deg, var(--dtv-color-border) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--dtv-color-border) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--dtv-color-border) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--dtv-color-border) 75%);
+    linear-gradient(45deg, var(--dtm-color-border) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--dtm-color-border) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--dtm-color-border) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--dtm-color-border) 75%);
   background-size: 12px 12px;
   background-position: 0 0, 0 6px, 6px -6px, -6px 0;
 }
 
 /* Solid left half for translucent swatches. opacityColor is passed via a
    custom property so scoped CSS can consume it without `v-bind` churn. */
-.dtv-color__swatch--translucent::before {
+.dtm-color__swatch--translucent::before {
   content: '';
   position: absolute;
   inset: 0 50% 0 0;
-  background-color: var(--dtv-swatch-opaque, transparent);
+  background-color: var(--dtm-swatch-opaque, transparent);
 }
 
-.dtv-color__swatch--placeholder {
+.dtm-color__swatch--placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--dtv-color-surface-muted);
+  background-color: var(--dtm-color-surface-muted);
   background-image: none;
 }
 
-.dtv-color__question {
-  font-size: var(--dtv-font-size-lg);
-  color: var(--dtv-color-text-subtle);
+.dtm-color__question {
+  font-size: var(--dtm-font-size-lg);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-color__values {
+.dtm-color__values {
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-color__row {
+.dtm-color__row {
   display: flex;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-color__row dt {
-  color: var(--dtv-color-text-subtle);
+.dtm-color__row dt {
+  color: var(--dtm-color-text-subtle);
   width: 2.5em;
   flex-shrink: 0;
 }
 
-.dtv-color__row dd {
+.dtm-color__row dd {
   margin: 0;
-  color: var(--dtv-color-text);
+  color: var(--dtm-color-text);
   word-break: break-all;
 }
 </style>

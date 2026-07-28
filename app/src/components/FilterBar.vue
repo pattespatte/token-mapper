@@ -40,100 +40,100 @@ function setFilter(value: 'all' | DiffBucket): void {
 </script>
 
 <template>
-  <div class="dtv-filterbar" role="group" aria-label="Filter comparison results">
+  <div class="dtm-filterbar" role="group" aria-label="Filter comparison results">
     <button
       v-for="opt in options()"
       :key="opt.value"
       type="button"
-      class="dtv-filterbar__button"
+      class="dtm-filterbar__button"
       :class="{
-        'dtv-filterbar__button--active': activeFilter === opt.value,
-        [`dtv-filterbar__button--${opt.value}`]: activeFilter === opt.value,
+        'dtm-filterbar__button--active': activeFilter === opt.value,
+        [`dtm-filterbar__button--${opt.value}`]: activeFilter === opt.value,
       }"
       :aria-pressed="activeFilter === opt.value"
       @click="setFilter(opt.value)"
     >
-      <span class="dtv-filterbar__label">{{ opt.label }}</span>
-      <span class="dtv-filterbar__count">{{ opt.count }}</span>
+      <span class="dtm-filterbar__label">{{ opt.label }}</span>
+      <span class="dtm-filterbar__count">{{ opt.count }}</span>
     </button>
   </div>
 </template>
 
 <style scoped>
-.dtv-filterbar {
+.dtm-filterbar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: center;
 }
 
-.dtv-filterbar__button {
+.dtm-filterbar__button {
   display: inline-flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
-  color: var(--dtv-color-text);
-  font-size: var(--dtv-font-size-sm);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
+  color: var(--dtm-color-text);
+  font-size: var(--dtm-font-size-sm);
   cursor: pointer;
 }
 
-.dtv-filterbar__button:hover:not(.dtv-filterbar__button--active) {
+.dtm-filterbar__button:hover:not(.dtm-filterbar__button--active) {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1).
      Excludes --active, whose white-on-color treatment shouldn't be overridden. */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-filterbar__button--active {
+.dtm-filterbar__button--active {
   color: #ffffff;
   border-color: transparent;
 }
 
 /* Active-state colours match DiffBadge for consistency. */
 /*
- * "All" uses --dtv-color-text as its background, which in dark mode is
+ * "All" uses --dtm-color-text as its background, which in dark mode is
  * near-white (#f5f5f5) — so the default #ffffff active text is invisible
- * against it. Override to --dtv-color-bg, which is the page background and
+ * against it. Override to --dtm-color-bg, which is the page background and
  * thus inverts with the theme: white in light mode (#ffffff text still
- * reads on the dark --dtv-color-text), dark in dark mode (#0a0d12 text on
+ * reads on the dark --dtm-color-text), dark in dark mode (#0a0d12 text on
  * the near-white background). The semantic buckets keep #ffffff since their
  * saturated backgrounds stay distinct in both modes.
  */
-.dtv-filterbar__button--all.dtv-filterbar__button--active {
-  background-color: var(--dtv-color-text);
-  color: var(--dtv-color-bg);
+.dtm-filterbar__button--all.dtm-filterbar__button--active {
+  background-color: var(--dtm-color-text);
+  color: var(--dtm-color-bg);
 }
 
-.dtv-filterbar__button--matching.dtv-filterbar__button--active {
-  background-color: var(--dtv-color-success);
+.dtm-filterbar__button--matching.dtm-filterbar__button--active {
+  background-color: var(--dtm-color-success);
 }
 
-.dtv-filterbar__button--changed.dtv-filterbar__button--active {
-  background-color: var(--dtv-color-warning);
+.dtm-filterbar__button--changed.dtm-filterbar__button--active {
+  background-color: var(--dtm-color-warning);
 }
 
-.dtv-filterbar__button--missing.dtv-filterbar__button--active {
-  background-color: var(--dtv-color-error);
+.dtm-filterbar__button--missing.dtm-filterbar__button--active {
+  background-color: var(--dtm-color-error);
 }
 
-.dtv-filterbar__button--extra.dtv-filterbar__button--active {
-  background-color: var(--dtv-color-info);
+.dtm-filterbar__button--extra.dtm-filterbar__button--active {
+  background-color: var(--dtm-color-info);
 }
 
-.dtv-filterbar__count {
-  padding: 0 var(--dtv-spacing-xs);
+.dtm-filterbar__count {
+  padding: 0 var(--dtm-spacing-xs);
   background-color: rgba(255, 255, 255, 0.2);
-  border-radius: var(--dtv-radius-sm);
+  border-radius: var(--dtm-radius-sm);
   font-variant-numeric: tabular-nums;
-  font-size: var(--dtv-font-size-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
 /* When not active, the count badge needs a visible chip against the surface. */
-.dtv-filterbar__button:not(.dtv-filterbar__button--active) .dtv-filterbar__count {
-  background-color: var(--dtv-color-surface-muted);
-  color: var(--dtv-color-text-subtle);
+.dtm-filterbar__button:not(.dtm-filterbar__button--active) .dtm-filterbar__count {
+  background-color: var(--dtm-color-surface-muted);
+  color: var(--dtm-color-text-subtle);
 }
 </style>

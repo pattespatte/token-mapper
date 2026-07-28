@@ -30,8 +30,8 @@ const variant = computed(() => VARIANT[props.bucket])
 
 <template>
   <span
-    class="dtv-diff-badge"
-    :class="`dtv-diff-badge--${bucket}`"
+    class="dtm-diff-badge"
+    :class="`dtm-diff-badge--${bucket}`"
     :aria-label="variant.aria"
   >
     {{ variant.label }}
@@ -39,13 +39,13 @@ const variant = computed(() => VARIANT[props.bucket])
 </template>
 
 <style scoped>
-.dtv-diff-badge {
+.dtm-diff-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px var(--dtv-spacing-sm);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-medium);
+  padding: 2px var(--dtm-spacing-sm);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-medium);
   line-height: 1.3;
   white-space: nowrap;
 }
@@ -54,23 +54,23 @@ const variant = computed(() => VARIANT[props.bucket])
  * Each variant picks foreground/background colours that hit WCAG AA against
  * the card surface. Tested against both light and dark themes' surfaces.
  */
-.dtv-diff-badge--matching {
-  background-color: var(--dtv-color-success);
+.dtm-diff-badge--matching {
+  background-color: var(--dtm-color-success);
   color: #ffffff;
 }
 
-.dtv-diff-badge--changed {
-  background-color: var(--dtv-color-warning);
+.dtm-diff-badge--changed {
+  background-color: var(--dtm-color-warning);
   color: #ffffff;
 }
 
-.dtv-diff-badge--missing {
-  background-color: var(--dtv-color-error);
+.dtm-diff-badge--missing {
+  background-color: var(--dtm-color-error);
   color: #ffffff;
 }
 
-.dtv-diff-badge--extra {
-  background-color: var(--dtv-color-info);
+.dtm-diff-badge--extra {
+  background-color: var(--dtm-color-info);
   color: #ffffff;
 }
 </style>

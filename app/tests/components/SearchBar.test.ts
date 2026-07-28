@@ -32,11 +32,11 @@ describe('SearchBar', () => {
   it('clear button empties the query and hides itself when empty', async () => {
     const wrapper = mount(SearchBar)
     await wrapper.get('input[type="search"]').setValue('something')
-    expect(wrapper.find('.dtv-searchbar__clear').exists()).toBe(true)
+    expect(wrapper.find('.dtm-searchbar__clear').exists()).toBe(true)
 
-    await wrapper.get('.dtv-searchbar__clear').trigger('click')
+    await wrapper.get('.dtm-searchbar__clear').trigger('click')
     expect(useSearch().query.value).toBe('')
-    expect(wrapper.find('.dtv-searchbar__clear').exists()).toBe(false)
+    expect(wrapper.find('.dtm-searchbar__clear').exists()).toBe(false)
   })
 
   it('Esc clears the query', async () => {
@@ -48,9 +48,9 @@ describe('SearchBar', () => {
 
   it('renders an accessible label and placeholder', () => {
     const wrapper = mount(SearchBar)
-    // Label is wired via for/id; both should reference dtv-searchbar-input.
-    expect(wrapper.get('label').attributes('for')).toBe('dtv-searchbar-input')
-    expect(wrapper.get('input').attributes('id')).toBe('dtv-searchbar-input')
+    // Label is wired via for/id; both should reference dtm-searchbar-input.
+    expect(wrapper.get('label').attributes('for')).toBe('dtm-searchbar-input')
+    expect(wrapper.get('input').attributes('id')).toBe('dtm-searchbar-input')
     expect(wrapper.get('input').attributes('placeholder')).toContain('Search')
   })
 })

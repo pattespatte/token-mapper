@@ -60,166 +60,166 @@ function toggle(): void {
 </script>
 
 <template>
-  <section class="dtv-validation" :class="{ 'dtv-validation--open': open }">
+  <section class="dtm-validation" :class="{ 'dtm-validation--open': open }">
     <button
       type="button"
-      class="dtv-validation__header"
+      class="dtm-validation__header"
       :aria-expanded="open"
-      aria-controls="dtv-validation-body"
+      aria-controls="dtm-validation-body"
       @click="toggle"
     >
-      <span class="dtv-validation__title">Validation <span class="dtv-validation__set">· {{ setLabel }}</span></span>
-      <span v-if="errorCount > 0" class="dtv-validation__badge dtv-validation__badge--error">
+      <span class="dtm-validation__title">Validation <span class="dtm-validation__set">· {{ setLabel }}</span></span>
+      <span v-if="errorCount > 0" class="dtm-validation__badge dtm-validation__badge--error">
         {{ errorCount }} error{{ errorCount === 1 ? '' : 's' }}
       </span>
-      <span v-if="warningCount > 0" class="dtv-validation__badge dtv-validation__badge--warning">
+      <span v-if="warningCount > 0" class="dtm-validation__badge dtm-validation__badge--warning">
         {{ warningCount }} warning{{ warningCount === 1 ? '' : 's' }}
       </span>
-      <span v-if="issues.length === 0" class="dtv-validation__clean">
+      <span v-if="issues.length === 0" class="dtm-validation__clean">
         No issues
       </span>
-      <span class="dtv-validation__chevron" aria-hidden="true">{{ open ? '▾' : '▸' }}</span>
+      <span class="dtm-validation__chevron" aria-hidden="true">{{ open ? '▾' : '▸' }}</span>
     </button>
 
-    <ol v-if="open" id="dtv-validation-body" class="dtv-validation__list">
-      <li v-if="sortedIssues.length === 0" class="dtv-validation__empty">
+    <ol v-if="open" id="dtm-validation-body" class="dtm-validation__list">
+      <li v-if="sortedIssues.length === 0" class="dtm-validation__empty">
         Loaded tokens passed all checks.
       </li>
       <li
         v-for="(issue, idx) in sortedIssues"
         :key="`${issue.path}-${issue.code}-${idx}`"
-        class="dtv-validation__row"
-        :class="`dtv-validation__row--${issue.severity}`"
+        class="dtm-validation__row"
+        :class="`dtm-validation__row--${issue.severity}`"
       >
-        <span class="dtv-validation__severity" :aria-label="issue.severity">
+        <span class="dtm-validation__severity" :aria-label="issue.severity">
           {{ issue.severity === 'error' ? '⛔' : '⚠' }}
         </span>
-        <code class="dtv-validation__path">{{ issue.path }}</code>
-        <span class="dtv-validation__code">{{ issue.code }}</span>
-        <span class="dtv-validation__message">{{ issue.message }}</span>
+        <code class="dtm-validation__path">{{ issue.path }}</code>
+        <span class="dtm-validation__code">{{ issue.code }}</span>
+        <span class="dtm-validation__message">{{ issue.message }}</span>
       </li>
     </ol>
   </section>
 </template>
 
 <style scoped>
-.dtv-validation {
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
-  background-color: var(--dtv-color-surface);
+.dtm-validation {
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
+  background-color: var(--dtm-color-surface);
   overflow: hidden;
 }
 
-.dtv-validation__header {
+.dtm-validation__header {
   display: flex;
   align-items: center;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
   width: 100%;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-md);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-md);
   background: none;
   border: none;
   text-align: left;
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
 }
 
-.dtv-validation__header:hover {
+.dtm-validation__header:hover {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-validation__title {
-  font-weight: var(--dtv-font-weight-semibold);
+.dtm-validation__title {
+  font-weight: var(--dtm-font-weight-semibold);
 }
 
 /* "· Set A/B" suffix — secondary weight so "Validation" leads visually. */
-.dtv-validation__set {
-  font-weight: var(--dtv-font-weight-regular);
-  color: var(--dtv-color-text-subtle);
+.dtm-validation__set {
+  font-weight: var(--dtm-font-weight-regular);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-validation__badge {
-  padding: 1px var(--dtv-spacing-xs);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-medium);
+.dtm-validation__badge {
+  padding: 1px var(--dtm-spacing-xs);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-medium);
 }
 
-.dtv-validation__badge--error {
-  background-color: var(--dtv-color-error);
+.dtm-validation__badge--error {
+  background-color: var(--dtm-color-error);
   color: #fff;
 }
 
-.dtv-validation__badge--warning {
-  background-color: var(--dtv-color-warning);
+.dtm-validation__badge--warning {
+  background-color: var(--dtm-color-warning);
   color: #fff;
 }
 
-.dtv-validation__clean {
-  color: var(--dtv-color-success);
-  font-size: var(--dtv-font-size-sm);
+.dtm-validation__clean {
+  color: var(--dtm-color-success);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-validation__chevron {
+.dtm-validation__chevron {
   margin-left: auto;
-  color: var(--dtv-color-text-subtle);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-validation__list {
+.dtm-validation__list {
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--dtv-color-border);
+  border-top: 1px solid var(--dtm-color-border);
   max-height: 320px;
   overflow-y: auto;
 }
 
-.dtv-validation__empty {
-  padding: var(--dtv-spacing-md);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-validation__empty {
+  padding: var(--dtm-spacing-md);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-validation__row {
+.dtm-validation__row {
   display: grid;
   grid-template-columns: auto auto auto 1fr;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: baseline;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-md);
-  border-bottom: 1px solid var(--dtv-color-border);
-  font-size: var(--dtv-font-size-sm);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-md);
+  border-bottom: 1px solid var(--dtm-color-border);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-validation__row:last-child {
+.dtm-validation__row:last-child {
   border-bottom: none;
 }
 
-.dtv-validation__row--error {
-  background-color: var(--dtv-color-surface);
+.dtm-validation__row--error {
+  background-color: var(--dtm-color-surface);
 }
 
-.dtv-validation__row--warning {
-  background-color: var(--dtv-color-surface-muted);
+.dtm-validation__row--warning {
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-validation__severity {
-  font-size: var(--dtv-font-size-md);
+.dtm-validation__severity {
+  font-size: var(--dtm-font-size-md);
 }
 
-.dtv-validation__path {
-  font-family: var(--dtv-font-family-mono);
-  color: var(--dtv-color-text);
+.dtm-validation__path {
+  font-family: var(--dtm-font-family-mono);
+  color: var(--dtm-color-text);
   word-break: break-all;
 }
 
-.dtv-validation__code {
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-validation__code {
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-validation__message {
-  color: var(--dtv-color-text-muted);
+.dtm-validation__message {
+  color: var(--dtm-color-text-muted);
 }
 </style>

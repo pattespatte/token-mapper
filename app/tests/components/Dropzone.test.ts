@@ -99,7 +99,7 @@ describe('Dropzone', () => {
     const inputEl = wrapper.find('input[type="file"]').element as HTMLInputElement
     const clickSpy = vi.spyOn(inputEl, 'click').mockImplementation(() => {})
 
-    await wrapper.find('button.dtv-dropzone__button').trigger('click')
+    await wrapper.find('button.dtm-dropzone__button').trigger('click')
     expect(clickSpy).toHaveBeenCalledTimes(1)
     clickSpy.mockRestore()
   })
@@ -116,7 +116,7 @@ describe('Dropzone', () => {
 
     // Vue Test Utils doesn't simulate native button activation, so trigger
     // click directly. The behaviour we care about is that the picker opens.
-    await wrapper.find('button.dtv-dropzone__button').trigger('click')
+    await wrapper.find('button.dtm-dropzone__button').trigger('click')
     expect(clickSpy).toHaveBeenCalledTimes(1)
     clickSpy.mockRestore()
   })
@@ -133,7 +133,7 @@ describe('Dropzone', () => {
     // Drop events fire on the outer wrapper (where the @drop handler lives),
     // not the button.
     const dataTransfer = { files }
-    await wrapper.find('.dtv-dropzone').trigger('drop', { dataTransfer })
+    await wrapper.find('.dtm-dropzone').trigger('drop', { dataTransfer })
 
     expect(mockAddFiles).toHaveBeenCalledTimes(1)
     const [, passedFiles] = mockAddFiles.mock.calls[0] ?? []
@@ -174,7 +174,7 @@ describe('Dropzone', () => {
     })
     expect(wrapper.text()).toContain('foundation.json + 1 more')
     // The tooltip carries the full file list.
-    const filename = wrapper.find('.dtv-dropzone__filename')
+    const filename = wrapper.find('.dtm-dropzone__filename')
     expect(filename.attributes('title')).toBe('foundation.json\nsemantic.json')
   })
 

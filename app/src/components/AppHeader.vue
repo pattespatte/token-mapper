@@ -43,12 +43,12 @@ const currentLabel = computed(() => {
 </script>
 
 <template>
-  <header class="dtv-header">
-    <div class="dtv-header__brand">
-      <span class="dtv-header__name">Design Token Mapper</span>
+  <header class="dtm-header">
+    <div class="dtm-header__brand">
+      <span class="dtm-header__name">Design Token Mapper</span>
       <a
         :href="REPO_URL"
-        class="dtv-header__repo"
+        class="dtm-header__repo"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="View source on GitHub"
@@ -60,7 +60,7 @@ const currentLabel = computed(() => {
       -->
       <button
         type="button"
-        class="dtv-header__theme-toggle"
+        class="dtm-header__theme-toggle"
         :aria-label="`Switch to ${nextTheme} theme`"
         :title="`Theme: ${currentLabel}. Click to switch.`"
         @click="toggleTheme"
@@ -124,70 +124,70 @@ const currentLabel = computed(() => {
         </svg>
       </button>
     </div>
-    <p class="dtv-header__tagline">
+    <p class="dtm-header__tagline">
       Visually browse and compare W3C design tokens, in your browser.
     </p>
   </header>
 </template>
 
 <style scoped>
-.dtv-header {
+.dtm-header {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-sm) var(--dtv-spacing-lg);
-  border-bottom: 1px solid var(--dtv-color-border);
-  background-color: var(--dtv-color-surface);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-sm) var(--dtm-spacing-lg);
+  border-bottom: 1px solid var(--dtm-color-border);
+  background-color: var(--dtm-color-surface);
 }
 
-.dtv-header__brand {
+.dtm-header__brand {
   display: flex;
   align-items: baseline;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
 }
 
-.dtv-header__name {
-  font-size: var(--dtv-font-size-lg);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text);
+.dtm-header__name {
+  font-size: var(--dtm-font-size-lg);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text);
 }
 
-.dtv-header__repo {
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-header__repo {
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   text-decoration: none;
 }
 
-.dtv-header__repo:hover {
-  color: var(--dtv-color-accent);
+.dtm-header__repo:hover {
+  color: var(--dtm-color-accent);
   text-decoration: underline;
 }
 
-.dtv-header__theme-toggle {
+.dtm-header__theme-toggle {
   margin-left: auto;
-  padding: 2px var(--dtv-spacing-xs);
-  font-size: var(--dtv-font-size-md);
+  padding: 2px var(--dtm-spacing-xs);
+  font-size: var(--dtm-font-size-md);
   line-height: 1;
-  color: var(--dtv-color-text-subtle);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
 }
 
-.dtv-header__theme-toggle:hover {
-  color: var(--dtv-color-text);
-  border-color: var(--dtv-color-border-strong);
+.dtm-header__theme-toggle:hover {
+  color: var(--dtm-color-text);
+  border-color: var(--dtm-color-border-strong);
 }
 
-.dtv-header__theme-toggle:focus-visible {
-  outline: 2px solid var(--dtv-color-accent);
+.dtm-header__theme-toggle:focus-visible {
+  outline: 2px solid var(--dtm-color-accent);
   outline-offset: 2px;
 }
 
-.dtv-header__tagline {
+.dtm-header__tagline {
   margin: 0;
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
 }
 </style>

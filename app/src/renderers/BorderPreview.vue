@@ -85,76 +85,76 @@ function asString(v: RawValue | undefined): string | undefined {
 </script>
 
 <template>
-  <div class="dtv-border">
+  <div class="dtm-border">
     <template v-if="isRenderable">
       <div
-        class="dtv-border__preview"
+        class="dtm-border__preview"
         :style="{ border: borderCss }"
         :aria-label="`Border preview for ${token.path}`"
         role="img"
       ></div>
-      <dl class="dtv-border__fields">
-        <div class="dtv-border__field"><dt>width</dt><dd>{{ fieldText(border?.width) }}</dd></div>
-        <div class="dtv-border__field"><dt>style</dt><dd>{{ fieldText(border?.style) }}</dd></div>
-        <div class="dtv-border__field"><dt>color</dt><dd>{{ fieldText(border?.color) }}</dd></div>
+      <dl class="dtm-border__fields">
+        <div class="dtm-border__field"><dt>width</dt><dd>{{ fieldText(border?.width) }}</dd></div>
+        <div class="dtm-border__field"><dt>style</dt><dd>{{ fieldText(border?.style) }}</dd></div>
+        <div class="dtm-border__field"><dt>color</dt><dd>{{ fieldText(border?.color) }}</dd></div>
       </dl>
     </template>
-    <pre v-else class="dtv-border__fallback"><code>{{ jsonDump }}</code></pre>
+    <pre v-else class="dtm-border__fallback"><code>{{ jsonDump }}</code></pre>
   </div>
 </template>
 
 <style scoped>
-.dtv-border {
+.dtm-border {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
 }
 
-.dtv-border__preview {
+.dtm-border__preview {
   width: 100%;
   height: 64px;
-  background-color: var(--dtv-color-bg);
-  border-radius: var(--dtv-radius-md);
+  background-color: var(--dtm-color-bg);
+  border-radius: var(--dtm-radius-md);
   /* border is applied via inline style from the token value. */
 }
 
-.dtv-border__fields {
+.dtm-border__fields {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 2px var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
+  gap: 2px var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-border__field {
+.dtm-border__field {
   display: flex;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-border__field dt {
-  color: var(--dtv-color-text-subtle);
-  font-family: var(--dtv-font-family-mono);
+.dtm-border__field dt {
+  color: var(--dtm-color-text-subtle);
+  font-family: var(--dtm-font-family-mono);
   flex-shrink: 0;
 }
 
-.dtv-border__field dd {
+.dtm-border__field dd {
   margin: 0;
-  color: var(--dtv-color-text);
-  font-family: var(--dtv-font-family-mono);
+  color: var(--dtm-color-text);
+  font-family: var(--dtm-font-family-mono);
   word-break: break-all;
 }
 
-.dtv-border__fallback {
+.dtm-border__fallback {
   margin: 0;
-  padding: var(--dtv-spacing-xs);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  padding: var(--dtm-spacing-xs);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
   white-space: pre-wrap;
   word-break: break-word;
 }

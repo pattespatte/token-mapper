@@ -35,14 +35,14 @@ function onKeydown(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <div class="dtv-searchbar">
-    <label for="dtv-searchbar-input" class="dtv-searchbar__label">Search</label>
-    <div class="dtv-searchbar__input-wrap">
-      <span class="dtv-searchbar__icon" aria-hidden="true">⌕</span>
+  <div class="dtm-searchbar">
+    <label for="dtm-searchbar-input" class="dtm-searchbar__label">Search</label>
+    <div class="dtm-searchbar__input-wrap">
+      <span class="dtm-searchbar__icon" aria-hidden="true">⌕</span>
       <input
-        id="dtv-searchbar-input"
+        id="dtm-searchbar-input"
         type="search"
-        class="dtv-searchbar__input"
+        class="dtm-searchbar__input"
         placeholder="Search path, description, or value…"
         autocomplete="off"
         spellcheck="false"
@@ -52,7 +52,7 @@ function onKeydown(event: KeyboardEvent): void {
       <button
         v-if="hasQuery"
         type="button"
-        class="dtv-searchbar__clear"
+        class="dtm-searchbar__clear"
         aria-label="Clear search"
         @click="clearInput"
       >✕</button>
@@ -61,15 +61,15 @@ function onKeydown(event: KeyboardEvent): void {
 </template>
 
 <style scoped>
-.dtv-searchbar {
+.dtm-searchbar {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.dtv-searchbar__label {
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-searchbar__label {
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   /* Visually hidden but available to assistive tech — the placeholder already
      communicates purpose visually, and a visible label would duplicate it. */
   position: absolute;
@@ -83,45 +83,45 @@ function onKeydown(event: KeyboardEvent): void {
   border: 0;
 }
 
-.dtv-searchbar__input-wrap {
+.dtm-searchbar__input-wrap {
   display: flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
 }
 
-.dtv-searchbar__input-wrap:focus-within {
-  border-color: var(--dtv-color-accent);
+.dtm-searchbar__input-wrap:focus-within {
+  border-color: var(--dtm-color-accent);
 }
 
-.dtv-searchbar__icon {
-  color: var(--dtv-color-text-subtle);
-  font-size: var(--dtv-font-size-md);
+.dtm-searchbar__icon {
+  color: var(--dtm-color-text-subtle);
+  font-size: var(--dtm-font-size-md);
   line-height: 1;
 }
 
-.dtv-searchbar__input {
+.dtm-searchbar__input {
   flex: 1;
   min-width: 0;
   background: none;
   border: none;
   outline: none;
-  color: var(--dtv-color-text);
+  color: var(--dtm-color-text);
   font: inherit;
-  font-size: var(--dtv-font-size-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
 /* Hide the browser's built-in search clear button — we render our own so the
    affordance is consistent with the rest of the app. */
-.dtv-searchbar__input::-webkit-search-cancel-button {
+.dtm-searchbar__input::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
 }
 
-.dtv-searchbar__clear {
+.dtm-searchbar__clear {
   flex-shrink: 0;
   width: 20px;
   height: 20px;
@@ -130,15 +130,15 @@ function onKeydown(event: KeyboardEvent): void {
   justify-content: center;
   background: none;
   border: none;
-  border-radius: var(--dtv-radius-sm);
-  color: var(--dtv-color-text-subtle);
+  border-radius: var(--dtm-radius-sm);
+  color: var(--dtm-color-text-subtle);
   cursor: pointer;
-  font-size: var(--dtv-font-size-sm);
+  font-size: var(--dtm-font-size-sm);
   line-height: 1;
 }
 
-.dtv-searchbar__clear:hover {
-  color: var(--dtv-color-error);
-  background-color: var(--dtv-color-surface-muted);
+.dtm-searchbar__clear:hover {
+  color: var(--dtm-color-error);
+  background-color: var(--dtm-color-surface-muted);
 }
 </style>

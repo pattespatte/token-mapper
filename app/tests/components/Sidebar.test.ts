@@ -71,28 +71,28 @@ describe('Sidebar', () => {
 
   it('renders the toggle button with aria-expanded=true when expanded', () => {
     const wrapper = mount(Sidebar)
-    const toggle = wrapper.find('.dtv-sidebar__toggle')
+    const toggle = wrapper.find('.dtm-sidebar__toggle')
     expect(toggle.exists()).toBe(true)
     expect(toggle.attributes('aria-expanded')).toBe('true')
-    expect(toggle.attributes('aria-controls')).toBe('dtv-sidebar-content')
+    expect(toggle.attributes('aria-controls')).toBe('dtm-sidebar-content')
   })
 
   it('renders the toggle button with aria-expanded=false when collapsed', () => {
     mockCollapsed = ref(true)
     const wrapper = mount(Sidebar)
-    const toggle = wrapper.find('.dtv-sidebar__toggle')
+    const toggle = wrapper.find('.dtm-sidebar__toggle')
     expect(toggle.attributes('aria-expanded')).toBe('false')
   })
 
   it('calls toggle() when the toggle button is clicked', async () => {
     const wrapper = mount(Sidebar)
-    await wrapper.find('.dtv-sidebar__toggle').trigger('click')
+    await wrapper.find('.dtm-sidebar__toggle').trigger('click')
     expect(mockToggle).toHaveBeenCalledTimes(1)
   })
 
   it('shows category list when expanded', () => {
     const wrapper = mount(Sidebar)
-    const items = wrapper.findAll('.dtv-sidebar__item')
+    const items = wrapper.findAll('.dtm-sidebar__item')
     expect(items).toHaveLength(3)
     // "all", "color", "spacing" should each render with their count.
     expect(wrapper.text()).toContain('color')
@@ -104,11 +104,11 @@ describe('Sidebar', () => {
   it('marks the category list as hidden when collapsed', () => {
     mockCollapsed = ref(true)
     const wrapper = mount(Sidebar)
-    const content = wrapper.find('#dtv-sidebar-content')
+    const content = wrapper.find('#dtm-sidebar-content')
     expect(content.exists()).toBe(true)
-    expect(content.classes()).toContain('dtv-sidebar__content--hidden')
+    expect(content.classes()).toContain('dtm-sidebar__content--hidden')
     // Toggle stays visible in both states.
-    expect(wrapper.find('.dtv-sidebar__toggle').exists()).toBe(true)
+    expect(wrapper.find('.dtm-sidebar__toggle').exists()).toBe(true)
   })
 
   it('shows the no-set prompt when browseSet is null and not comparing', () => {
@@ -131,13 +131,13 @@ describe('Sidebar', () => {
 
   it('updates the toggle aria-label for each state', () => {
     const wrapperExpanded = mount(Sidebar)
-    expect(wrapperExpanded.find('.dtv-sidebar__toggle').attributes('aria-label')).toBe(
+    expect(wrapperExpanded.find('.dtm-sidebar__toggle').attributes('aria-label')).toBe(
       'Collapse categories'
     )
 
     mockCollapsed = ref(true)
     const wrapperCollapsed = mount(Sidebar)
-    expect(wrapperCollapsed.find('.dtv-sidebar__toggle').attributes('aria-label')).toBe(
+    expect(wrapperCollapsed.find('.dtm-sidebar__toggle').attributes('aria-label')).toBe(
       'Expand categories'
     )
   })

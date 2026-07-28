@@ -104,11 +104,11 @@ async function handleFiles(files: File[]): Promise<void> {
 
 <template>
   <div
-    class="dtv-dropzone"
+    class="dtm-dropzone"
     :class="{
-      'dtv-dropzone--drag': isDragOver,
-      'dtv-dropzone--loading': isLoading,
-      'dtv-dropzone--loaded': currentSet !== null,
+      'dtm-dropzone--drag': isDragOver,
+      'dtm-dropzone--loading': isLoading,
+      'dtm-dropzone--loaded': currentSet !== null,
     }"
     @dragover.prevent="onDragOver"
     @dragleave.prevent="onDragLeave"
@@ -116,41 +116,41 @@ async function handleFiles(files: File[]): Promise<void> {
   >
     <button
       type="button"
-      class="dtv-dropzone__button"
+      class="dtm-dropzone__button"
       :aria-label="`Upload token files for Set ${setId} (${hint}). Activate to choose files.`"
       :disabled="isLoading"
       @click="openPicker"
     >
-      <span class="dtv-dropzone__label">
-        <span class="dtv-dropzone__slot">Set {{ setId }}</span>
-        <span class="dtv-dropzone__hint">{{ hint }}</span>
+      <span class="dtm-dropzone__label">
+        <span class="dtm-dropzone__slot">Set {{ setId }}</span>
+        <span class="dtm-dropzone__hint">{{ hint }}</span>
       </span>
 
-      <span v-if="currentSet === null && !isLoading" class="dtv-dropzone__empty">
+      <span v-if="currentSet === null && !isLoading" class="dtm-dropzone__empty">
         Drop JSON or CSS here or click to choose
       </span>
 
-      <span v-else-if="isLoading" class="dtv-dropzone__loading" aria-live="polite">
+      <span v-else-if="isLoading" class="dtm-dropzone__loading" aria-live="polite">
         Loading…
       </span>
 
-      <span v-else-if="currentSet !== null" class="dtv-dropzone__summary">
-        <span class="dtv-dropzone__filename" :title="fileListTooltip">
+      <span v-else-if="currentSet !== null" class="dtm-dropzone__summary">
+        <span class="dtm-dropzone__filename" :title="fileListTooltip">
           {{ fileListLabel }}
         </span>
-        <span class="dtv-dropzone__count">{{ currentSet.tokens.size }} tokens</span>
+        <span class="dtm-dropzone__count">{{ currentSet.tokens.size }} tokens</span>
         <span
           v-if="currentSet.validation.length > 0"
-          class="dtv-dropzone__issues"
+          class="dtm-dropzone__issues"
           :title="`${currentSet.validation.length} validation issue(s)`"
         >
           {{ currentSet.validation.length }} issue{{ currentSet.validation.length === 1 ? '' : 's' }}
         </span>
-        <span class="dtv-dropzone__add-hint">+ Add files</span>
+        <span class="dtm-dropzone__add-hint">+ Add files</span>
       </span>
     </button>
 
-    <p v-if="errorMsg !== null" class="dtv-dropzone__error" role="alert">
+    <p v-if="errorMsg !== null" class="dtm-dropzone__error" role="alert">
       {{ errorMsg }}
     </p>
 
@@ -162,7 +162,7 @@ async function handleFiles(files: File[]): Promise<void> {
       type="file"
       accept=".json,.css,application/json,text/css"
       multiple
-      class="dtv-dropzone__input"
+      class="dtm-dropzone__input"
       :aria-label="`Choose JSON or CSS files for Set ${setId}`"
       tabindex="-1"
       @change="onInputChange"
@@ -171,136 +171,136 @@ async function handleFiles(files: File[]): Promise<void> {
 </template>
 
 <style scoped>
-.dtv-dropzone {
+.dtm-dropzone {
   /* Outer drop target. Holds the visible border/dashed style and the drag
      state. The actual button (with keyboard focus and click) lives inside. */
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
-  border: 2px dashed var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
-  background-color: var(--dtv-color-surface);
+  gap: var(--dtm-spacing-xs);
+  border: 2px dashed var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
+  background-color: var(--dtm-color-surface);
   min-width: 200px;
   transition: border-color 0.15s, background-color 0.15s;
 }
 
-.dtv-dropzone--drag {
-  border-color: var(--dtv-color-accent);
-  background-color: var(--dtv-color-accent-muted);
+.dtm-dropzone--drag {
+  border-color: var(--dtm-color-accent);
+  background-color: var(--dtm-color-accent-muted);
 }
 
-.dtv-dropzone--loaded {
+.dtm-dropzone--loaded {
   border-style: solid;
-  border-color: var(--dtv-color-border);
+  border-color: var(--dtm-color-border);
 }
 
-.dtv-dropzone__button {
+.dtm-dropzone__button {
   /* The button fills the dropzone so the whole region is clickable and
      keyboard-focusable as one interactive control. */
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: flex-start;
   width: 100%;
-  padding: var(--dtv-spacing-sm) var(--dtv-spacing-md);
+  padding: var(--dtm-spacing-sm) var(--dtm-spacing-md);
   background: none;
   border: none;
-  border-radius: var(--dtv-radius-md);
+  border-radius: var(--dtm-radius-md);
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.dtv-dropzone__button:hover:not(:disabled) {
+.dtm-dropzone__button:hover:not(:disabled) {
   /* Lift hover affordance to the wrapper via parent selector. */
   outline: none;
 }
 
-.dtv-dropzone__button:focus-visible {
-  outline: 2px solid var(--dtv-color-accent);
+.dtm-dropzone__button:focus-visible {
+  outline: 2px solid var(--dtm-color-accent);
   outline-offset: -2px;
 }
 
-.dtv-dropzone__button:disabled {
+.dtm-dropzone__button:disabled {
   cursor: progress;
   opacity: 0.7;
 }
 
 /* When the button is hovered or focused, paint the wrapper border. */
-.dtv-dropzone:has(.dtv-dropzone__button:hover:not(:disabled)),
-.dtv-dropzone:has(.dtv-dropzone__button:focus-visible) {
-  border-color: var(--dtv-color-accent);
+.dtm-dropzone:has(.dtm-dropzone__button:hover:not(:disabled)),
+.dtm-dropzone:has(.dtm-dropzone__button:focus-visible) {
+  border-color: var(--dtm-color-accent);
 }
 
-.dtv-dropzone__label {
+.dtm-dropzone__label {
   display: flex;
   align-items: baseline;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-dropzone__slot {
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text);
+.dtm-dropzone__slot {
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text);
 }
 
-.dtv-dropzone__hint {
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-dropzone__hint {
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-dropzone__empty,
-.dtv-dropzone__loading {
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-muted);
+.dtm-dropzone__empty,
+.dtm-dropzone__loading {
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-muted);
 }
 
-.dtv-dropzone__summary {
+.dtm-dropzone__summary {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: baseline;
-  font-size: var(--dtv-font-size-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-dropzone__filename {
-  font-family: var(--dtv-font-family-mono);
-  color: var(--dtv-color-text);
+.dtm-dropzone__filename {
+  font-family: var(--dtm-font-family-mono);
+  color: var(--dtm-color-text);
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dtv-dropzone__count {
-  color: var(--dtv-color-text-subtle);
+.dtm-dropzone__count {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-dropzone__issues {
-  color: var(--dtv-color-warning);
-  font-weight: var(--dtv-font-weight-medium);
+.dtm-dropzone__issues {
+  color: var(--dtm-color-warning);
+  font-weight: var(--dtm-font-weight-medium);
 }
 
-.dtv-dropzone__add-hint {
+.dtm-dropzone__add-hint {
   /* Visual hint that subsequent uploads append. Matches the hint colour so
      it doesn't compete with the filename/count for attention. */
-  color: var(--dtv-color-text-subtle);
-  font-size: var(--dtv-font-size-sm);
+  color: var(--dtm-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-dropzone__button:hover:not(:disabled) .dtv-dropzone__add-hint,
-.dtv-dropzone__button:focus-visible .dtv-dropzone__add-hint {
-  color: var(--dtv-color-accent);
+.dtm-dropzone__button:hover:not(:disabled) .dtm-dropzone__add-hint,
+.dtm-dropzone__button:focus-visible .dtm-dropzone__add-hint {
+  color: var(--dtm-color-accent);
 }
 
-.dtv-dropzone__error {
+.dtm-dropzone__error {
   margin: 0;
-  padding: 0 var(--dtv-spacing-md) var(--dtv-spacing-xs);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-error);
+  padding: 0 var(--dtm-spacing-md) var(--dtm-spacing-xs);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-error);
 }
 
-.dtv-dropzone__input {
+.dtm-dropzone__input {
   /* Visually hidden but accessible to the file chooser. */
   position: absolute;
   width: 1px;

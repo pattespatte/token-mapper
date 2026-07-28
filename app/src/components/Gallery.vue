@@ -100,7 +100,7 @@ function onDocumentKeydown(event: KeyboardEvent): void {
   // Ignore modifier combos (Cmd+/, Ctrl+/, etc.) — those belong to the
   // browser or the user agent.
   if (event.metaKey || event.ctrlKey || event.altKey) return
-  const input = document.querySelector<HTMLInputElement>('#dtv-searchbar-input')
+  const input = document.querySelector<HTMLInputElement>('#dtm-searchbar-input')
   if (input === null) return
   event.preventDefault()
   input.focus()
@@ -116,20 +116,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="dtv-gallery">
+  <div class="dtm-gallery">
     <!-- Shared search bar (both modes). FilterChips is browse-only. -->
-    <div class="dtv-gallery__search-row">
+    <div class="dtm-gallery__search-row">
       <SearchBar />
       <FilterChips v-if="!compare" />
     </div>
 
     <!-- BROWSE MODE -->
-    <div v-if="!compare" class="dtv-gallery__browse">
-      <h1 class="dtv-gallery__heading">{{ browseHeading }}</h1>
+    <div v-if="!compare" class="dtm-gallery__browse">
+      <h1 class="dtm-gallery__heading">{{ browseHeading }}</h1>
 
       <p
         v-if="browseSet === null"
-        class="dtv-gallery__empty"
+        class="dtm-gallery__empty"
       >
         No tokens loaded. Click <strong>Load demo</strong> above, or drop a
         W3C DTCG JSON file into either slot.
@@ -137,43 +137,43 @@ onUnmounted(() => {
 
       <p
         v-else-if="browseCards.length === 0"
-        class="dtv-gallery__empty"
+        class="dtm-gallery__empty"
       >
         No tokens match the current filters.
       </p>
 
-      <div v-else class="dtv-gallery__grid">
+      <div v-else class="dtm-gallery__grid">
         <TokenCard
           v-for="token in browseCards"
           :key="token.path"
           :token="token"
-          :class="{ 'dtv-token-card--selected': selectedTokenPath === token.path }"
+          :class="{ 'dtm-token-card--selected': selectedTokenPath === token.path }"
           @select="handleSelect"
         />
       </div>
     </div>
 
     <!-- COMPARE MODE -->
-    <div v-else class="dtv-gallery__compare">
-      <div class="dtv-gallery__compare-header">
-        <h1 class="dtv-gallery__heading">{{ compareHeading }}</h1>
+    <div v-else class="dtm-gallery__compare">
+      <div class="dtm-gallery__compare-header">
+        <h1 class="dtm-gallery__heading">{{ compareHeading }}</h1>
         <FilterBar />
         <ExportMenu />
       </div>
 
       <p
         v-if="filteredDiff.length === 0"
-        class="dtv-gallery__empty"
+        class="dtm-gallery__empty"
       >
         No tokens in the current filter.
       </p>
 
-      <div v-else class="dtv-gallery__grid dtv-gallery__grid--compare">
+      <div v-else class="dtm-gallery__grid dtm-gallery__grid--compare">
         <DiffCard
           v-for="d in filteredDiff"
           :key="`${d.bucket}-${d.path}`"
           :diff="d"
-          :class="{ 'dtv-diffcard--selected': selectedDiffPath === d.path }"
+          :class="{ 'dtm-diffcard--selected': selectedDiffPath === d.path }"
           @select="handleDiffSelect"
         />
       </div>
@@ -182,57 +182,57 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.dtv-gallery {
-  padding: var(--dtv-spacing-lg);
+.dtm-gallery {
+  padding: var(--dtm-spacing-lg);
 }
 
-.dtv-gallery__search-row {
+.dtm-gallery__search-row {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
-  margin-bottom: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-sm);
+  margin-bottom: var(--dtm-spacing-md);
 }
 
-.dtv-gallery__heading {
+.dtm-gallery__heading {
   margin: 0;
-  font-size: var(--dtv-font-size-xl);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text);
+  font-size: var(--dtm-font-size-xl);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text);
 }
 
-.dtv-gallery__compare-header {
+.dtm-gallery__compare-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dtv-spacing-md);
-  margin-bottom: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
+  margin-bottom: var(--dtm-spacing-md);
 }
 
-.dtv-gallery__empty {
+.dtm-gallery__empty {
   margin: 0;
-  padding: var(--dtv-spacing-lg);
+  padding: var(--dtm-spacing-lg);
   text-align: center;
-  color: var(--dtv-color-text-subtle);
-  background-color: var(--dtv-color-surface);
-  border: 1px dashed var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
+  color: var(--dtm-color-text-subtle);
+  background-color: var(--dtm-color-surface);
+  border: 1px dashed var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
 }
 
-.dtv-gallery__grid {
+.dtm-gallery__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
 }
 
 /* Compare cards are wider — they hold two side-by-side visuals. */
-.dtv-gallery__grid--compare {
+.dtm-gallery__grid--compare {
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
 }
 
 /* Selected-card affordance in browse mode. */
-.dtv-gallery__grid :deep(.dtv-token-card--selected) {
-  border-color: var(--dtv-color-accent);
-  box-shadow: 0 0 0 2px var(--dtv-color-accent);
+.dtm-gallery__grid :deep(.dtm-token-card--selected) {
+  border-color: var(--dtm-color-accent);
+  box-shadow: 0 0 0 2px var(--dtm-color-accent);
 }
 </style>

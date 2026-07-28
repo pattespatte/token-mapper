@@ -107,111 +107,111 @@ function isLength(v: RawValue | undefined): v is string | number {
 </script>
 
 <template>
-  <div class="dtv-shadow">
+  <div class="dtm-shadow">
     <template v-if="isRenderable">
       <div
-        class="dtv-shadow__preview"
+        class="dtm-shadow__preview"
         :style="{ boxShadow: boxShadowCss }"
         :aria-label="`Shadow preview for ${token.path}`"
         role="img"
       ></div>
-      <ul class="dtv-shadow__layers">
-        <li v-for="(layer, idx) in layers" :key="idx" class="dtv-shadow__layer">
-          <span class="dtv-shadow__layer-label">
+      <ul class="dtm-shadow__layers">
+        <li v-for="(layer, idx) in layers" :key="idx" class="dtm-shadow__layer">
+          <span class="dtm-shadow__layer-label">
             {{ layers.length > 1 ? `Layer ${idx + 1}` : 'Layer' }}
-            <span v-if="layer.inset === true || layer.inset === 'true'" class="dtv-shadow__inset">(inset)</span>
+            <span v-if="layer.inset === true || layer.inset === 'true'" class="dtm-shadow__inset">(inset)</span>
           </span>
-          <dl class="dtv-shadow__fields">
-            <div class="dtv-shadow__field"><dt>offsetX</dt><dd>{{ fieldText(layer.offsetX) }}</dd></div>
-            <div class="dtv-shadow__field"><dt>offsetY</dt><dd>{{ fieldText(layer.offsetY) }}</dd></div>
-            <div class="dtv-shadow__field"><dt>blur</dt><dd>{{ fieldText(layer.blur) }}</dd></div>
-            <div class="dtv-shadow__field"><dt>spread</dt><dd>{{ fieldText(layer.spread) }}</dd></div>
-            <div class="dtv-shadow__field"><dt>color</dt><dd>{{ fieldText(layer.color) }}</dd></div>
+          <dl class="dtm-shadow__fields">
+            <div class="dtm-shadow__field"><dt>offsetX</dt><dd>{{ fieldText(layer.offsetX) }}</dd></div>
+            <div class="dtm-shadow__field"><dt>offsetY</dt><dd>{{ fieldText(layer.offsetY) }}</dd></div>
+            <div class="dtm-shadow__field"><dt>blur</dt><dd>{{ fieldText(layer.blur) }}</dd></div>
+            <div class="dtm-shadow__field"><dt>spread</dt><dd>{{ fieldText(layer.spread) }}</dd></div>
+            <div class="dtm-shadow__field"><dt>color</dt><dd>{{ fieldText(layer.color) }}</dd></div>
           </dl>
         </li>
       </ul>
     </template>
-    <pre v-else class="dtv-shadow__fallback"><code>{{ jsonDump }}</code></pre>
+    <pre v-else class="dtm-shadow__fallback"><code>{{ jsonDump }}</code></pre>
   </div>
 </template>
 
 <style scoped>
-.dtv-shadow {
+.dtm-shadow {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
 }
 
-.dtv-shadow__preview {
+.dtm-shadow__preview {
   width: 100%;
   height: 64px;
-  background-color: var(--dtv-color-bg);
-  border-radius: var(--dtv-radius-md);
+  background-color: var(--dtm-color-bg);
+  border-radius: var(--dtm-radius-md);
   /* boxShadow is applied via inline style from the token value. */
 }
 
-.dtv-shadow__layers {
+.dtm-shadow__layers {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-shadow__layer {
+.dtm-shadow__layer {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-shadow__layer-label {
-  font-family: var(--dtv-font-family-mono);
-  color: var(--dtv-color-text-subtle);
+.dtm-shadow__layer-label {
+  font-family: var(--dtm-font-family-mono);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-shadow__inset {
-  color: var(--dtv-color-text-muted);
+.dtm-shadow__inset {
+  color: var(--dtm-color-text-muted);
   font-style: italic;
 }
 
-.dtv-shadow__fields {
+.dtm-shadow__fields {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 2px var(--dtv-spacing-sm);
+  gap: 2px var(--dtm-spacing-sm);
 }
 
-.dtv-shadow__field {
+.dtm-shadow__field {
   display: flex;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-shadow__field dt {
-  color: var(--dtv-color-text-subtle);
-  font-family: var(--dtv-font-family-mono);
+.dtm-shadow__field dt {
+  color: var(--dtm-color-text-subtle);
+  font-family: var(--dtm-font-family-mono);
   flex-shrink: 0;
 }
 
-.dtv-shadow__field dd {
+.dtm-shadow__field dd {
   margin: 0;
-  color: var(--dtv-color-text);
-  font-family: var(--dtv-font-family-mono);
+  color: var(--dtm-color-text);
+  font-family: var(--dtm-font-family-mono);
   word-break: break-all;
 }
 
-.dtv-shadow__fallback {
+.dtm-shadow__fallback {
   margin: 0;
-  padding: var(--dtv-spacing-xs);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  padding: var(--dtm-spacing-xs);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
   white-space: pre-wrap;
   word-break: break-word;
 }

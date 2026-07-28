@@ -124,100 +124,100 @@ function fieldText(value: RawValue | undefined): string {
 </script>
 
 <template>
-  <div class="dtv-gradient">
+  <div class="dtm-gradient">
     <template v-if="isRenderable">
       <div
-        class="dtv-gradient__strip"
+        class="dtm-gradient__strip"
         :style="{ background: backgroundCss }"
         :aria-label="`Gradient preview for ${token.path}`"
         role="img"
       ></div>
-      <ul class="dtv-gradient__stops">
-        <li v-for="(stop, idx) in parsed?.stops ?? []" :key="idx" class="dtv-gradient__stop">
-          <span class="dtv-gradient__stop-label">Stop {{ idx + 1 }}</span>
-          <dl class="dtv-gradient__fields">
-            <div class="dtv-gradient__field"><dt>color</dt><dd>{{ fieldText(stop.color) }}</dd></div>
-            <div class="dtv-gradient__field"><dt>position</dt><dd>{{ fieldText(stop.position) }}</dd></div>
+      <ul class="dtm-gradient__stops">
+        <li v-for="(stop, idx) in parsed?.stops ?? []" :key="idx" class="dtm-gradient__stop">
+          <span class="dtm-gradient__stop-label">Stop {{ idx + 1 }}</span>
+          <dl class="dtm-gradient__fields">
+            <div class="dtm-gradient__field"><dt>color</dt><dd>{{ fieldText(stop.color) }}</dd></div>
+            <div class="dtm-gradient__field"><dt>position</dt><dd>{{ fieldText(stop.position) }}</dd></div>
           </dl>
         </li>
       </ul>
     </template>
-    <pre v-else class="dtv-gradient__fallback"><code>{{ jsonDump }}</code></pre>
+    <pre v-else class="dtm-gradient__fallback"><code>{{ jsonDump }}</code></pre>
   </div>
 </template>
 
 <style scoped>
-.dtv-gradient {
+.dtm-gradient {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
 }
 
-.dtv-gradient__strip {
+.dtm-gradient__strip {
   width: 100%;
   height: 56px;
-  border-radius: var(--dtv-radius-md);
-  border: 1px solid var(--dtv-color-border);
+  border-radius: var(--dtm-radius-md);
+  border: 1px solid var(--dtm-color-border);
   /* background is applied via inline style from the token value. */
 }
 
-.dtv-gradient__stops {
+.dtm-gradient__stops {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-gradient__stop {
+.dtm-gradient__stop {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-gradient__stop-label {
-  font-family: var(--dtv-font-family-mono);
-  color: var(--dtv-color-text-subtle);
+.dtm-gradient__stop-label {
+  font-family: var(--dtm-font-family-mono);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-gradient__fields {
+.dtm-gradient__fields {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 2px var(--dtv-spacing-sm);
+  gap: 2px var(--dtm-spacing-sm);
 }
 
-.dtv-gradient__field {
+.dtm-gradient__field {
   display: flex;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-gradient__field dt {
-  color: var(--dtv-color-text-subtle);
-  font-family: var(--dtv-font-family-mono);
+.dtm-gradient__field dt {
+  color: var(--dtm-color-text-subtle);
+  font-family: var(--dtm-font-family-mono);
   flex-shrink: 0;
 }
 
-.dtv-gradient__field dd {
+.dtm-gradient__field dd {
   margin: 0;
-  color: var(--dtv-color-text);
-  font-family: var(--dtv-font-family-mono);
+  color: var(--dtm-color-text);
+  font-family: var(--dtm-font-family-mono);
   word-break: break-all;
 }
 
-.dtv-gradient__fallback {
+.dtm-gradient__fallback {
   margin: 0;
-  padding: var(--dtv-spacing-xs);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  padding: var(--dtm-spacing-xs);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
   white-space: pre-wrap;
   word-break: break-word;
 }

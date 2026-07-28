@@ -183,23 +183,23 @@ onUnmounted(() => {
 <template>
   <div
     v-if="isOpen && diff"
-    class="dtv-inspector-overlay"
+    class="dtm-inspector-overlay"
     @click="onBackdropClick"
   >
     <div
       ref="dialogRef"
-      class="dtv-inspector dtv-diffinspector"
+      class="dtm-inspector dtm-diffinspector"
       role="dialog"
       aria-modal="true"
       :aria-label="`A/B comparison for ${diff.path}`"
     >
-      <header class="dtv-inspector__header">
-        <div class="dtv-inspector__path-row">
-          <code class="dtv-inspector__path">{{ diff.path }}</code>
-          <span class="dtv-diffinspector__bucket">{{ diff.bucket }}</span>
+      <header class="dtm-inspector__header">
+        <div class="dtm-inspector__path-row">
+          <code class="dtm-inspector__path">{{ diff.path }}</code>
+          <span class="dtm-diffinspector__bucket">{{ diff.bucket }}</span>
           <button
             type="button"
-            class="dtv-inspector__copy"
+            class="dtm-inspector__copy"
             :aria-label="copied ? 'Path copied' : `Copy ${diff.path}`"
             @click="copyPath"
           >
@@ -209,33 +209,33 @@ onUnmounted(() => {
         <button
           ref="closeButtonRef"
           type="button"
-          class="dtv-inspector__close"
+          class="dtm-inspector__close"
           aria-label="Close inspector"
           @click="close"
         >✕</button>
       </header>
 
-      <div class="dtv-inspector__body dtv-diffinspector__body">
+      <div class="dtm-inspector__body dtm-diffinspector__body">
         <!-- Tier 2: "What changed" details list, shown only for changed
              tokens whose explainer produced a details array. Sits above
              the side-by-side A/B layout so the headline diff is the first
              thing the reader sees after opening the inspector. -->
         <section
           v-if="diff.bucket === 'changed' && diff.explanation?.details?.length"
-          class="dtv-diffinspector__changed"
+          class="dtm-diffinspector__changed"
         >
-          <h3 class="dtv-inspector__heading">What changed</h3>
-          <dl class="dtv-diffinspector__changed-list">
+          <h3 class="dtm-inspector__heading">What changed</h3>
+          <dl class="dtm-diffinspector__changed-list">
             <div
               v-for="(d, i) in diff.explanation.details"
               :key="`${d.label}-${i}`"
-              class="dtv-diffinspector__changed-row"
+              class="dtm-diffinspector__changed-row"
             >
               <dt>{{ d.label }}</dt>
               <dd>
                 <code v-if="d.before">{{ d.before }}</code>
-                <span v-else class="dtv-diffinspector__changed-empty">—</span>
-                <span class="dtv-diffinspector__changed-arrow" aria-hidden="true">→</span>
+                <span v-else class="dtm-diffinspector__changed-empty">—</span>
+                <span class="dtm-diffinspector__changed-arrow" aria-hidden="true">→</span>
                 <code>{{ d.after }}</code>
               </dd>
             </div>
@@ -243,36 +243,36 @@ onUnmounted(() => {
         </section>
 
         <!-- Side-by-side: matching / changed -->
-        <div v-if="isSideBySide" class="dtv-diffinspector__sides">
-          <section v-if="sideA" class="dtv-diffinspector__side dtv-diffinspector__side--a">
-            <h2 class="dtv-diffinspector__sidelabel">A</h2>
-            <div v-if="sideA.renderer" class="dtv-inspector__preview">
+        <div v-if="isSideBySide" class="dtm-diffinspector__sides">
+          <section v-if="sideA" class="dtm-diffinspector__side dtm-diffinspector__side--a">
+            <h2 class="dtm-diffinspector__sidelabel">A</h2>
+            <div v-if="sideA.renderer" class="dtm-inspector__preview">
               <component :is="sideA.renderer" :token="sideA.token" />
             </div>
-            <section class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Resolved value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideA.resolvedFormatted }}</code></pre>
+            <section class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Resolved value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideA.resolvedFormatted }}</code></pre>
             </section>
-            <section v-if="sideA.showRaw" class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Raw value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideA.rawFormatted }}</code></pre>
+            <section v-if="sideA.showRaw" class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Raw value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideA.rawFormatted }}</code></pre>
             </section>
-            <section v-if="sideA.hasAliasChain" class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Reference chain</h3>
-              <ol class="dtv-inspector__chain">
-                <li class="dtv-inspector__chain-start">
+            <section v-if="sideA.hasAliasChain" class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Reference chain</h3>
+              <ol class="dtm-inspector__chain">
+                <li class="dtm-inspector__chain-start">
                   <code>{{ sideA.token.path }}</code>
-                  <span class="dtv-inspector__chain-raw">= {{ sideA.rawFormatted }}</span>
+                  <span class="dtm-inspector__chain-raw">= {{ sideA.rawFormatted }}</span>
                 </li>
                 <li
                   v-for="(hop, idx) in sideA.token.aliasChain"
                   :key="`a-${hop.path}-${idx}`"
-                  class="dtv-inspector__chain-hop"
+                  class="dtm-inspector__chain-hop"
                 >
-                  <span class="dtv-inspector__chain-arrow" aria-hidden="true">→</span>
-                  <code class="dtv-inspector__chain-path">{{ hop.path }}</code>
-                  <span class="dtv-inspector__chain-raw">{{ hop.raw }}</span>
-                  <span v-if="hop.resolved !== undefined" class="dtv-inspector__chain-resolved">
+                  <span class="dtm-inspector__chain-arrow" aria-hidden="true">→</span>
+                  <code class="dtm-inspector__chain-path">{{ hop.path }}</code>
+                  <span class="dtm-inspector__chain-raw">{{ hop.raw }}</span>
+                  <span v-if="hop.resolved !== undefined" class="dtm-inspector__chain-resolved">
                     resolves to <code>{{ JSON.stringify(hop.resolved) }}</code>
                   </span>
                 </li>
@@ -280,35 +280,35 @@ onUnmounted(() => {
             </section>
           </section>
 
-          <section v-if="sideB" class="dtv-diffinspector__side dtv-diffinspector__side--b">
-            <h2 class="dtv-diffinspector__sidelabel">B</h2>
-            <div v-if="sideB.renderer" class="dtv-inspector__preview">
+          <section v-if="sideB" class="dtm-diffinspector__side dtm-diffinspector__side--b">
+            <h2 class="dtm-diffinspector__sidelabel">B</h2>
+            <div v-if="sideB.renderer" class="dtm-inspector__preview">
               <component :is="sideB.renderer" :token="sideB.token" />
             </div>
-            <section class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Resolved value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideB.resolvedFormatted }}</code></pre>
+            <section class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Resolved value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideB.resolvedFormatted }}</code></pre>
             </section>
-            <section v-if="sideB.showRaw" class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Raw value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideB.rawFormatted }}</code></pre>
+            <section v-if="sideB.showRaw" class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Raw value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideB.rawFormatted }}</code></pre>
             </section>
-            <section v-if="sideB.hasAliasChain" class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Reference chain</h3>
-              <ol class="dtv-inspector__chain">
-                <li class="dtv-inspector__chain-start">
+            <section v-if="sideB.hasAliasChain" class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Reference chain</h3>
+              <ol class="dtm-inspector__chain">
+                <li class="dtm-inspector__chain-start">
                   <code>{{ sideB.token.path }}</code>
-                  <span class="dtv-inspector__chain-raw">= {{ sideB.rawFormatted }}</span>
+                  <span class="dtm-inspector__chain-raw">= {{ sideB.rawFormatted }}</span>
                 </li>
                 <li
                   v-for="(hop, idx) in sideB.token.aliasChain"
                   :key="`b-${hop.path}-${idx}`"
-                  class="dtv-inspector__chain-hop"
+                  class="dtm-inspector__chain-hop"
                 >
-                  <span class="dtv-inspector__chain-arrow" aria-hidden="true">→</span>
-                  <code class="dtv-inspector__chain-path">{{ hop.path }}</code>
-                  <span class="dtv-inspector__chain-raw">{{ hop.raw }}</span>
-                  <span v-if="hop.resolved !== undefined" class="dtv-inspector__chain-resolved">
+                  <span class="dtm-inspector__chain-arrow" aria-hidden="true">→</span>
+                  <code class="dtm-inspector__chain-path">{{ hop.path }}</code>
+                  <span class="dtm-inspector__chain-raw">{{ hop.raw }}</span>
+                  <span v-if="hop.resolved !== undefined" class="dtm-inspector__chain-resolved">
                     resolves to <code>{{ JSON.stringify(hop.resolved) }}</code>
                   </span>
                 </li>
@@ -318,38 +318,38 @@ onUnmounted(() => {
         </div>
 
         <!-- Single-side: missing (A only) or extra (B only) -->
-        <div v-else class="dtv-diffinspector__single">
-          <section v-if="sideA" class="dtv-diffinspector__side dtv-diffinspector__side--a">
-            <h2 class="dtv-diffinspector__sidelabel">A</h2>
-            <div v-if="sideA.renderer" class="dtv-inspector__preview">
+        <div v-else class="dtm-diffinspector__single">
+          <section v-if="sideA" class="dtm-diffinspector__side dtm-diffinspector__side--a">
+            <h2 class="dtm-diffinspector__sidelabel">A</h2>
+            <div v-if="sideA.renderer" class="dtm-inspector__preview">
               <component :is="sideA.renderer" :token="sideA.token" />
             </div>
-            <section class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Resolved value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideA.resolvedFormatted }}</code></pre>
+            <section class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Resolved value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideA.resolvedFormatted }}</code></pre>
             </section>
-            <section v-if="sideA.showRaw" class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Raw value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideA.rawFormatted }}</code></pre>
+            <section v-if="sideA.showRaw" class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Raw value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideA.rawFormatted }}</code></pre>
             </section>
           </section>
-          <p v-else class="dtv-diffinspector__absent">not in set A</p>
+          <p v-else class="dtm-diffinspector__absent">not in set A</p>
 
-          <section v-if="sideB" class="dtv-diffinspector__side dtv-diffinspector__side--b">
-            <h2 class="dtv-diffinspector__sidelabel">B</h2>
-            <div v-if="sideB.renderer" class="dtv-inspector__preview">
+          <section v-if="sideB" class="dtm-diffinspector__side dtm-diffinspector__side--b">
+            <h2 class="dtm-diffinspector__sidelabel">B</h2>
+            <div v-if="sideB.renderer" class="dtm-inspector__preview">
               <component :is="sideB.renderer" :token="sideB.token" />
             </div>
-            <section class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Resolved value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideB.resolvedFormatted }}</code></pre>
+            <section class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Resolved value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideB.resolvedFormatted }}</code></pre>
             </section>
-            <section v-if="sideB.showRaw" class="dtv-inspector__section">
-              <h3 class="dtv-inspector__heading">Raw value</h3>
-              <pre class="dtv-inspector__code"><code>{{ sideB.rawFormatted }}</code></pre>
+            <section v-if="sideB.showRaw" class="dtm-inspector__section">
+              <h3 class="dtm-inspector__heading">Raw value</h3>
+              <pre class="dtm-inspector__code"><code>{{ sideB.rawFormatted }}</code></pre>
             </section>
           </section>
-          <p v-else class="dtv-diffinspector__absent">not in set B</p>
+          <p v-else class="dtm-diffinspector__absent">not in set B</p>
         </div>
       </div>
     </div>
@@ -357,27 +357,27 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Reuse Inspector.vue's modal vocabulary (dtv-inspector-*) so the two modal
-   types read as a family. A few dtv-diffinspector-* additions carry the A/B
+/* Reuse Inspector.vue's modal vocabulary (dtm-inspector-*) so the two modal
+   types read as a family. A few dtm-diffinspector-* additions carry the A/B
    layout specifics. */
 
-.dtv-diffinspector {
+.dtm-diffinspector {
   max-width: 900px; /* wider than Inspector's 640px — two columns need room */
 }
 
-.dtv-diffinspector__bucket {
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text-subtle);
-  background-color: var(--dtv-color-surface-muted);
-  padding: 2px var(--dtv-spacing-xs);
-  border-radius: var(--dtv-radius-sm);
+.dtm-diffinspector__bucket {
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text-subtle);
+  background-color: var(--dtm-color-surface-muted);
+  padding: 2px var(--dtm-spacing-xs);
+  border-radius: var(--dtm-radius-sm);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.dtv-diffinspector__body {
-  gap: var(--dtv-spacing-md);
+.dtm-diffinspector__body {
+  gap: var(--dtm-spacing-md);
 }
 
 /*
@@ -385,108 +385,108 @@ onUnmounted(() => {
  * the side-by-side A/B layout for `changed` tokens. Reuses the heading
  * typography of the existing inspector sections for visual consistency.
  */
-.dtv-diffinspector__changed {
+.dtm-diffinspector__changed {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-sm) var(--dtv-spacing-md);
-  background-color: var(--dtv-color-surface-muted);
-  border: 1px solid var(--dtv-color-border);
-  border-left: 3px solid var(--dtv-color-warning);
-  border-radius: var(--dtv-radius-md);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-sm) var(--dtm-spacing-md);
+  background-color: var(--dtm-color-surface-muted);
+  border: 1px solid var(--dtm-color-border);
+  border-left: 3px solid var(--dtm-color-warning);
+  border-radius: var(--dtm-radius-md);
 }
 
-.dtv-diffinspector__changed-list {
+.dtm-diffinspector__changed-list {
   margin: 0;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--dtv-spacing-xs) var(--dtv-spacing-md);
-  font-size: var(--dtv-font-size-sm);
+  gap: var(--dtm-spacing-xs) var(--dtm-spacing-md);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-diffinspector__changed-row {
+.dtm-diffinspector__changed-row {
   display: contents;
 }
 
-.dtv-diffinspector__changed-row dt {
-  color: var(--dtv-color-text-subtle);
-  font-family: var(--dtv-font-family-mono);
+.dtm-diffinspector__changed-row dt {
+  color: var(--dtm-color-text-subtle);
+  font-family: var(--dtm-font-family-mono);
 }
 
-.dtv-diffinspector__changed-row dd {
+.dtm-diffinspector__changed-row dd {
   margin: 0;
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: var(--dtv-spacing-xs);
-  color: var(--dtv-color-text);
-  font-family: var(--dtv-font-family-mono);
+  gap: var(--dtm-spacing-xs);
+  color: var(--dtm-color-text);
+  font-family: var(--dtm-font-family-mono);
 }
 
-.dtv-diffinspector__changed-row dd code {
+.dtm-diffinspector__changed-row dd code {
   font-family: inherit;
   word-break: break-all;
 }
 
-.dtv-diffinspector__changed-arrow {
-  color: var(--dtv-color-text-subtle);
+.dtm-diffinspector__changed-arrow {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-diffinspector__changed-empty {
-  color: var(--dtv-color-text-subtle);
+.dtm-diffinspector__changed-empty {
+  color: var(--dtm-color-text-subtle);
   font-style: italic;
 }
 
-.dtv-diffinspector__sides {
+.dtm-diffinspector__sides {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
 }
 
-.dtv-diffinspector__single {
+.dtm-diffinspector__single {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
 }
 
-.dtv-diffinspector__side {
+.dtm-diffinspector__side {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
   min-width: 0;
 }
 
-.dtv-diffinspector__sides .dtv-diffinspector__side--b {
-  border-inline-start: 1px solid var(--dtv-color-border);
-  padding-inline-start: var(--dtv-spacing-md);
+.dtm-diffinspector__sides .dtm-diffinspector__side--b {
+  border-inline-start: 1px solid var(--dtm-color-border);
+  padding-inline-start: var(--dtm-spacing-md);
 }
 
-.dtv-diffinspector__sidelabel {
+.dtm-diffinspector__sidelabel {
   align-self: flex-start;
   margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 1.5em;
-  padding: 2px var(--dtv-spacing-xs);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
-  border: 1px solid var(--dtv-color-border);
-  font-family: var(--dtv-font-family-mono);
+  padding: 2px var(--dtm-spacing-xs);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
+  border: 1px solid var(--dtm-color-border);
+  font-family: var(--dtm-font-family-mono);
   line-height: 1.3;
 }
 
-.dtv-diffinspector__absent {
+.dtm-diffinspector__absent {
   margin: 0;
-  padding: var(--dtv-spacing-md);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  padding: var(--dtm-spacing-md);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   font-style: italic;
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-md);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-md);
   text-align: center;
   min-height: 64px;
   display: flex;
@@ -498,106 +498,106 @@ onUnmounted(() => {
    re-declare the ones we reuse here so this component is self-contained
    (Vue scoped CSS doesn't bleed across components). */
 
-.dtv-inspector__section {
+.dtm-inspector__section {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-inspector__heading {
+.dtm-inspector__heading {
   margin: 0;
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.dtv-inspector__preview {
-  padding: var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
+.dtm-inspector__preview {
+  padding: var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
 }
 
-.dtv-inspector__code {
+.dtm-inspector__code {
   margin: 0;
-  padding: var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  padding: var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.dtv-inspector__chain {
+.dtm-inspector__chain {
   margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-inspector__chain-start,
-.dtv-inspector__chain-hop {
+.dtm-inspector__chain-start,
+.dtm-inspector__chain-hop {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-inspector__chain-start {
-  font-weight: var(--dtv-font-weight-medium);
+.dtm-inspector__chain-start {
+  font-weight: var(--dtm-font-weight-medium);
 }
 
-.dtv-inspector__chain-arrow {
-  color: var(--dtv-color-text-subtle);
+.dtm-inspector__chain-arrow {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-inspector__chain-path,
-.dtv-inspector__chain-raw,
-.dtv-inspector__chain-resolved code {
-  font-family: var(--dtv-font-family-mono);
+.dtm-inspector__chain-path,
+.dtm-inspector__chain-raw,
+.dtm-inspector__chain-resolved code {
+  font-family: var(--dtm-font-family-mono);
 }
 
-.dtv-inspector__chain-raw {
-  color: var(--dtv-color-text-subtle);
+.dtm-inspector__chain-raw {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-inspector__chain-resolved {
-  color: var(--dtv-color-text-muted);
+.dtm-inspector__chain-resolved {
+  color: var(--dtm-color-text-muted);
 }
 
-.dtv-inspector__chain-resolved code {
-  color: var(--dtv-color-accent);
+.dtm-inspector__chain-resolved code {
+  color: var(--dtm-color-accent);
 }
 
 /* The overlay/header/close/copy/path styles come from Inspector.vue and are
    scoped to it; we duplicate the minimum needed here for the modal shell. */
-.dtv-inspector-overlay {
+.dtm-inspector-overlay {
   position: fixed;
   inset: 0;
   background-color: rgba(10, 13, 18, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--dtv-spacing-lg);
+  padding: var(--dtm-spacing-lg);
   z-index: 100;
 }
 
-.dtv-inspector {
-  background-color: var(--dtv-color-bg);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-lg);
+.dtm-inspector {
+  background-color: var(--dtm-color-bg);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-lg);
   box-shadow: 0 10px 30px rgba(10, 13, 18, 0.2);
   width: 100%;
   max-width: 640px;
@@ -607,83 +607,83 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.dtv-inspector__header {
+.dtm-inspector__header {
   display: flex;
   align-items: flex-start;
-  gap: var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-md);
-  border-bottom: 1px solid var(--dtv-color-border);
+  gap: var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-md);
+  border-bottom: 1px solid var(--dtm-color-border);
 }
 
-.dtv-inspector__path-row {
+.dtm-inspector__path-row {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   min-width: 0;
 }
 
-.dtv-inspector__path {
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-md);
-  color: var(--dtv-color-text);
+.dtm-inspector__path {
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-md);
+  color: var(--dtm-color-text);
   word-break: break-all;
 }
 
-.dtv-inspector__copy {
+.dtm-inspector__copy {
   flex-shrink: 0;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-muted);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-muted);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
 }
 
-.dtv-inspector__copy:hover {
-  color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
+.dtm-inspector__copy:hover {
+  color: var(--dtm-color-accent);
+  border-color: var(--dtm-color-accent);
 }
 
-.dtv-inspector__close {
+.dtm-inspector__close {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  font-size: var(--dtv-font-size-md);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-md);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
   line-height: 1;
 }
 
-.dtv-inspector__close:hover {
-  color: var(--dtv-color-error);
-  border-color: var(--dtv-color-error);
+.dtm-inspector__close:hover {
+  color: var(--dtm-color-error);
+  border-color: var(--dtm-color-error);
 }
 
-.dtv-inspector__body {
+.dtm-inspector__body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--dtv-spacing-md);
+  padding: var(--dtm-spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
 }
 
 /* Stack the two sides under 640px so the inspector stays usable on phones. */
 @media (max-width: 640px) {
-  .dtv-diffinspector__sides {
+  .dtm-diffinspector__sides {
     grid-template-columns: 1fr;
   }
 
-  .dtv-diffinspector__sides .dtv-diffinspector__side--b {
+  .dtm-diffinspector__sides .dtm-diffinspector__side--b {
     border-inline-start: none;
-    border-block-start: 1px solid var(--dtv-color-border);
+    border-block-start: 1px solid var(--dtm-color-border);
     padding-inline-start: 0;
-    padding-block-start: var(--dtv-spacing-md);
+    padding-block-start: var(--dtm-spacing-md);
   }
 }
 </style>

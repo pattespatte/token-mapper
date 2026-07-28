@@ -70,14 +70,14 @@ describe('FilterChips', () => {
     const chips = wrapper.findAll('button')
     // 4 type chips + 2 facet chips = 6.
     expect(chips).toHaveLength(6)
-    const labels = chips.map((c) => c.get('.dtv-filterchips__label').text())
+    const labels = chips.map((c) => c.get('.dtm-filterchips__label').text())
     expect(labels).toEqual(['color', 'dimension', 'typography', 'other', 'has alias', 'has issues'])
   })
 
   it('shows counts on each chip', async () => {
     const wrapper = mount(FilterChips)
     await flushPromises()
-    const counts = wrapper.findAll('.dtv-filterchips__count').map((c) => c.text())
+    const counts = wrapper.findAll('.dtm-filterchips__count').map((c) => c.text())
     expect(counts).toEqual(['3', '2', '1', '1', '2', '1'])
   })
 
@@ -112,7 +112,7 @@ describe('FilterChips', () => {
     await flushPromises()
     const colorChip = wrapper.findAll('button')[0]!
     expect(colorChip.attributes('aria-pressed')).toBe('true')
-    expect(colorChip.classes()).toContain('dtv-filterchips__chip--active')
+    expect(colorChip.classes()).toContain('dtm-filterchips__chip--active')
   })
 
   it('omits chips whose count is zero', async () => {
@@ -123,7 +123,7 @@ describe('FilterChips', () => {
     }))
     const wrapper = mount(FilterChips)
     await flushPromises()
-    const labels = wrapper.findAll('.dtv-filterchips__label').map((c) => c.text())
+    const labels = wrapper.findAll('.dtm-filterchips__label').map((c) => c.text())
     expect(labels).toEqual(['color'])
   })
 

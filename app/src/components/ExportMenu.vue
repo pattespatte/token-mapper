@@ -93,10 +93,10 @@ async function copyJson(): Promise<void> {
 </script>
 
 <template>
-  <div class="dtv-export-menu" role="group" aria-label="Export comparison report">
+  <div class="dtm-export-menu" role="group" aria-label="Export comparison report">
     <button
       type="button"
-      class="dtv-export-menu__button dtv-export-menu__button--primary"
+      class="dtm-export-menu__button dtm-export-menu__button--primary"
       :disabled="disabled"
       @click="exportMarkdown"
     >
@@ -104,7 +104,7 @@ async function copyJson(): Promise<void> {
     </button>
     <button
       type="button"
-      class="dtv-export-menu__button"
+      class="dtm-export-menu__button"
       :disabled="disabled"
       :aria-label="mdClipboard.copied.value ? 'Markdown copied' : 'Copy Markdown report to clipboard'"
       @click="copyMarkdown"
@@ -113,7 +113,7 @@ async function copyJson(): Promise<void> {
     </button>
     <button
       type="button"
-      class="dtv-export-menu__button"
+      class="dtm-export-menu__button"
       :disabled="disabled"
       @click="exportJson"
     >
@@ -121,7 +121,7 @@ async function copyJson(): Promise<void> {
     </button>
     <button
       type="button"
-      class="dtv-export-menu__button"
+      class="dtm-export-menu__button"
       :disabled="disabled"
       :aria-label="jsonClipboard.copied.value ? 'JSON copied' : 'Copy JSON report to clipboard'"
       @click="copyJson"
@@ -132,52 +132,52 @@ async function copyJson(): Promise<void> {
 </template>
 
 <style scoped>
-.dtv-export-menu {
+.dtm-export-menu {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: center;
 }
 
-.dtv-export-menu__button {
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-medium);
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
+.dtm-export-menu__button {
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-medium);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
   cursor: pointer;
 }
 
-.dtv-export-menu__button:hover:not(:disabled):not(.dtv-export-menu__button--primary) {
+.dtm-export-menu__button:hover:not(:disabled):not(.dtm-export-menu__button--primary) {
   /* Explicit color mirrors the 47026f1 fix on FilterChips: a hover state that
      changes background must also redeclare color so the text treatment is
      unambiguous rather than left to the cascade. Excludes --primary because
      the primary button keeps its accent background on hover (see below). */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-export-menu__button:focus-visible {
-  outline: 2px solid var(--dtv-color-accent);
+.dtm-export-menu__button:focus-visible {
+  outline: 2px solid var(--dtm-color-accent);
   outline-offset: 2px;
 }
 
-.dtv-export-menu__button:disabled {
+.dtm-export-menu__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* Primary "Export MD" gets the accent treatment so the most-common action
    stands out from the three secondary buttons. */
-.dtv-export-menu__button--primary {
-  color: var(--dtv-color-bg);
-  background-color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
+.dtm-export-menu__button--primary {
+  color: var(--dtm-color-bg);
+  background-color: var(--dtm-color-accent);
+  border-color: var(--dtm-color-accent);
 }
 
-.dtv-export-menu__button--primary:hover:not(:disabled) {
+.dtm-export-menu__button--primary:hover:not(:disabled) {
   filter: brightness(1.1);
 }
 </style>

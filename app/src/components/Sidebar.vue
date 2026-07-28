@@ -41,52 +41,52 @@ const toggleLabel = computed(() =>
 </script>
 
 <template>
-  <nav class="dtv-sidebar" :class="{ 'dtv-sidebar--collapsed': collapsed }" aria-label="Token categories">
+  <nav class="dtm-sidebar" :class="{ 'dtm-sidebar--collapsed': collapsed }" aria-label="Token categories">
     <!-- Toggle: always visible, in both states. Lives outside the
          collapsible content region so it remains interactive when collapsed. -->
     <button
       type="button"
-      class="dtv-sidebar__toggle"
-      :class="{ 'dtv-sidebar__toggle--collapsed': collapsed }"
+      class="dtm-sidebar__toggle"
+      :class="{ 'dtm-sidebar__toggle--collapsed': collapsed }"
       :aria-expanded="!collapsed"
-      aria-controls="dtv-sidebar-content"
+      aria-controls="dtm-sidebar-content"
       :aria-label="toggleLabel"
       :title="toggleLabel"
       @click="toggle"
     >
-      <span class="dtv-sidebar__chevron" aria-hidden="true">‹</span>
+      <span class="dtm-sidebar__chevron" aria-hidden="true">‹</span>
     </button>
 
     <!-- Collapsible content. Stays in the DOM; hidden visually when collapsed. -->
     <div
-      id="dtv-sidebar-content"
-      class="dtv-sidebar__content"
-      :class="{ 'dtv-sidebar__content--hidden': collapsed }"
+      id="dtm-sidebar-content"
+      class="dtm-sidebar__content"
+      :class="{ 'dtm-sidebar__content--hidden': collapsed }"
     >
-      <h2 class="dtv-sidebar__heading">Categories</h2>
+      <h2 class="dtm-sidebar__heading">Categories</h2>
 
-      <p v-if="isComparing" class="dtv-sidebar__note">
+      <p v-if="isComparing" class="dtm-sidebar__note">
         Comparing two sets. Categories are browse-only — switch back to a
         single set to use them, or use the
         <strong>Matching / Changed / Missing / Extra</strong> filters above
         the comparison grid.
       </p>
 
-      <p v-else-if="browseSet === null" class="dtv-sidebar__empty">
+      <p v-else-if="browseSet === null" class="dtm-sidebar__empty">
         No set loaded. Click <strong>Load demo</strong> or drop a JSON file.
       </p>
 
-      <ul v-else class="dtv-sidebar__list">
+      <ul v-else class="dtm-sidebar__list">
         <li v-for="cat in categories" :key="cat.name">
           <button
             type="button"
-            class="dtv-sidebar__item"
-            :class="{ 'dtv-sidebar__item--active': activeCategory === cat.name }"
+            class="dtm-sidebar__item"
+            :class="{ 'dtm-sidebar__item--active': activeCategory === cat.name }"
             :aria-pressed="activeCategory === cat.name"
             @click="selectCategory(cat.name)"
           >
-            <span class="dtv-sidebar__name">{{ cat.name }}</span>
-            <span class="dtv-sidebar__count">{{ cat.count }}</span>
+            <span class="dtm-sidebar__name">{{ cat.name }}</span>
+            <span class="dtm-sidebar__count">{{ cat.count }}</span>
           </button>
         </li>
       </ul>
@@ -95,45 +95,45 @@ const toggleLabel = computed(() =>
 </template>
 
 <style scoped>
-.dtv-sidebar {
+.dtm-sidebar {
   /* Expanded: vertical stack — toggle on top, content below. */
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   height: 100%;
-  padding: var(--dtv-spacing-md);
+  padding: var(--dtm-spacing-md);
 }
 
-.dtv-sidebar--collapsed {
+.dtm-sidebar--collapsed {
   /* Collapsed: thin rail. Center the toggle vertically; no horizontal
      padding so the rail is exactly the COLLAPSED_WIDTH from useSidebar. */
   align-items: center;
   justify-content: flex-start;
-  padding: var(--dtv-spacing-xs) 0;
+  padding: var(--dtm-spacing-xs) 0;
 }
 
-.dtv-sidebar__toggle {
+.dtm-sidebar__toggle {
   /* Toggle button fills its row when expanded (so the whole header strip
      is clickable) and becomes a square icon button when collapsed. */
   align-self: stretch;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
   background: none;
   border: none;
-  color: var(--dtv-color-text-subtle);
-  font-size: var(--dtv-font-size-md);
+  color: var(--dtm-color-text-subtle);
+  font-size: var(--dtm-font-size-md);
   cursor: pointer;
-  border-radius: var(--dtv-radius-sm);
+  border-radius: var(--dtm-radius-sm);
 }
 
-.dtv-sidebar__toggle:hover {
-  color: var(--dtv-color-accent);
-  background-color: var(--dtv-color-surface-muted);
+.dtm-sidebar__toggle:hover {
+  color: var(--dtm-color-accent);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-sidebar__toggle--collapsed {
+.dtm-sidebar__toggle--collapsed {
   /* Square icon button in the rail. */
   align-self: center;
   justify-content: center;
@@ -142,35 +142,35 @@ const toggleLabel = computed(() =>
   padding: 0;
 }
 
-.dtv-sidebar__chevron {
+.dtm-sidebar__chevron {
   /* Expanded: points left (‹) to indicate "collapse to the left".
      Collapsed: rotate 180° so it points right (›), indicating "expand". */
   display: inline-block;
-  font-size: var(--dtv-font-size-lg);
+  font-size: var(--dtm-font-size-lg);
   line-height: 1;
   transition: transform 0.15s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dtv-sidebar__chevron {
+  .dtm-sidebar__chevron {
     transition: none;
   }
 }
 
-.dtv-sidebar__toggle--collapsed .dtv-sidebar__chevron {
+.dtm-sidebar__toggle--collapsed .dtm-sidebar__chevron {
   transform: rotate(180deg);
 }
 
-.dtv-sidebar__content {
+.dtm-sidebar__content {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   /* Visibility transitions with the grid width so content fades out as
      the rail collapses, not before. */
   transition: visibility 0s linear 0.15s;
 }
 
-.dtv-sidebar__content--hidden {
+.dtm-sidebar__content--hidden {
   /* Hidden visually but kept in the DOM for SR users. Pointer-events
      none so the collapsed rail doesn't intercept clicks on hidden
      buttons. */
@@ -179,29 +179,29 @@ const toggleLabel = computed(() =>
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dtv-sidebar__content {
+  .dtm-sidebar__content {
     transition: none;
   }
 }
 
-.dtv-sidebar__heading {
-  margin: 0 0 var(--dtv-spacing-xs) 0;
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text-subtle);
+.dtm-sidebar__heading {
+  margin: 0 0 var(--dtm-spacing-xs) 0;
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.dtv-sidebar__empty,
-.dtv-sidebar__note {
+.dtm-sidebar__empty,
+.dtm-sidebar__note {
   margin: 0;
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   line-height: 1.4;
 }
 
-.dtv-sidebar__list {
+.dtm-sidebar__list {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -210,44 +210,44 @@ const toggleLabel = computed(() =>
   gap: 2px;
 }
 
-.dtv-sidebar__item {
+.dtm-sidebar__item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
   background: none;
   border: none;
-  border-radius: var(--dtv-radius-sm);
-  color: var(--dtv-color-text);
-  font-size: var(--dtv-font-size-sm);
+  border-radius: var(--dtm-radius-sm);
+  color: var(--dtm-color-text);
+  font-size: var(--dtm-font-size-sm);
   text-align: left;
   cursor: pointer;
 }
 
-.dtv-sidebar__item:hover:not(.dtv-sidebar__item--active) {
+.dtm-sidebar__item:hover:not(.dtm-sidebar__item--active) {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1).
      Excludes --active, whose accent-on-muted treatment shouldn't be overridden. */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-sidebar__item--active {
-  background-color: var(--dtv-color-accent-muted);
-  color: var(--dtv-color-accent);
-  font-weight: var(--dtv-font-weight-medium);
+.dtm-sidebar__item--active {
+  background-color: var(--dtm-color-accent-muted);
+  color: var(--dtm-color-accent);
+  font-weight: var(--dtm-font-weight-medium);
 }
 
-.dtv-sidebar__name {
-  font-family: var(--dtv-font-family-mono);
+.dtm-sidebar__name {
+  font-family: var(--dtm-font-family-mono);
 }
 
-.dtv-sidebar__count {
-  color: var(--dtv-color-text-subtle);
-  font-size: var(--dtv-font-size-sm);
+.dtm-sidebar__count {
+  color: var(--dtm-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-sidebar__item--active .dtv-sidebar__count {
-  color: var(--dtv-color-accent);
+.dtm-sidebar__item--active .dtm-sidebar__count {
+  color: var(--dtm-color-accent);
 }
 </style>

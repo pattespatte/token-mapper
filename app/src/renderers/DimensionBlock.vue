@@ -53,7 +53,7 @@ const visualStyle = computed(() => {
     return { borderRadius: valueString.value }
   }
   // Spacing: the bar width IS the token value. Overflow protection lives in
-  // CSS (max-width: 100% on .dtv-dimension__bar) — wrapping the value in
+  // CSS (max-width: 100% on .dtm-dimension__bar) — wrapping the value in
   // min(..., 100%) here defeats the visual: the 100% resolves against a
   // content-shrunk flex wrapper and collapses every bar to the same size.
   return { width: valueString.value }
@@ -61,63 +61,63 @@ const visualStyle = computed(() => {
 </script>
 
 <template>
-  <div class="dtv-dimension">
-    <div class="dtv-dimension__visual-wrap">
+  <div class="dtm-dimension">
+    <div class="dtm-dimension__visual-wrap">
       <div
         v-if="variant === 'radius'"
-        class="dtv-dimension__radius"
+        class="dtm-dimension__radius"
         :style="visualStyle"
         :aria-label="`Radius ${valueString}`"
         role="img"
       ></div>
       <div
         v-else
-        class="dtv-dimension__bar"
+        class="dtm-dimension__bar"
         :style="visualStyle"
         :aria-label="`Spacing ${valueString}`"
         role="img"
       ></div>
     </div>
-    <span class="dtv-dimension__value">{{ valueString }}</span>
+    <span class="dtm-dimension__value">{{ valueString }}</span>
   </div>
 </template>
 
 <style scoped>
-.dtv-dimension {
+.dtm-dimension {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: flex-start;
 }
 
 /* width: 100% so the bar's max-width: 100% resolves against the card's
    content box (the card is the nearest positioned/width-defined ancestor),
    not a content-shrunk flex item. */
-.dtv-dimension__visual-wrap {
+.dtm-dimension__visual-wrap {
   width: 100%;
   height: 32px;
   display: flex;
   align-items: center;
 }
 
-.dtv-dimension__bar {
+.dtm-dimension__bar {
   height: 16px;
   min-width: 2px;
   max-width: 100%;
-  background-color: var(--dtv-color-accent);
-  border-radius: var(--dtv-radius-sm);
+  background-color: var(--dtm-color-accent);
+  border-radius: var(--dtm-radius-sm);
 }
 
-.dtv-dimension__radius {
+.dtm-dimension__radius {
   width: 48px;
   height: 48px;
-  background-color: var(--dtv-color-accent);
+  background-color: var(--dtm-color-accent);
   /* borderRadius is applied via inline style from the token value. */
 }
 
-.dtv-dimension__value {
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+.dtm-dimension__value {
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
 }
 </style>

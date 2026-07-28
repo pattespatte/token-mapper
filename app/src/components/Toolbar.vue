@@ -52,11 +52,11 @@ function modeStatus(): string {
 </script>
 
 <template>
-  <div class="dtv-toolbar">
-    <div class="dtv-toolbar__actions">
+  <div class="dtm-toolbar">
+    <div class="dtm-toolbar__actions">
       <button
         type="button"
-        class="dtv-toolbar__button"
+        class="dtm-toolbar__button"
         @click="loadDemo"
       >
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -66,7 +66,7 @@ function modeStatus(): string {
       </button>
       <button
         type="button"
-        class="dtv-toolbar__button"
+        class="dtm-toolbar__button"
         :disabled="setA === null && setB === null"
         @click="clearAll"
       >
@@ -87,28 +87,28 @@ function modeStatus(): string {
       <ShareMenu />
     </div>
 
-    <p class="dtv-toolbar__status" aria-live="polite">
+    <p class="dtm-toolbar__status" aria-live="polite">
       {{ modeStatus() }}
     </p>
 
-    <div class="dtv-toolbar__slots">
-      <div class="dtv-toolbar__slot">
+    <div class="dtm-toolbar__slots">
+      <div class="dtm-toolbar__slot">
         <Dropzone set-id="A" hint="your design system" />
         <button
           v-if="setA !== null"
           type="button"
-          class="dtv-toolbar__clear"
+          class="dtm-toolbar__clear"
           aria-label="Clear set A"
           @click="clearSet('A')"
         >✕</button>
       </div>
 
-      <div class="dtv-toolbar__slot">
+      <div class="dtm-toolbar__slot">
         <Dropzone set-id="B" hint="base design system" />
         <button
           v-if="setB !== null"
           type="button"
-          class="dtv-toolbar__clear"
+          class="dtm-toolbar__clear"
           aria-label="Clear set B"
           @click="clearSet('B')"
         >✕</button>
@@ -119,76 +119,76 @@ function modeStatus(): string {
 </template>
 
 <style scoped>
-.dtv-toolbar {
+.dtm-toolbar {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-md);
-  border-bottom: 1px solid var(--dtv-color-border);
-  background-color: var(--dtv-color-surface);
+  gap: var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-md);
+  border-bottom: 1px solid var(--dtm-color-border);
+  background-color: var(--dtm-color-surface);
 }
 
-.dtv-toolbar__actions {
+.dtm-toolbar__actions {
   display: flex;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-toolbar__button {
+.dtm-toolbar__button {
   display: inline-flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-md);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-medium);
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-md);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-medium);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
   cursor: pointer;
 }
 
-.dtv-toolbar__button:hover:not(:disabled) {
+.dtm-toolbar__button:hover:not(:disabled) {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-toolbar__button:disabled {
+.dtm-toolbar__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.dtv-toolbar__status {
+.dtm-toolbar__status {
   margin: 0;
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-toolbar__slots {
+.dtm-toolbar__slots {
   display: flex;
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
   flex-wrap: wrap;
 }
 
-.dtv-toolbar__slot {
+.dtm-toolbar__slot {
   display: flex;
   align-items: stretch;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   flex: 1 1 280px;
 }
 
-.dtv-toolbar__clear {
-  padding: 0 var(--dtv-spacing-sm);
-  font-size: var(--dtv-font-size-md);
-  color: var(--dtv-color-text-subtle);
+.dtm-toolbar__clear {
+  padding: 0 var(--dtm-spacing-sm);
+  font-size: var(--dtm-font-size-md);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
   cursor: pointer;
 }
 
-.dtv-toolbar__clear:hover {
-  color: var(--dtv-color-error);
-  border-color: var(--dtv-color-error);
+.dtm-toolbar__clear:hover {
+  color: var(--dtm-color-error);
+  border-color: var(--dtm-color-error);
 }
 </style>

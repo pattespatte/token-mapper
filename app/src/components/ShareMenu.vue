@@ -126,10 +126,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="dtv-share-menu" role="group" aria-label="Share loaded token sets">
+  <div class="dtm-share-menu" role="group" aria-label="Share loaded token sets">
     <button
       type="button"
-      class="dtv-share-menu__button"
+      class="dtm-share-menu__button"
       @click="onCopyLink"
     >
       <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -140,7 +140,7 @@ onUnmounted(() => {
     </button>
     <button
       type="button"
-      class="dtv-share-menu__button"
+      class="dtm-share-menu__button"
       :disabled="!hasHashInUrl"
       @click="onClearUrl"
     >
@@ -153,10 +153,10 @@ onUnmounted(() => {
     </button>
     <span
       v-if="message !== null"
-      class="dtv-share-menu__message"
+      class="dtm-share-menu__message"
       :class="{
-        'dtv-share-menu__message--success': isSuccess,
-        'dtv-share-menu__message--error': isError,
+        'dtm-share-menu__message--success': isSuccess,
+        'dtm-share-menu__message--error': isError,
       }"
       role="status"
       aria-live="polite"
@@ -167,53 +167,53 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.dtv-share-menu {
+.dtm-share-menu {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: center;
 }
 
-.dtv-share-menu__button {
+.dtm-share-menu__button {
   display: inline-flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-medium);
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-medium);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
   cursor: pointer;
 }
 
-.dtv-share-menu__button:hover:not(:disabled) {
+.dtm-share-menu__button:hover:not(:disabled) {
   /* Explicit color on hover for unambiguous contrast (mirrors 47026f1). */
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-share-menu__button:focus-visible {
-  outline: 2px solid var(--dtv-color-accent);
+.dtm-share-menu__button:focus-visible {
+  outline: 2px solid var(--dtm-color-accent);
   outline-offset: 2px;
 }
 
-.dtv-share-menu__button:disabled {
+.dtm-share-menu__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.dtv-share-menu__message {
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-share-menu__message {
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-share-menu__message--success {
-  color: var(--dtv-color-success);
+.dtm-share-menu__message--success {
+  color: var(--dtm-color-success);
 }
 
-.dtv-share-menu__message--error {
-  color: var(--dtv-color-warning);
+.dtm-share-menu__message--error {
+  color: var(--dtm-color-warning);
 }
 </style>

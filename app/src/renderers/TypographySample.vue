@@ -90,18 +90,18 @@ const specRows = computed<SpecRow[]>(() => {
 </script>
 
 <template>
-  <div class="dtv-typography">
+  <div class="dtm-typography">
     <p
       v-if="composite"
-      class="dtv-typography__sample"
+      class="dtm-typography__sample"
       :style="sampleStyle"
     >The quick brown fox jumps over the lazy dog</p>
-    <p v-else class="dtv-typography__broken">
+    <p v-else class="dtm-typography__broken">
       Typography value is not a composite object.
     </p>
 
-    <dl class="dtv-typography__spec">
-      <div v-for="row in specRows" :key="row.label" class="dtv-typography__row">
+    <dl class="dtm-typography__spec">
+      <div v-for="row in specRows" :key="row.label" class="dtm-typography__row">
         <dt>{{ row.label }}</dt>
         <dd>{{ row.value }}</dd>
       </div>
@@ -110,47 +110,47 @@ const specRows = computed<SpecRow[]>(() => {
 </template>
 
 <style scoped>
-.dtv-typography {
+.dtm-typography {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
+  gap: var(--dtm-spacing-sm);
 }
 
-.dtv-typography__sample {
+.dtm-typography__sample {
   margin: 0;
   /* Defaults inherited from the page; per-token fields applied via inline style. */
-  color: var(--dtv-color-text);
+  color: var(--dtm-color-text);
   /* Leave font-family unset when the token doesn't specify one — fall through. */
   word-break: break-word;
 }
 
-.dtv-typography__broken {
+.dtm-typography__broken {
   margin: 0;
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   font-style: italic;
 }
 
-.dtv-typography__spec {
+.dtm-typography__spec {
   margin: 0;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 2px var(--dtv-spacing-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
+  gap: 2px var(--dtm-spacing-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-typography__row {
+.dtm-typography__row {
   display: contents;
 }
 
-.dtv-typography__row dt {
-  color: var(--dtv-color-text-subtle);
+.dtm-typography__row dt {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-typography__row dd {
+.dtm-typography__row dd {
   margin: 0;
-  color: var(--dtv-color-text);
+  color: var(--dtm-color-text);
   word-break: break-all;
 }
 </style>

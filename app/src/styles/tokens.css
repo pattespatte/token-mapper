@@ -8,60 +8,60 @@
 
 :root {
   /* Color — neutral surface */
-  --dtv-color-bg: #ffffff;
-  --dtv-color-surface: #fafafa;
-  --dtv-color-surface-muted: #f3f4f6;
-  --dtv-color-border: #e5e7eb;
-  --dtv-color-border-strong: #d1d5db;
+  --dtm-color-bg: #ffffff;
+  --dtm-color-surface: #fafafa;
+  --dtm-color-surface-muted: #f3f4f6;
+  --dtm-color-border: #e5e7eb;
+  --dtm-color-border-strong: #d1d5db;
 
   /* Color — text. Note: text-subtle must stay at or above 4.5:1 contrast
-     against --dtv-color-surface (#fafafa) per WCAG AA. Previous #717680
+     against --dtm-color-surface (#fafafa) per WCAG AA. Previous #717680
      was 4.36:1; #5e6470 hits ~5.0:1. */
-  --dtv-color-text: #181d27;
-  --dtv-color-text-muted: #535862;
-  --dtv-color-text-subtle: #5e6470;
+  --dtm-color-text: #181d27;
+  --dtm-color-text-muted: #535862;
+  --dtm-color-text-subtle: #5e6470;
 
   /* Color — accent */
-  --dtv-color-accent: #3d0414;
-  --dtv-color-accent-muted: #f3e8ea;
+  --dtm-color-accent: #3d0414;
+  --dtm-color-accent-muted: #f3e8ea;
 
   /* Color — semantic */
-  --dtv-color-success: #166534;
-  --dtv-color-warning: #854d0e;
-  --dtv-color-error: #991b1b;
-  --dtv-color-info: #1e40af;
+  --dtm-color-success: #166534;
+  --dtm-color-warning: #854d0e;
+  --dtm-color-error: #991b1b;
+  --dtm-color-info: #1e40af;
 
   /* Spacing scale */
-  --dtv-spacing-2xs: 4px;
-  --dtv-spacing-xs: 8px;
-  --dtv-spacing-sm: 12px;
-  --dtv-spacing-md: 16px;
-  --dtv-spacing-lg: 24px;
-  --dtv-spacing-xl: 32px;
-  --dtv-spacing-2xl: 48px;
+  --dtm-spacing-2xs: 4px;
+  --dtm-spacing-xs: 8px;
+  --dtm-spacing-sm: 12px;
+  --dtm-spacing-md: 16px;
+  --dtm-spacing-lg: 24px;
+  --dtm-spacing-xl: 32px;
+  --dtm-spacing-2xl: 48px;
 
   /* Radius */
-  --dtv-radius-sm: 4px;
-  --dtv-radius-md: 8px;
-  --dtv-radius-lg: 12px;
+  --dtm-radius-sm: 4px;
+  --dtm-radius-md: 8px;
+  --dtm-radius-lg: 12px;
 
   /* Typography */
-  --dtv-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  --dtm-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Helvetica, Arial, sans-serif;
-  --dtv-font-family-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', Menlo,
+  --dtm-font-family-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', Menlo,
     Consolas, monospace;
-  --dtv-font-size-sm: 13px;
-  --dtv-font-size-md: 15px;
-  --dtv-font-size-lg: 18px;
-  --dtv-font-size-xl: 24px;
-  --dtv-font-weight-regular: 400;
-  --dtv-font-weight-medium: 500;
-  --dtv-font-weight-semibold: 600;
+  --dtm-font-size-sm: 13px;
+  --dtm-font-size-md: 15px;
+  --dtm-font-size-lg: 18px;
+  --dtm-font-size-xl: 24px;
+  --dtm-font-weight-regular: 400;
+  --dtm-font-weight-medium: 500;
+  --dtm-font-weight-semibold: 600;
 
   /* Layout */
-  --dtv-header-height: 56px;
-  --dtv-sidebar-width: 240px;
-  --dtv-shadow-card: 0 1px 2px rgba(10, 13, 18, 0.05),
+  --dtm-header-height: 56px;
+  --dtm-sidebar-width: 240px;
+  --dtm-shadow-card: 0 1px 2px rgba(10, 13, 18, 0.05),
     0 1px 3px rgba(10, 13, 18, 0.1);
 }
 
@@ -86,30 +86,30 @@
  * guard is what makes "user chose light on a dark-OS device" actually stick.
  */
 :root[data-theme='dark'] {
-  --dtv-color-bg: #0a0d12;
-  --dtv-color-surface: #181d27;
-  --dtv-color-surface-muted: #252b37;
-  --dtv-color-border: #414651;
-  --dtv-color-border-strong: #535862;
-  --dtv-color-text: #f5f5f5;
-  --dtv-color-text-muted: #d5d7da;
-  --dtv-color-text-subtle: #a4a7ae;
-  --dtv-color-accent: #f5d0d8;
-  --dtv-color-accent-muted: #2a1a1e;
+  --dtm-color-bg: #0a0d12;
+  --dtm-color-surface: #181d27;
+  --dtm-color-surface-muted: #252b37;
+  --dtm-color-border: #414651;
+  --dtm-color-border-strong: #535862;
+  --dtm-color-text: #f5f5f5;
+  --dtm-color-text-muted: #d5d7da;
+  --dtm-color-text-subtle: #a4a7ae;
+  --dtm-color-accent: #f5d0d8;
+  --dtm-color-accent-muted: #2a1a1e;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --dtv-color-bg: #0a0d12;
-    --dtv-color-surface: #181d27;
-    --dtv-color-surface-muted: #252b37;
-    --dtv-color-border: #414651;
-    --dtv-color-border-strong: #535862;
-    --dtv-color-text: #f5f5f5;
-    --dtv-color-text-muted: #d5d7da;
-    --dtv-color-text-subtle: #a4a7ae;
-    --dtv-color-accent: #f5d0d8;
-    --dtv-color-accent-muted: #2a1a1e;
+    --dtm-color-bg: #0a0d12;
+    --dtm-color-surface: #181d27;
+    --dtm-color-surface-muted: #252b37;
+    --dtm-color-border: #414651;
+    --dtm-color-border-strong: #535862;
+    --dtm-color-text: #f5f5f5;
+    --dtm-color-text-muted: #d5d7da;
+    --dtm-color-text-subtle: #a4a7ae;
+    --dtm-color-accent: #f5d0d8;
+    --dtm-color-accent-muted: #2a1a1e;
   }
 }
 
@@ -129,18 +129,18 @@ body,
 }
 
 body {
-  font-family: var(--dtv-font-family);
-  font-size: var(--dtv-font-size-md);
+  font-family: var(--dtm-font-family);
+  font-size: var(--dtm-font-size-md);
   line-height: 1.5;
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-bg);
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Focus visibility — WCAG */
 :focus-visible {
-  outline: 2px solid var(--dtv-color-accent);
+  outline: 2px solid var(--dtm-color-accent);
   outline-offset: 2px;
 }
 

@@ -67,7 +67,7 @@ onUnmounted(() => {
 
 <template>
   <article
-    class="dtv-card"
+    class="dtm-card"
     tabindex="0"
     :aria-label="`Token ${token.path}`"
     @click="emit('select', token.path)"
@@ -75,12 +75,12 @@ onUnmounted(() => {
     @keydown.space.prevent="emit('select', token.path)"
   >
     <TokenVisual :token="token" />
-    <div class="dtv-card__footer">
-      <code class="dtv-card__path" :title="token.path">{{ token.path }}</code>
-      <div class="dtv-card__actions">
+    <div class="dtm-card__footer">
+      <code class="dtm-card__path" :title="token.path">{{ token.path }}</code>
+      <div class="dtm-card__actions">
         <button
           type="button"
-          class="dtv-card__copy"
+          class="dtm-card__copy"
           :aria-label="pathClipboard.copied.value ? 'Path copied' : `Copy path ${token.path}`"
           @click.stop="copyPath"
           @keydown.stop
@@ -89,7 +89,7 @@ onUnmounted(() => {
         </button>
         <button
           type="button"
-          class="dtv-card__copy dtv-card__copy--value"
+          class="dtm-card__copy dtm-card__copy--value"
           :aria-label="valueClipboard.copied.value ? 'Value copied' : `Copy value of ${token.path}`"
           @click.stop="copyValue"
           @keydown.stop
@@ -100,112 +100,112 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.dtv-card {
+.dtm-card {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-md);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
+  gap: var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-md);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.dtv-card:hover,
-.dtv-card:focus-visible {
-  border-color: var(--dtv-color-accent);
-  box-shadow: var(--dtv-shadow-card);
+.dtm-card:hover,
+.dtm-card:focus-visible {
+  border-color: var(--dtm-color-accent);
+  box-shadow: var(--dtm-shadow-card);
   outline: none;
 }
 
-.dtv-card__footer {
+.dtm-card__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-card__path {
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-muted);
+.dtm-card__path {
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-muted);
   word-break: break-all;
   line-height: 1.3;
 }
 
-.dtv-card__actions {
+.dtm-card__actions {
   display: inline-flex;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   flex-shrink: 0;
 }
 
-.dtv-card__copy {
-  padding: 2px var(--dtv-spacing-xs);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+.dtm-card__copy {
+  padding: 2px var(--dtm-spacing-xs);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
   line-height: 1;
 }
 
-.dtv-card__copy:hover {
-  color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
+.dtm-card__copy:hover {
+  color: var(--dtm-color-accent);
+  border-color: var(--dtm-color-accent);
 }
 </style>
 
 <style scoped>
-.dtv-card {
+.dtm-card {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-md);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
+  gap: var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-md);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.dtv-card:hover,
-.dtv-card:focus-visible {
-  border-color: var(--dtv-color-accent);
-  box-shadow: var(--dtv-shadow-card);
+.dtm-card:hover,
+.dtm-card:focus-visible {
+  border-color: var(--dtm-color-accent);
+  box-shadow: var(--dtm-shadow-card);
   outline: none;
 }
 
-.dtv-card__footer {
+.dtm-card__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-card__path {
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-muted);
+.dtm-card__path {
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-muted);
   word-break: break-all;
   line-height: 1.3;
 }
 
-.dtv-card__copy {
+.dtm-card__copy {
   flex-shrink: 0;
-  padding: 2px var(--dtv-spacing-xs);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-subtle);
+  padding: 2px var(--dtm-spacing-xs);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
   line-height: 1;
 }
 
-.dtv-card__copy:hover {
-  color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
+.dtm-card__copy:hover {
+  color: var(--dtm-color-accent);
+  border-color: var(--dtm-color-accent);
 }
 </style>

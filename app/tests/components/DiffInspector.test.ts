@@ -112,16 +112,16 @@ describe('DiffInspector', () => {
 
   it('renders nothing when selectedDiff is null', () => {
     const w = mountFresh()
-    expect(w.find('.dtv-inspector-overlay').exists()).toBe(false)
+    expect(w.find('.dtm-inspector-overlay').exists()).toBe(false)
   })
 
   it('renders path + bucket when open', async () => {
     selectedDiff = computed(() => makeBothDiff('changed'))
     const w = mountFresh()
     await flushPromises()
-    expect(w.find('.dtv-inspector-overlay').exists()).toBe(true)
-    expect(w.get('.dtv-inspector__path').text()).toBe('color.accent')
-    expect(w.get('.dtv-diffinspector__bucket').text()).toBe('changed')
+    expect(w.find('.dtm-inspector-overlay').exists()).toBe(true)
+    expect(w.get('.dtm-inspector__path').text()).toBe('color.accent')
+    expect(w.get('.dtm-diffinspector__bucket').text()).toBe('changed')
   })
 
   it('shows two side-by-side columns for changed (both present)', async () => {
@@ -129,17 +129,17 @@ describe('DiffInspector', () => {
     const w = mountFresh()
     await flushPromises()
     // Both A and B sidlabels should be in the side-by-side grid.
-    const sides = w.findAll('.dtv-diffinspector__sides .dtv-diffinspector__side')
+    const sides = w.findAll('.dtm-diffinspector__sides .dtm-diffinspector__side')
     expect(sides).toHaveLength(2)
-    expect(sides[0]!.classes()).toContain('dtv-diffinspector__side--a')
-    expect(sides[1]!.classes()).toContain('dtv-diffinspector__side--b')
+    expect(sides[0]!.classes()).toContain('dtm-diffinspector__side--a')
+    expect(sides[1]!.classes()).toContain('dtm-diffinspector__side--b')
   })
 
   it('shows two side-by-side columns for matching', async () => {
     selectedDiff = computed(() => makeBothDiff('matching'))
     const w = mountFresh()
     await flushPromises()
-    const sides = w.findAll('.dtv-diffinspector__sides .dtv-diffinspector__side')
+    const sides = w.findAll('.dtm-diffinspector__sides .dtm-diffinspector__side')
     expect(sides).toHaveLength(2)
   })
 
@@ -148,19 +148,19 @@ describe('DiffInspector', () => {
     const w = mountFresh()
     await flushPromises()
     // Single-side container is used.
-    expect(w.find('.dtv-diffinspector__sides').exists()).toBe(false)
-    expect(w.find('.dtv-diffinspector__single').exists()).toBe(true)
-    expect(w.findAll('.dtv-diffinspector__side--a')).toHaveLength(1)
-    expect(w.get('.dtv-diffinspector__absent').text()).toContain('not in set B')
+    expect(w.find('.dtm-diffinspector__sides').exists()).toBe(false)
+    expect(w.find('.dtm-diffinspector__single').exists()).toBe(true)
+    expect(w.findAll('.dtm-diffinspector__side--a')).toHaveLength(1)
+    expect(w.get('.dtm-diffinspector__absent').text()).toContain('not in set B')
   })
 
   it('shows single B side + "not in set A" for extra', async () => {
     selectedDiff = computed(() => makeExtraDiff())
     const w = mountFresh()
     await flushPromises()
-    expect(w.find('.dtv-diffinspector__single').exists()).toBe(true)
-    expect(w.findAll('.dtv-diffinspector__side--b')).toHaveLength(1)
-    expect(w.get('.dtv-diffinspector__absent').text()).toContain('not in set A')
+    expect(w.find('.dtm-diffinspector__single').exists()).toBe(true)
+    expect(w.findAll('.dtm-diffinspector__side--b')).toHaveLength(1)
+    expect(w.get('.dtm-diffinspector__absent').text()).toContain('not in set A')
   })
 
   it('Esc closes the modal via clearDiffSelection', async () => {
@@ -176,7 +176,7 @@ describe('DiffInspector', () => {
     selectedDiff = computed(() => makeBothDiff('changed'))
     const w = mountFresh()
     await flushPromises()
-    await w.get('.dtv-inspector__close').trigger('click')
+    await w.get('.dtm-inspector__close').trigger('click')
     expect(clearDiffSelection).toHaveBeenCalledTimes(1)
   })
 
@@ -194,9 +194,9 @@ describe('DiffInspector', () => {
     selectedDiff = computed(() => diff)
     const w = mountFresh()
     await flushPromises()
-    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(true)
-    expect(w.get('.dtv-inspector__heading').text()).toBe('What changed')
-    const rows = w.findAll('.dtv-diffinspector__changed-row')
+    expect(w.find('.dtm-diffinspector__changed').exists()).toBe(true)
+    expect(w.get('.dtm-inspector__heading').text()).toBe('What changed')
+    const rows = w.findAll('.dtm-diffinspector__changed-row')
     expect(rows).toHaveLength(2)
     expect(rows[0]!.get('dt').text()).toBe('value')
     expect(rows[0]!.findAll('code')[0]!.text()).toBe('16px')
@@ -209,7 +209,7 @@ describe('DiffInspector', () => {
     selectedDiff = computed(() => diff)
     const w = mountFresh()
     await flushPromises()
-    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(false)
+    expect(w.find('.dtm-diffinspector__changed').exists()).toBe(false)
   })
 
   it('hides "What changed" section when explanation is undefined', async () => {
@@ -217,7 +217,7 @@ describe('DiffInspector', () => {
     selectedDiff = computed(() => makeBothDiff('changed'))
     const w = mountFresh()
     await flushPromises()
-    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(false)
+    expect(w.find('.dtm-diffinspector__changed').exists()).toBe(false)
   })
 
   it('hides "What changed" section for matching tokens', async () => {
@@ -229,7 +229,7 @@ describe('DiffInspector', () => {
     selectedDiff = computed(() => diff)
     const w = mountFresh()
     await flushPromises()
-    expect(w.find('.dtv-diffinspector__changed').exists()).toBe(false)
+    expect(w.find('.dtm-diffinspector__changed').exists()).toBe(false)
   })
 
   it('renders "—" placeholder for empty before-value in details', async () => {
@@ -241,9 +241,9 @@ describe('DiffInspector', () => {
     selectedDiff = computed(() => diff)
     const w = mountFresh()
     await flushPromises()
-    const row = w.findAll('.dtv-diffinspector__changed-row')[0]!
+    const row = w.findAll('.dtm-diffinspector__changed-row')[0]!
     // before is empty → placeholder shown, before-<code> absent.
-    expect(row.get('.dtv-diffinspector__changed-empty').text()).toBe('—')
+    expect(row.get('.dtm-diffinspector__changed-empty').text()).toBe('—')
     // after still has its <code>.
     const codes = row.findAll('code')
     expect(codes).toHaveLength(1)

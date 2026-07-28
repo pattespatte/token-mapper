@@ -115,7 +115,7 @@ function toggleFacet(value: string): void {
 <template>
   <div
     v-if="chips.typeChips.length > 0 || chips.facetChips.length > 0"
-    class="dtv-filterchips"
+    class="dtm-filterchips"
     role="group"
     aria-label="Filter browse-set tokens"
   >
@@ -123,18 +123,18 @@ function toggleFacet(value: string): void {
       v-for="chip in chips.typeChips"
       :key="chip.key"
       type="button"
-      class="dtv-filterchips__chip"
-      :class="{ 'dtv-filterchips__chip--active': chip.active }"
+      class="dtm-filterchips__chip"
+      :class="{ 'dtm-filterchips__chip--active': chip.active }"
       :aria-pressed="chip.active"
       @click="toggleType(chip.value)"
     >
-      <span class="dtv-filterchips__label">{{ chip.label }}</span>
-      <span class="dtv-filterchips__count">{{ chip.count }}</span>
+      <span class="dtm-filterchips__label">{{ chip.label }}</span>
+      <span class="dtm-filterchips__count">{{ chip.count }}</span>
     </button>
 
     <span
       v-if="chips.typeChips.length > 0 && chips.facetChips.length > 0"
-      class="dtv-filterchips__divider"
+      class="dtm-filterchips__divider"
       aria-hidden="true"
     ></span>
 
@@ -142,67 +142,67 @@ function toggleFacet(value: string): void {
       v-for="chip in chips.facetChips"
       :key="chip.key"
       type="button"
-      class="dtv-filterchips__chip"
-      :class="{ 'dtv-filterchips__chip--active': chip.active }"
+      class="dtm-filterchips__chip"
+      :class="{ 'dtm-filterchips__chip--active': chip.active }"
       :aria-pressed="chip.active"
       @click="toggleFacet(chip.value)"
     >
-      <span class="dtv-filterchips__label">{{ chip.label }}</span>
-      <span class="dtv-filterchips__count">{{ chip.count }}</span>
+      <span class="dtm-filterchips__label">{{ chip.label }}</span>
+      <span class="dtm-filterchips__count">{{ chip.count }}</span>
     </button>
   </div>
 </template>
 
 <style scoped>
-.dtv-filterchips {
+.dtm-filterchips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   align-items: center;
 }
 
-.dtv-filterchips__chip {
+.dtm-filterchips__chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border-strong);
-  border-radius: var(--dtv-radius-md);
-  color: var(--dtv-color-text);
-  font-size: var(--dtv-font-size-sm);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border-strong);
+  border-radius: var(--dtm-radius-md);
+  color: var(--dtm-color-text);
+  font-size: var(--dtm-font-size-sm);
   cursor: pointer;
 }
 
-.dtv-filterchips__chip:hover:not(.dtv-filterchips__chip--active) {
-  color: var(--dtv-color-text);
-  background-color: var(--dtv-color-surface-muted);
+.dtm-filterchips__chip:hover:not(.dtm-filterchips__chip--active) {
+  color: var(--dtm-color-text);
+  background-color: var(--dtm-color-surface-muted);
 }
 
-.dtv-filterchips__chip--active {
+.dtm-filterchips__chip--active {
   color: #ffffff;
-  background-color: var(--dtv-color-text);
+  background-color: var(--dtm-color-text);
   border-color: transparent;
 }
 
-.dtv-filterchips__count {
-  padding: 0 var(--dtv-spacing-xs);
+.dtm-filterchips__count {
+  padding: 0 var(--dtm-spacing-xs);
   background-color: rgba(255, 255, 255, 0.2);
-  border-radius: var(--dtv-radius-sm);
+  border-radius: var(--dtm-radius-sm);
   font-variant-numeric: tabular-nums;
-  font-size: var(--dtv-font-size-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-filterchips__chip:not(.dtv-filterchips__chip--active) .dtv-filterchips__count {
-  background-color: var(--dtv-color-surface-muted);
-  color: var(--dtv-color-text-subtle);
+.dtm-filterchips__chip:not(.dtm-filterchips__chip--active) .dtm-filterchips__count {
+  background-color: var(--dtm-color-surface-muted);
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-filterchips__divider {
+.dtm-filterchips__divider {
   display: inline-block;
   width: 1px;
   height: 1.5em;
-  background-color: var(--dtv-color-border);
-  margin: 0 var(--dtv-spacing-xs);
+  background-color: var(--dtm-color-border);
+  margin: 0 var(--dtm-spacing-xs);
 }
 </style>

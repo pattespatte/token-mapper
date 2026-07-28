@@ -163,18 +163,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="dtv-app">
+  <div class="dtm-app">
     <AppHeader />
 
     <main
-      class="dtv-app__main"
+      class="dtm-app__main"
       :style="{ gridTemplateColumns: `${sidebarWidth} 1fr` }"
     >
-      <aside class="dtv-app__sidebar" aria-label="Categories">
+      <aside class="dtm-app__sidebar" aria-label="Categories">
         <Sidebar />
       </aside>
 
-      <section class="dtv-app__content">
+      <section class="dtm-app__content">
         <Toolbar />
 
         <Gallery :compare="isComparing" />
@@ -188,8 +188,8 @@ onUnmounted(() => {
         -->
         <div
           v-if="setA !== null || setB !== null"
-          class="dtv-app__validation"
-          :class="{ 'dtv-app__validation--split': isComparing }"
+          class="dtm-app__validation"
+          :class="{ 'dtm-app__validation--split': isComparing }"
         >
           <ValidationPanel
             v-if="setA !== null"
@@ -213,13 +213,13 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.dtv-app {
+.dtm-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-.dtv-app__main {
+.dtm-app__main {
   display: grid;
   /* grid-template-columns is bound inline via :style to the sidebarWidth
      computed from useSidebar. */
@@ -227,9 +227,9 @@ onUnmounted(() => {
   min-height: 0;
 }
 
-.dtv-app__sidebar {
-  border-right: 1px solid var(--dtv-color-border);
-  background-color: var(--dtv-color-surface);
+.dtm-app__sidebar {
+  border-right: 1px solid var(--dtm-color-border);
+  background-color: var(--dtm-color-surface);
   overflow-y: auto;
 }
 
@@ -238,31 +238,31 @@ onUnmounted(() => {
    expanded and collapsed states; the aside itself stays at padding 0 so
    the collapsed rail doesn't add visual chrome around the toggle. */
 @media (prefers-reduced-motion: no-preference) {
-  .dtv-app__main {
+  .dtm-app__main {
     transition: grid-template-columns 0.15s ease;
   }
 }
 
-.dtv-app__content {
+.dtm-app__content {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.dtv-app__validation {
-  padding: 0 var(--dtv-spacing-lg) var(--dtv-spacing-lg);
+.dtm-app__validation {
+  padding: 0 var(--dtm-spacing-lg) var(--dtm-spacing-lg);
 }
 
 /* Compare mode: A | B side by side, mirroring the gallery's two columns.
    Each panel flexes equally so they share the row; the gap matches the
    gallery's compare layout. */
-.dtv-app__validation--split {
+.dtm-app__validation--split {
   display: flex;
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
   align-items: flex-start;
 }
 
-.dtv-app__validation--split > * {
+.dtm-app__validation--split > * {
   flex: 1 1 0;
   min-width: 0;
 }
@@ -270,7 +270,7 @@ onUnmounted(() => {
 /* On narrow viewports the two panels stack rather than squeeze — a 50/50
    split is unreadable below ~600px. */
 @media (max-width: 600px) {
-  .dtv-app__validation--split {
+  .dtm-app__validation--split {
     flex-direction: column;
   }
 }
@@ -278,11 +278,11 @@ onUnmounted(() => {
 /* Responsive — hide sidebar under 900px (category filter on narrow
    viewports is a future enhancement; gallery shows "all" by default). */
 @media (max-width: 900px) {
-  .dtv-app__main {
+  .dtm-app__main {
     grid-template-columns: 1fr;
   }
 
-  .dtv-app__sidebar {
+  .dtm-app__sidebar {
     display: none;
   }
 }

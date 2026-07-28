@@ -32,7 +32,7 @@ describe('AppHeader', () => {
 
   it('renders the theme toggle button', () => {
     const wrapper = mount(AppHeader)
-    const toggle = wrapper.find('.dtv-header__theme-toggle')
+    const toggle = wrapper.find('.dtm-header__theme-toggle')
     expect(toggle.exists()).toBe(true)
     // No aria-pressed: it's binary and can't represent three modes. The
     // descriptive aria-label conveys state to assistive tech instead.
@@ -51,7 +51,7 @@ describe('AppHeader', () => {
 
   it('clicking cycles light → dark → system → light', async () => {
     const wrapper = mount(AppHeader)
-    const toggle = wrapper.find('.dtv-header__theme-toggle')
+    const toggle = wrapper.find('.dtm-header__theme-toggle')
     expect(theme.value).toBe('light')
 
     await toggle.trigger('click')
@@ -71,20 +71,20 @@ describe('AppHeader', () => {
     // light → target dark → moon (arc command, no <circle>).
     expect(wrapper.find('svg').html()).toMatch(/A\d/)
 
-    await wrapper.find('.dtv-header__theme-toggle').trigger('click')
+    await wrapper.find('.dtm-header__theme-toggle').trigger('click')
     // dark → target system → contrast glyph (a <path> with a fill, no arc 'A…').
     const systemIcon = wrapper.find('svg').html()
     expect(systemIcon).toMatch(/fill="currentColor"/)
     expect(systemIcon).not.toMatch(/A\d/)
 
-    await wrapper.find('.dtv-header__theme-toggle').trigger('click')
+    await wrapper.find('.dtm-header__theme-toggle').trigger('click')
     // system → target light → sun (<circle> present).
     expect(wrapper.find('svg').html()).toMatch(/<circle/)
   })
 
   it('the aria-label names the mode you will switch to', async () => {
     const wrapper = mount(AppHeader)
-    const toggle = wrapper.find('.dtv-header__theme-toggle')
+    const toggle = wrapper.find('.dtm-header__theme-toggle')
 
     // light → offers "switch to dark".
     expect(toggle.attributes('aria-label')).toBe('Switch to dark theme')
@@ -100,7 +100,7 @@ describe('AppHeader', () => {
 
   it('renders the project name and tagline', () => {
     const wrapper = mount(AppHeader)
-    expect(wrapper.find('.dtv-header__name').text()).toBe('Design Token Mapper')
-    expect(wrapper.find('.dtv-header__tagline').text()).toMatch(/W3C design tokens/)
+    expect(wrapper.find('.dtm-header__name').text()).toBe('Design Token Mapper')
+    expect(wrapper.find('.dtm-header__tagline').text()).toMatch(/W3C design tokens/)
   })
 })

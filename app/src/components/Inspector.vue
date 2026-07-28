@@ -196,22 +196,22 @@ onUnmounted(() => {
 <template>
   <div
     v-if="isOpen && token"
-    class="dtv-inspector-overlay"
+    class="dtm-inspector-overlay"
     @click="onBackdropClick"
   >
     <div
       ref="dialogRef"
-      class="dtv-inspector"
+      class="dtm-inspector"
       role="dialog"
       aria-modal="true"
       :aria-label="`Token details for ${token.path}`"
     >
-      <header class="dtv-inspector__header">
-        <div class="dtv-inspector__path-row">
-          <code class="dtv-inspector__path">{{ token.path }}</code>
+      <header class="dtm-inspector__header">
+        <div class="dtm-inspector__path-row">
+          <code class="dtm-inspector__path">{{ token.path }}</code>
           <button
             type="button"
-            class="dtv-inspector__copy"
+            class="dtm-inspector__copy"
             :aria-label="copied ? 'Path copied' : `Copy ${token.path}`"
             @click="copyPath"
           >
@@ -221,66 +221,66 @@ onUnmounted(() => {
         <button
           ref="closeButtonRef"
           type="button"
-          class="dtv-inspector__close"
+          class="dtm-inspector__close"
           aria-label="Close inspector"
           @click="close"
         >✕</button>
       </header>
 
-      <div class="dtv-inspector__body">
+      <div class="dtm-inspector__body">
         <!-- Metadata -->
-        <dl class="dtv-inspector__meta">
-          <div class="dtv-inspector__row">
+        <dl class="dtm-inspector__meta">
+          <div class="dtm-inspector__row">
             <dt>Type</dt>
             <dd><code>{{ token.type ?? 'unknown' }}</code></dd>
           </div>
-          <div v-if="token.description" class="dtv-inspector__row">
+          <div v-if="token.description" class="dtm-inspector__row">
             <dt>Description</dt>
             <dd>{{ token.description }}</dd>
           </div>
-          <div v-if="token.hasError" class="dtv-inspector__row dtv-inspector__row--error">
+          <div v-if="token.hasError" class="dtm-inspector__row dtm-inspector__row--error">
             <dt>Status</dt>
             <dd>Reference could not be fully resolved (dangling or cyclic).</dd>
           </div>
         </dl>
 
         <!-- Live preview -->
-        <section class="dtv-inspector__section">
-          <h2 class="dtv-inspector__heading">Preview</h2>
-          <div v-if="renderer" class="dtv-inspector__preview">
+        <section class="dtm-inspector__section">
+          <h2 class="dtm-inspector__heading">Preview</h2>
+          <div v-if="renderer" class="dtm-inspector__preview">
             <component :is="renderer" :token="token" />
           </div>
         </section>
 
         <!-- Resolved value -->
-        <section class="dtv-inspector__section">
-          <h2 class="dtv-inspector__heading">Resolved value</h2>
-          <pre class="dtv-inspector__code"><code>{{ resolvedFormatted }}</code></pre>
+        <section class="dtm-inspector__section">
+          <h2 class="dtm-inspector__heading">Resolved value</h2>
+          <pre class="dtm-inspector__code"><code>{{ resolvedFormatted }}</code></pre>
         </section>
 
         <!-- Raw value (only shown when it differs from resolved) -->
-        <section v-if="showRawSection" class="dtv-inspector__section">
-          <h2 class="dtv-inspector__heading">Raw value</h2>
-          <pre class="dtv-inspector__code"><code>{{ rawFormatted }}</code></pre>
+        <section v-if="showRawSection" class="dtm-inspector__section">
+          <h2 class="dtm-inspector__heading">Raw value</h2>
+          <pre class="dtm-inspector__code"><code>{{ rawFormatted }}</code></pre>
         </section>
 
         <!-- Alias chain — the headline inspector feature -->
-        <section v-if="hasAliasChain" class="dtv-inspector__section">
-          <h2 class="dtv-inspector__heading">Reference chain</h2>
-          <ol class="dtv-inspector__chain">
-            <li class="dtv-inspector__chain-start">
+        <section v-if="hasAliasChain" class="dtm-inspector__section">
+          <h2 class="dtm-inspector__heading">Reference chain</h2>
+          <ol class="dtm-inspector__chain">
+            <li class="dtm-inspector__chain-start">
               <code>{{ token.path }}</code>
-              <span class="dtv-inspector__chain-raw">= {{ rawFormatted }}</span>
+              <span class="dtm-inspector__chain-raw">= {{ rawFormatted }}</span>
             </li>
             <li
               v-for="(hop, idx) in token.aliasChain"
               :key="`${hop.path}-${idx}`"
-              class="dtv-inspector__chain-hop"
+              class="dtm-inspector__chain-hop"
             >
-              <span class="dtv-inspector__chain-arrow" aria-hidden="true">→</span>
-              <code class="dtv-inspector__chain-path">{{ hop.path }}</code>
-              <span class="dtv-inspector__chain-raw">{{ hop.raw }}</span>
-              <span v-if="hop.resolved !== undefined" class="dtv-inspector__chain-resolved">
+              <span class="dtm-inspector__chain-arrow" aria-hidden="true">→</span>
+              <code class="dtm-inspector__chain-path">{{ hop.path }}</code>
+              <span class="dtm-inspector__chain-raw">{{ hop.raw }}</span>
+              <span v-if="hop.resolved !== undefined" class="dtm-inspector__chain-resolved">
                 resolves to <code>{{ JSON.stringify(hop.resolved) }}</code>
               </span>
             </li>
@@ -292,21 +292,21 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.dtv-inspector-overlay {
+.dtm-inspector-overlay {
   position: fixed;
   inset: 0;
   background-color: rgba(10, 13, 18, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--dtv-spacing-lg);
+  padding: var(--dtm-spacing-lg);
   z-index: 100;
 }
 
-.dtv-inspector {
-  background-color: var(--dtv-color-bg);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-lg);
+.dtm-inspector {
+  background-color: var(--dtm-color-bg);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-lg);
   box-shadow: 0 10px 30px rgba(10, 13, 18, 0.2);
   width: 100%;
   max-width: 640px;
@@ -316,179 +316,179 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.dtv-inspector__header {
+.dtm-inspector__header {
   display: flex;
   align-items: flex-start;
-  gap: var(--dtv-spacing-sm);
-  padding: var(--dtv-spacing-md);
-  border-bottom: 1px solid var(--dtv-color-border);
+  gap: var(--dtm-spacing-sm);
+  padding: var(--dtm-spacing-md);
+  border-bottom: 1px solid var(--dtm-color-border);
 }
 
-.dtv-inspector__path-row {
+.dtm-inspector__path-row {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
   min-width: 0;
 }
 
-.dtv-inspector__path {
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-md);
-  color: var(--dtv-color-text);
+.dtm-inspector__path {
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-md);
+  color: var(--dtm-color-text);
   word-break: break-all;
 }
 
-.dtv-inspector__copy {
+.dtm-inspector__copy {
   flex-shrink: 0;
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text-muted);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-muted);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
 }
 
-.dtv-inspector__copy:hover {
-  color: var(--dtv-color-accent);
-  border-color: var(--dtv-color-accent);
+.dtm-inspector__copy:hover {
+  color: var(--dtm-color-accent);
+  border-color: var(--dtm-color-accent);
 }
 
-.dtv-inspector__close {
+.dtm-inspector__close {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  font-size: var(--dtv-font-size-md);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-md);
+  color: var(--dtm-color-text-subtle);
   background: none;
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
   cursor: pointer;
   line-height: 1;
 }
 
-.dtv-inspector__close:hover {
-  color: var(--dtv-color-error);
-  border-color: var(--dtv-color-error);
+.dtm-inspector__close:hover {
+  color: var(--dtm-color-error);
+  border-color: var(--dtm-color-error);
 }
 
-.dtv-inspector__body {
+.dtm-inspector__body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--dtv-spacing-md);
+  padding: var(--dtm-spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-md);
+  gap: var(--dtm-spacing-md);
 }
 
-.dtv-inspector__meta {
+.dtm-inspector__meta {
   margin: 0;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--dtv-spacing-xs) var(--dtv-spacing-md);
-  font-size: var(--dtv-font-size-sm);
+  gap: var(--dtm-spacing-xs) var(--dtm-spacing-md);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-inspector__row {
+.dtm-inspector__row {
   display: contents;
 }
 
-.dtv-inspector__row dt {
-  color: var(--dtv-color-text-subtle);
-  font-weight: var(--dtv-font-weight-medium);
+.dtm-inspector__row dt {
+  color: var(--dtm-color-text-subtle);
+  font-weight: var(--dtm-font-weight-medium);
 }
 
-.dtv-inspector__row dd {
+.dtm-inspector__row dd {
   margin: 0;
-  color: var(--dtv-color-text);
+  color: var(--dtm-color-text);
   word-break: break-word;
 }
 
-.dtv-inspector__row--error dd {
-  color: var(--dtv-color-error);
+.dtm-inspector__row--error dd {
+  color: var(--dtm-color-error);
 }
 
-.dtv-inspector__section {
+.dtm-inspector__section {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-inspector__heading {
+.dtm-inspector__heading {
   margin: 0;
-  font-size: var(--dtv-font-size-sm);
-  font-weight: var(--dtv-font-weight-semibold);
-  color: var(--dtv-color-text-subtle);
+  font-size: var(--dtm-font-size-sm);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.dtv-inspector__preview {
-  padding: var(--dtv-spacing-md);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-md);
+.dtm-inspector__preview {
+  padding: var(--dtm-spacing-md);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-md);
 }
 
-.dtv-inspector__code {
+.dtm-inspector__code {
   margin: 0;
-  padding: var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border: 1px solid var(--dtv-color-border);
-  border-radius: var(--dtv-radius-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  padding: var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border: 1px solid var(--dtm-color-border);
+  border-radius: var(--dtm-radius-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.dtv-inspector__chain {
+.dtm-inspector__chain {
   margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-inspector__chain-start,
-.dtv-inspector__chain-hop {
+.dtm-inspector__chain-start,
+.dtm-inspector__chain-hop {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--dtv-spacing-xs);
-  padding: var(--dtv-spacing-xs) var(--dtv-spacing-sm);
-  background-color: var(--dtv-color-surface);
-  border-radius: var(--dtv-radius-sm);
-  font-size: var(--dtv-font-size-sm);
+  gap: var(--dtm-spacing-xs);
+  padding: var(--dtm-spacing-xs) var(--dtm-spacing-sm);
+  background-color: var(--dtm-color-surface);
+  border-radius: var(--dtm-radius-sm);
+  font-size: var(--dtm-font-size-sm);
 }
 
-.dtv-inspector__chain-start {
-  font-weight: var(--dtv-font-weight-medium);
+.dtm-inspector__chain-start {
+  font-weight: var(--dtm-font-weight-medium);
 }
 
-.dtv-inspector__chain-arrow {
-  color: var(--dtv-color-text-subtle);
+.dtm-inspector__chain-arrow {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-inspector__chain-path,
-.dtv-inspector__chain-raw,
-.dtv-inspector__chain-resolved code {
-  font-family: var(--dtv-font-family-mono);
+.dtm-inspector__chain-path,
+.dtm-inspector__chain-raw,
+.dtm-inspector__chain-resolved code {
+  font-family: var(--dtm-font-family-mono);
 }
 
-.dtv-inspector__chain-raw {
-  color: var(--dtv-color-text-subtle);
+.dtm-inspector__chain-raw {
+  color: var(--dtm-color-text-subtle);
 }
 
-.dtv-inspector__chain-resolved {
-  color: var(--dtv-color-text-muted);
+.dtm-inspector__chain-resolved {
+  color: var(--dtm-color-text-muted);
 }
 
-.dtv-inspector__chain-resolved code {
-  color: var(--dtv-color-accent);
+.dtm-inspector__chain-resolved code {
+  color: var(--dtm-color-accent);
 }
 </style>

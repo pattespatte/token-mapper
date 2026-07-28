@@ -33,43 +33,43 @@ const typeLabel = computed(() => props.token.type ?? 'unknown')
 </script>
 
 <template>
-  <div class="dtv-generic">
-    <span class="dtv-generic__type">{{ typeLabel }}</span>
-    <pre class="dtv-generic__value"><code>{{ formattedValue }}</code></pre>
+  <div class="dtm-generic">
+    <span class="dtm-generic__type">{{ typeLabel }}</span>
+    <pre class="dtm-generic__value"><code>{{ formattedValue }}</code></pre>
   </div>
 </template>
 
 <style scoped>
-.dtv-generic {
+.dtm-generic {
   display: flex;
   flex-direction: column;
-  gap: var(--dtv-spacing-xs);
+  gap: var(--dtm-spacing-xs);
 }
 
-.dtv-generic__type {
+.dtm-generic__type {
   align-self: flex-start;
-  font-size: var(--dtv-font-size-sm);
-  font-family: var(--dtv-font-family-mono);
-  color: var(--dtv-color-text-subtle);
-  background-color: var(--dtv-color-surface-muted);
-  padding: 2px var(--dtv-spacing-xs);
-  border-radius: var(--dtv-radius-sm);
+  font-size: var(--dtm-font-size-sm);
+  font-family: var(--dtm-font-family-mono);
+  color: var(--dtm-color-text-subtle);
+  background-color: var(--dtm-color-surface-muted);
+  padding: 2px var(--dtm-spacing-xs);
+  border-radius: var(--dtm-radius-sm);
 }
 
-.dtv-generic__value {
+.dtm-generic__value {
   margin: 0;
-  padding: var(--dtv-spacing-xs);
-  background-color: var(--dtv-color-surface-muted);
-  border-radius: var(--dtv-radius-sm);
-  font-family: var(--dtv-font-family-mono);
-  font-size: var(--dtv-font-size-sm);
-  color: var(--dtv-color-text);
+  padding: var(--dtm-spacing-xs);
+  background-color: var(--dtm-color-surface-muted);
+  border-radius: var(--dtm-radius-sm);
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text);
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.dtv-generic__value code {
+.dtm-generic__value code {
   font-family: inherit;
 }
 </style>

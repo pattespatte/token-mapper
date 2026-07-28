@@ -20,7 +20,7 @@ const collapsed: Ref<boolean> = ref(false)
 export function useSidebar() {
   /** CSS length for the sidebar column, derived from collapse state. */
   const sidebarWidth: ComputedRef<string> = computed(() =>
-    collapsed.value ? COLLAPSED_WIDTH : 'var(--dtv-sidebar-width)'
+    collapsed.value ? COLLAPSED_WIDTH : 'var(--dtm-sidebar-width)'
   )
 
   /** Flip the collapsed state. */
