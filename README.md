@@ -94,7 +94,17 @@ The hash is a gzip-compressed, base64url-encoded JSON snapshot of the form:
 
 **Precedence on load.** When the page opens, the loader checks in this order: (1) a share hash in the URL wins; (2) otherwise the last-saved session is restored from localStorage; (3) otherwise the dropzones start empty. So a teammate's share link overrides your previous session — that's deliberate.
 
-> **Status.** Opening a share link works today — drop a `#…` hash onto the URL and the sets auto-load on page open. A **"Copy share link" button** in the toolbar is landing in an upcoming release; until then, share links are produced programmatically (e.g. via the `useShare()` composable from devtools or a downstream integration) rather than through the UI.
+#### Creating a share link
+
+Load the sets you want to share, then use the toolbar's **Share** controls:
+
+- **Copy link** — encodes the loaded sets into a URL hash, writes it to the address bar, and copies the full URL to your clipboard. You'll see *"✓ Link copied"* next to the button on success. Paste it into chat, email, or a PR to share the exact state.
+- **Open in tab** — encodes the sets and opens the share URL in a new tab, so you can see the receiver's experience first.
+- **Clear URL** — strips the hash from the address bar via `history.replaceState`, leaving the page state intact but the URL clean. (Disabled when there's no hash.)
+
+If you don't have any sets loaded, **Copy link** and **Open in tab** show *"Load a set first"* instead of producing a link. If your sets exceed the 32 000-character ceiling, both show *"Sets too large for a URL — use export instead"* and the Markdown/JSON export menu is the suggested fallback.
+
+When a clipboard write fails (older browsers, insecure-context `http://`, or a permissions rejection), the hash is still written to the address bar before the copy attempt, so the note reads *"Couldn't copy — link is in the address bar"* and the **Clear URL** button is available.
 
 ### Session persistence (localStorage)
 
