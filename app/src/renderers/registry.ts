@@ -5,7 +5,7 @@
  * Add a new renderer by calling `registerRenderer` with the type and the
  * component. Unknown or missing types fall back to `GenericToken`, so the
  * gallery never breaks on a token type we haven't built a dedicated renderer
- * for yet (e.g. opacity, duration, fontFamily — future work).
+ * for yet (e.g. opacity, cubicBezier — still future work).
  *
  * The registry is module-scoped and mutable so future plugin/extension work
  * could add renderers at runtime; for now it is populated once below.
@@ -16,8 +16,12 @@ import type { DtcgType } from '@dtcg-mapper/core'
 import BorderPreview from './BorderPreview.vue'
 import ColorSwatch from './ColorSwatch.vue'
 import DimensionBlock from './DimensionBlock.vue'
+import DurationSample from './DurationSample.vue'
+import FontFamilySample from './FontFamilySample.vue'
+import FontWeightSample from './FontWeightSample.vue'
 import GenericToken from './GenericToken.vue'
 import GradientStrip from './GradientStrip.vue'
+import NumberValue from './NumberValue.vue'
 import ShadowPreview from './ShadowPreview.vue'
 import TypographySample from './TypographySample.vue'
 
@@ -52,3 +56,7 @@ registerRenderer('typography', TypographySample)
 registerRenderer('shadow', ShadowPreview)
 registerRenderer('border', BorderPreview)
 registerRenderer('gradient', GradientStrip)
+registerRenderer('fontFamily', FontFamilySample)
+registerRenderer('fontWeight', FontWeightSample)
+registerRenderer('duration', DurationSample)
+registerRenderer('number', NumberValue)
