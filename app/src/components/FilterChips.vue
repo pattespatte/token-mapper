@@ -185,6 +185,21 @@ function toggleFacet(value: string): void {
   border-color: transparent;
 }
 
+/* Dark mode: --dtm-color-text flips to near-white (#f5f5f5), so a
+   white-on-text active chip would lose all contrast. Flip the text to
+   the dark bg token so the active chip stays high-contrast in both
+   themes. Mirrors the two-selector cascade in tokens.css (explicit dark
+   choice, plus OS-dark when the user hasn't forced light). */
+:root[data-theme='dark'] .dtm-filterchips__chip--active {
+  color: var(--dtm-color-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .dtm-filterchips__chip--active {
+    color: var(--dtm-color-bg);
+  }
+}
+
 .dtm-filterchips__count {
   padding: 0 var(--dtm-spacing-xs);
   background-color: rgba(255, 255, 255, 0.2);
