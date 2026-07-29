@@ -70,3 +70,54 @@ export function parseReference(raw: string): string | null {
   }
   return trimmed.slice(1, -1)
 }
+
+/**
+ * One embedded `{...}` reference found inside a larger string value, with the
+ * span (start/end indices) covering the `{...}` fragment inclusive.
+ *
+ * Used by the resolver to splice partial references (e.g. the `{color.border}`
+ * inside `1px solid {color.border}`) into the surrounding literal text.
+ */
+export interface EmbeddedReference {
+  /** The dotted path inside the braces, e.g. `color.border`. */
+  path: string
+  /** The raw `{...}` fragment as it appears in the source string. */
+  raw: string
+  /** Start index of the `{` in the source string. */
+  start: number
+  /** End index (exclusive) just past the `}` in the source string. */
+  end: number
+}
+
+/**
+ * Find every `{...}` reference embedded in a larger string. Returns each with
+ * its path, raw form, and span (indices into `value`). Returns an empty array
+ * when the string holds no embedded references.
+ *
+ * This is the partial-reference counterpart to {@link parseReference}: that
+ * helper treats a string as a reference only when it is *entirely* `{...}`;
+ * this one scans for `{...}` fragments *anywhere* inside a string, so partial
+ * references like `1px solid {color.border}` can be resolved by splicing each
+ * target value into the surrounding text.
+ *
+ * @example
+ *   findEmbeddedReferences('1px solid {color.border}')
+ *     // → [{ path: 'color.border', raw: '{color.border}', start: 9, end: 23 }]
+ *   findEmbeddedReferences('#ff0000')   // → []
+ */
+export function findEmbeddedReferences(value: string): EmbeddedReference[] {
+  if (typeof value !== 'string') return []
+  const out: EmbeddedReference[] = []
+  const re = /\{([^}]+)\}/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(value)) !== null) {
+    const path = m[1] ?? ''
+    out.push({
+      path,
+      raw: m[0],
+      start: m.index,
+      end: m.index + m[0].length,
+    })
+  }
+  return out
+}

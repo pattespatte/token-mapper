@@ -61,9 +61,23 @@ const DECLARATION = /--([a-zA-Z0-9_-]+)\s*:\s*([^;}/]+?)\s*(?:;|(?=\})|$)/g
  * with optional inner whitespace, where the only contents are the custom-
  * property name (no comma, no fallback, no arithmetic). Anything else
  * (`var(--x, fallback)`, `1px solid var(--color)`, etc.) does NOT match
- * and stays literal.
+ * here — the partial rewriter ({@link PARTIAL_VAR_REFERENCE}) handles those.
  */
 const WHOLE_VAR_REFERENCE = /^var\(\s*(--[a-zA-Z0-9-]+)\s*\)$/
+
+/**
+ * Regex for any `var(--name)` occurrence, including inside a larger value
+ * (e.g. the `var(--color-border)` in `1px solid var(--color-border)`). Global
+ * so it finds every occurrence in one pass. Captures the `--name`; a `, fallback`
+ * after the name is matched but not captured (the fallback is dropped during
+ * rewrite — see {@link rewritePartialVarReferences}).
+ *
+ * Used only when the whole-value check ({@link WHOLE_VAR_REFERENCE}) didn't
+ * match, so a bare `var(--x)` becomes a single `{x}` via the whole-value path
+ * and a partial `var()` inside a larger string gets each occurrence rewritten
+ * here.
+ */
+const PARTIAL_VAR_REFERENCE = /var\(\s*(--[a-zA-Z0-9-]+)\s*(?:,[^)]*)?\s*\)/g
 
 /**
  * Parse one CSS source file into a `TokenMap` plus a list of issues.
@@ -263,25 +277,50 @@ function makeToken(
   segments: string[],
   rawValue: string
 ): NormalizedToken {
-  const value: RawValue = rewriteVarReference(rawValue)
+  // Whole-value var() → single {path}; partial var() inside a larger string
+  // → each occurrence rewritten to {path} inline. Falls through to the raw
+  // string when there's no var() at all.
+  const value: RawValue = rewriteVarReference(rawValue) ?? rewritePartialVarReferences(rawValue)
   const token: NormalizedToken = { path, segments, rawValue: value }
   return token
 }
 
 /**
  * If `rawValue` is exactly `var(--foo-bar)`, rewrite to `{foo.bar}` so the
- * existing resolver treats it as a whole-value reference. Otherwise return
- * the value unchanged (including `var(--x, fallback)`, mixed values like
- * `1px solid var(--color)`, etc.).
+ * existing resolver treats it as a whole-value reference. Returns `null` for
+ * anything else (including `var(--x, fallback)`, mixed values like
+ * `1px solid var(--color)`, etc.) so the caller can fall through to the
+ * partial-reference rewriter.
  *
  * Phase 4 task — kept here as a single-purpose helper so the second-pass
  * type-inheritance logic in Phase 5 can also call `WHOLE_VAR_REFERENCE` to
  * identify alias tokens.
  */
-function rewriteVarReference(rawValue: string): RawValue {
+function rewriteVarReference(rawValue: string): RawValue | null {
   const m = WHOLE_VAR_REFERENCE.exec(rawValue)
-  if (m === null) return rawValue
+  if (m === null) return null
   const varName = (m[1] ?? '').slice(2) // strip leading `--`
   const segments = kebabToSegments(varName)
   return `{${joinPath(segments)}}`
+}
+
+/**
+ * Rewrite every `var(--name)` occurrence inside a larger string to `{name}`,
+ * leaving the surrounding text intact. This turns partial references like
+ * `1px solid var(--color-border)` into `1px solid {color.border}` so the
+ * resolver can splice the target value into the string.
+ *
+ * A `var()` with a fallback (`var(--missing, #fff)`) is rewritten using only
+ * the variable name — the fallback is dropped. True fallback resolution
+ * (using the fallback when the variable is undefined) is a separate feature;
+ * here we only normalise the syntax so the resolver sees a uniform `{...}`
+ * form. Returns the original string unchanged when it contains no `var()`.
+ */
+function rewritePartialVarReferences(rawValue: string): RawValue {
+  if (!rawValue.includes('var(')) return rawValue
+  return rawValue.replace(PARTIAL_VAR_REFERENCE, (_match, nameGroup: string) => {
+    const varName = (nameGroup ?? '').slice(2) // strip leading `--`
+    const segments = kebabToSegments(varName)
+    return `{${joinPath(segments)}}`
+  })
 }

@@ -44,7 +44,8 @@ export {
   rgbDistance,
 } from './utils/color'
 export { weightKeywordToNumber, primaryFontFamily } from './utils/font'
-export { joinPath, parseReference } from './utils/path'
+export { joinPath, parseReference, findEmbeddedReferences } from './utils/path'
+export type { EmbeddedReference } from './utils/path'
 
 // Types
 export type { DtcgType } from './types/dtcg'

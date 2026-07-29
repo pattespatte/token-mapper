@@ -280,6 +280,79 @@ describe('resolve', () => {
     expect(layers[1]?.color).toBe('#00000020') // literal
   })
 
+  /* ----------------------- Partial references (embedded) ----------------------- */
+  /* A `{...}` fragment inside a larger literal string. The resolver splices   */
+  /* the target value into the string and records one hop per fragment.        */
+
+  it('splices a single embedded reference into the surrounding string', () => {
+    const tokens = tokensOf(
+      JSON.stringify({
+        color: { border: { $value: '#ccc', $type: 'color' } },
+        border: { default: { $value: '1px solid {color.border}', $type: 'border' } },
+      })
+    )
+    const t = resolve(tokens).get('border.default') as ResolvedToken
+    expect(t.resolvedValue).toBe('1px solid #ccc')
+    expect(t.aliasChain).toHaveLength(1)
+    expect(t.aliasChain[0]?.path).toBe('color.border')
+    expect(t.aliasChain[0]?.resolved).toBe('#ccc')
+    expect(t.hasError).toBe(false)
+  })
+
+  it('splices multiple embedded references in one string', () => {
+    const tokens = tokensOf(
+      JSON.stringify({
+        c1: { $value: '#fff', $type: 'color' },
+        c2: { $value: '#000', $type: 'color' },
+        grad: { $value: 'linear-gradient({c1}, {c2})' },
+      })
+    )
+    const t = resolve(tokens).get('grad') as ResolvedToken
+    expect(t.resolvedValue).toBe('linear-gradient(#fff, #000)')
+    expect(t.aliasChain).toHaveLength(2)
+    expect(t.hasError).toBe(false)
+  })
+
+  it('leaves a dangling embedded reference in place and flags hasError', () => {
+    const tokens = tokensOf(
+      JSON.stringify({
+        border: { default: { $value: '1px solid {color.missing}' } },
+      })
+    )
+    const t = resolve(tokens).get('border.default') as ResolvedToken
+    // The fragment stays as {color.missing} so the UI shows what broke.
+    expect(t.resolvedValue).toBe('1px solid {color.missing}')
+    expect(t.aliasChain).toHaveLength(1)
+    expect(t.aliasChain[0]?.resolved).toBeUndefined()
+    expect(t.hasError).toBe(true)
+  })
+
+  it('detects a cycle through an embedded reference', () => {
+    // a → 'x {b}'; b → 'y {a}'  (cycle through the embedded refs)
+    const tokens = tokensOf(
+      JSON.stringify({
+        a: { $value: 'x {b}' },
+        b: { $value: 'y {a}' },
+      })
+    )
+    const a = resolve(tokens).get('a') as ResolvedToken
+    expect(a.hasError).toBe(true)
+    // The fragment that cycles stays as {b}; 'x ' literal survives.
+    expect(typeof a.resolvedValue).toBe('string')
+  })
+
+  it('treats a pure literal (no embedded refs) exactly as before', () => {
+    const tokens = tokensOf(
+      JSON.stringify({
+        s: { $value: 'just a literal string', $type: 'string' },
+      })
+    )
+    const t = resolve(tokens).get('s') as ResolvedToken
+    expect(t.resolvedValue).toBe('just a literal string')
+    expect(t.aliasChain).toEqual([])
+    expect(t.hasError).toBe(false)
+  })
+
   /* ------------------------------ Edge cases ------------------------------ */
 
   it('preserves numeric and boolean literal values', () => {

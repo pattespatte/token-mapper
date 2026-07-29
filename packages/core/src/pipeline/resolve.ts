@@ -29,7 +29,7 @@ import type {
   ResolvedTokenMap,
   TokenMap,
 } from '../types/token'
-import { parseReference } from '../utils/path'
+import { parseReference, findEmbeddedReferences } from '../utils/path'
 
 /** Maximum chain depth before we bail out as a cycle safety net. */
 const MAX_DEPTH = 32
@@ -83,16 +83,20 @@ function resolveValue(
   chain: AliasHop[],
   visited: Set<string>
 ): { value: RawValue; chain: AliasHop[]; hasError: boolean } {
-  // String — could be a reference or a literal.
+  // String — could be a whole reference, a partial reference (embedded
+  // `{...}` inside larger literal text), or a pure literal.
   if (typeof value === 'string') {
     const refPath = parseReference(value)
 
-    // Literal string — keep as-is.
+    // Not a whole reference. Before declaring it a pure literal, check for
+    // embedded `{...}` fragments — a partial reference like
+    // `1px solid {color.border}` needs each fragment spliced and a hop
+    // recorded per fragment.
     if (refPath === null) {
-      return { value, chain, hasError: false }
+      return resolvePartialReference(value, tokens, chain, visited)
     }
 
-    // Reference — record the hop, then follow it.
+    // Whole reference — record the hop, then follow it.
     const hop: AliasHop = { path: refPath, raw: value }
     chain.push(hop)
 
@@ -161,4 +165,92 @@ function resolveValue(
 
   // Number / boolean / null / undefined — literal.
   return { value, chain, hasError: false }
+}
+
+/**
+ * Resolve embedded `{...}` fragments inside a string that isn't a whole
+ * reference. Splices each target's resolved value into the surrounding literal
+ * text to build a new `resolvedValue`, and records one hop per fragment on the
+ * chain (annotating).
+ *
+ * Behaviour:
+ *   - No embedded references → pure literal: returned unchanged with no hops
+ *     and `hasError: false` (identical to the pre-partial-reference behaviour).
+ *   - Each embedded reference is resolved via {@link resolveValue}, sharing the
+ *     `visited` set so a cycle through a fragment is caught. Its resolved
+ *     value is stringified and spliced into the rebuilt string.
+ *   - A dangling or cyclic fragment is left as its raw `{...}` form in the
+ *     rebuilt string, its hop's `resolved` is set to `undefined`, and
+ *     `hasError` becomes true — the UI shows the broken fragment in context.
+ *   - Depth guard: if the chain is already at {@link MAX_DEPTH}, fragments are
+ *     left in place and `hasError` is true (mirrors the whole-reference path).
+ *
+ * @param value    The string to scan for embedded references.
+ * @param tokens   The full token map, for following fragment references.
+ * @param chain    The accumulated hop chain (mutated: one hop per fragment).
+ * @param visited  Paths on the current chain, for cycle detection.
+ */
+function resolvePartialReference(
+  value: string,
+  tokens: TokenMap,
+  chain: AliasHop[],
+  visited: Set<string>
+): { value: RawValue; chain: AliasHop[]; hasError: boolean } {
+  const refs = findEmbeddedReferences(value)
+  // Pure literal — fast path, identical to historic behaviour.
+  if (refs.length === 0) {
+    return { value, chain, hasError: false }
+  }
+
+  // Depth guard — matches the whole-reference behaviour.
+  if (chain.length > MAX_DEPTH) {
+    return { value, chain, hasError: true }
+  }
+
+  let hasError = false
+  // Build the resolved string by walking the source left-to-right, copying
+  // literal spans verbatim and splicing each reference's resolved value.
+  let rebuilt = ''
+  let cursor = 0
+  for (const ref of refs) {
+    // Literal text before this reference.
+    rebuilt += value.slice(cursor, ref.start)
+    cursor = ref.end
+
+    const hop: AliasHop = { path: ref.path, raw: ref.raw }
+    chain.push(hop)
+
+    // Cycle / dangling / missing handling.
+    if (visited.has(ref.path)) {
+      hop.resolved = undefined
+      hasError = true
+      rebuilt += ref.raw // leave the fragment so the UI shows what broke
+      continue
+    }
+    const target = tokens.get(ref.path)
+    if (target === undefined) {
+      hop.resolved = undefined
+      hasError = true
+      rebuilt += ref.raw
+      continue
+    }
+
+    // Resolve the fragment's target, tracking the path for cycle safety.
+    const nextVisited = new Set(visited)
+    nextVisited.add(ref.path)
+    const inner = resolveValue(target.rawValue, tokens, chain, nextVisited)
+    hop.resolved = inner.value
+    if (inner.hasError) {
+      hasError = true
+      rebuilt += ref.raw // keep the raw fragment on error
+    } else {
+      // Splice the resolved value (stringified — partial refs are inherently
+      // string contexts, e.g. inside a CSS shorthand).
+      rebuilt += typeof inner.value === 'string' ? inner.value : JSON.stringify(inner.value)
+    }
+  }
+  // Trailing literal text after the last reference.
+  rebuilt += value.slice(cursor)
+
+  return { value: rebuilt, chain, hasError }
 }

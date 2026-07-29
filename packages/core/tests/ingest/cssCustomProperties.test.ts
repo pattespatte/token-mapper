@@ -157,23 +157,37 @@ describe('parseCss — var() reference rewriting', () => {
     expect(tokens.get('color.link')?.rawValue).toBe('{color.accent}')
   })
 
-  it('does NOT rewrite var(--x, fallback)', () => {
+  it('rewrites var(--x, fallback) to {x} (fallback dropped at parse time)', () => {
     const css = `:root {
       --color-accent: #6366f1;
       --color-link: var(--color-accent, #000);
     }`
     const { tokens } = parseCss('test.css', css)
-    // Literal string preserved; comma breaks the whole-var regex.
-    expect(tokens.get('color.link')?.rawValue).toBe('var(--color-accent, #000)')
+    // The comma defeats the whole-var regex, so the partial rewriter handles
+    // it: the variable name becomes {color.accent} and the fallback is dropped.
+    // True fallback resolution (using the fallback when undefined) is separate.
+    expect(tokens.get('color.link')?.rawValue).toBe('{color.accent}')
   })
 
-  it('does NOT rewrite partial references like "1px solid var(--color)"', () => {
+  it('rewrites partial references like "1px solid var(--color)" inline', () => {
     const css = `:root {
       --color-border: #ccc;
       --border-default: 1px solid var(--color-border);
     }`
     const { tokens } = parseCss('test.css', css)
-    expect(tokens.get('border.default')?.rawValue).toBe('1px solid var(--color-border)')
+    // Each var() occurrence inside the larger string becomes {path}, leaving
+    // the surrounding text intact so the resolver can splice the target in.
+    expect(tokens.get('border.default')?.rawValue).toBe('1px solid {color.border}')
+  })
+
+  it('rewrites multiple partial var() references in one value', () => {
+    const css = `:root {
+      --c1: #fff;
+      --c2: #000;
+      --gradient: linear-gradient(var(--c1), var(--c2));
+    }`
+    const { tokens } = parseCss('test.css', css)
+    expect(tokens.get('gradient')?.rawValue).toBe('linear-gradient({c1}, {c2})')
   })
 
   it('rewrites var() to a nonexistent target (dangling ref caught by validator later)', () => {
