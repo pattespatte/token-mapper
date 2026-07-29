@@ -60,7 +60,11 @@ function toggle(): void {
 </script>
 
 <template>
-  <section class="dtm-validation" :class="{ 'dtm-validation--open': open }">
+  <section
+    :id="`dtm-validation-${setId}`"
+    class="dtm-validation"
+    :class="{ 'dtm-validation--open': open }"
+  >
     <button
       type="button"
       class="dtm-validation__header"

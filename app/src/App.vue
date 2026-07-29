@@ -17,7 +17,7 @@
  * through the Gallery component, which takes a `compare` prop.
  */
 
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { watch, onMounted, onUnmounted } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Toolbar from '@/components/Toolbar.vue'
@@ -31,6 +31,7 @@ import { useSidebar } from '@/composables/useSidebar'
 import { useShare } from '@/composables/useShare'
 import { usePersistence } from '@/composables/usePersistence'
 import { useTheme } from '@/composables/useTheme'
+import { useValidationPanel } from '@/composables/useValidationPanel'
 
 const { isComparing, setA, setB } = useTokenSets()
 const { resetCategory } = useGallery()
@@ -38,15 +39,13 @@ const { sidebarWidth } = useSidebar()
 const { readFromUrl, loadFromHash } = useShare()
 const { restoreFromStorage, saveState } = usePersistence()
 const { theme, initThemeFromStorage } = useTheme()
+const { openA: validationOpenA, openB: validationOpenB } = useValidationPanel()
 
 /**
- * Per-set validation-panel expand state. Independent so each set's panel
- * can be opened/closed on its own — in compare mode the two side-by-side
- * panels don't force-couple. In browse mode only the loaded set's panel
- * renders, so the other ref is simply unused.
+ * Per-set validation-panel expand state lives in `useValidationPanel` (shared
+ * singleton) so token cards anywhere in the tree can open a panel via
+ * `openForValidation`. App.vue binds the same refs to the panels' `v-model:open`.
  */
-const validationOpenA = ref(false)
-const validationOpenB = ref(false)
 
 /**
  * Signal that changes whenever the loaded source list changes. The label is

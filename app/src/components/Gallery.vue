@@ -19,8 +19,10 @@
  */
 
 import { computed, onMounted, onUnmounted } from 'vue'
+import type { ResolvedToken, ValidationIssue } from '@dtcg-mapper/core'
 import { useGallery } from '@/composables/useGallery'
 import { useDiff } from '@/composables/useDiff'
+import { useValidationPanel } from '@/composables/useValidationPanel'
 import TokenCard from './TokenCard.vue'
 import DiffCard from './DiffCard.vue'
 import FilterBar from './FilterBar.vue'
@@ -41,6 +43,7 @@ const {
   activeCategory,
 } = useGallery()
 const { filteredDiff } = useDiff()
+const { openForValidation } = useValidationPanel()
 
 /* ------------------------------ Browse mode ------------------------------ */
 
@@ -50,12 +53,52 @@ const browseHeading = computed(() => {
   return cat
 })
 
-const browseCards = computed(() => {
+/**
+ * Browse set's validation issues grouped by token path, so each card can be
+ * stamped with its issues in one lookup instead of re-scanning the whole
+ * issues list per card. `undefined` (no entry) means "no issues" — cards
+ * default to an empty array via `?? []`. Recomputed when the browse set or
+ * its issues change.
+ */
+const issueMap = computed<Map<string, ValidationIssue[]>>(() => {
+  const set = browseSet.value
+  if (set === null) return new Map()
+  const map = new Map<string, ValidationIssue[]>()
+  for (const issue of set.validation) {
+    const list = map.get(issue.path)
+    if (list === undefined) {
+      map.set(issue.path, [issue])
+    } else {
+      list.push(issue)
+    }
+  }
+  return map
+})
+
+/** A browse card: its resolved token plus any validation issues (empty when none). */
+interface BrowseCard {
+  token: ResolvedToken
+  issues: ValidationIssue[]
+}
+
+/**
+ * Cards to render in browse mode: each visible token paired with its issues
+ * (empty when none). Previously this returned bare `ResolvedToken`s, which
+ * left no room to surface validation problems on the card — the issue list
+ * was discarded along with the set. Threading `issues` through lets TokenCard
+ * show the per-card indicator.
+ */
+const browseCards = computed<BrowseCard[]>(() => {
   const set = browseSet.value
   if (set === null) return []
-  return visibleTokens.value
-    .map(({ path }) => set.resolved.get(path))
-    .filter((t): t is NonNullable<typeof t> => t !== undefined)
+  const issues = issueMap.value
+  const cards: BrowseCard[] = []
+  for (const { path } of visibleTokens.value) {
+    const token = set.resolved.get(path)
+    if (token === undefined) continue
+    cards.push({ token, issues: issues.get(path) ?? [] })
+  }
+  return cards
 })
 
 function handleSelect(path: string): void {
@@ -65,6 +108,17 @@ function handleSelect(path: string): void {
   } else {
     selectedTokenPath.value = path
   }
+}
+
+/**
+ * Card issue-indicator click → open the browse set's validation panel and
+ * scroll it into view. The set is guaranteed non-null here (cards only render
+ * when a set is loaded), but the guard keeps the call honest.
+ */
+async function handleJumpToValidation(): Promise<void> {
+  const set = browseSet.value
+  if (set === null) return
+  await openForValidation(set.id)
 }
 
 /** Compare-mode DiffCard click → toggles the DiffInspector selection. */
@@ -144,11 +198,13 @@ onUnmounted(() => {
 
       <div v-else class="dtm-gallery__grid">
         <TokenCard
-          v-for="token in browseCards"
+          v-for="{ token, issues } in browseCards"
           :key="token.path"
           :token="token"
+          :issues="issues"
           :class="{ 'dtm-token-card--selected': selectedTokenPath === token.path }"
           @select="handleSelect"
+          @jump-to-validation="handleJumpToValidation"
         />
       </div>
     </div>
