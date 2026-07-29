@@ -25,6 +25,11 @@ import { computed } from 'vue'
 import { useTheme, type Theme } from '@/composables/useTheme'
 
 const REPO_URL = 'https://github.com/pattespatte/token-mapper'
+
+// Logo lives in app/public/, served by Vite at the configured base path
+// (/token-mapper/ in production). BASE_URL keeps the reference correct
+// across dev and the deployed path.
+const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`
 const { theme, toggleTheme } = useTheme()
 
 /** The cycle order — kept in sync with `useTheme.CYCLE`. */
@@ -45,6 +50,14 @@ const currentLabel = computed(() => {
 <template>
   <header class="dtm-header">
     <div class="dtm-header__brand">
+      <img
+        :src="logoUrl"
+        alt=""
+        aria-hidden="true"
+        class="dtm-header__logo"
+        width="24"
+        height="24"
+      />
       <span class="dtm-header__name">Design Token Mapper</span>
       <a
         :href="REPO_URL"
@@ -144,6 +157,15 @@ const currentLabel = computed(() => {
   display: flex;
   align-items: baseline;
   gap: var(--dtm-spacing-sm);
+}
+
+/* Logo sits beside the brand name. The brand row uses baseline alignment
+   (good for the text link), so the logo self-centres to the line height. */
+.dtm-header__logo {
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
 }
 
 .dtm-header__name {
