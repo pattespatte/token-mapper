@@ -172,17 +172,31 @@ export function isValidNumber(value: RawValue): boolean {
  */
 export function isValidShadow(value: RawValue): boolean {
   if (typeof value !== 'string') return false
-  // Multi-layer (comma-separated) shadows are out of scope. But commas inside
+  // Multi-layer shadows are comma-separated at the top level. Commas inside
   // function calls — rgb(0,0,0,0.3), rgba(...), hsl(...) — are part of the
-  // colour, not a layer separator. Reject only commas at the top level (outside
-  // any parentheses).
-  if (hasTopLevelComma(value)) return false
+  // colour, not a layer separator. Split on top-level commas and validate each
+  // layer; a value is a valid shadow iff every layer is a valid single-layer
+  // shadow.
+  const layers = splitTopLevelCommas(value)
+  if (layers.length === 0) return false
+  return layers.every((layer) => isValidSingleLayerShadow(layer))
+}
+
+/**
+ * Validate one box-shadow layer: an optional leading `inset`, then 2–4
+ * whitespace-separated length tokens (offset-x, offset-y, optional blur,
+ * optional spread), then an optional trailing colour. The leading run of
+ * lengths must be contiguous (no colour interleaved) and at least 2 (the two
+ * required offsets). Extracted from the old `isValidShadow` so the multi-layer
+ * path can reuse it per layer.
+ */
+function isValidSingleLayerShadow(layer: string): boolean {
   // Strip an optional leading `inset` (case-insensitive, with trailing space).
-  const body = value.replace(/^inset\s+/i, '')
-  // Split on whitespace. Up to 4 leading tokens are lengths (offset-x, offset-y,
-  // optional blur, optional spread); anything after is the optional colour. The
-  // leading run of lengths must be contiguous (no colour interleaved) and at
-  // least 2 (the two required offsets).
+  const body = layer.replace(/^inset\s+/i, '').trim()
+  if (body === '') return false
+  // Split on whitespace. Up to 4 leading tokens are lengths; anything after is
+  // the optional colour. The leading run of lengths must be contiguous from the
+  // start and at least 2 (the two required offsets).
   const tokens = body.split(/\s+/).filter((t) => t.length > 0)
   if (tokens.length < 2) return false
   let lengthCount = 0
@@ -191,8 +205,7 @@ export function isValidShadow(value: RawValue): boolean {
     if (LENGTH_TOKEN.test(tok)) {
       lengthCount++
     } else {
-      // First non-length token: this is where the colour begins. The length
-      // run must have been contiguous from the start and ≥ 2.
+      // First non-length token: this is where the colour begins.
       break
     }
   }
@@ -203,19 +216,29 @@ export function isValidShadow(value: RawValue): boolean {
 }
 
 /**
- * True when `value` contains a comma at depth 0 (not nested inside any
- * parentheses). Used by {@link isValidShadow} to distinguish a multi-layer
- * shadow separator (`0 0 1px red, 0 0 2px blue`) from a comma inside a colour
- * function (`rgb(0, 0, 0)`).
+ * Split `value` on commas that are at depth 0 (not nested inside any
+ * parentheses). Used by {@link isValidShadow} to separate multi-layer shadow
+ * layers (`0 0 1px red, 0 0 2px blue` → two layers) without splitting on
+ * commas inside colour functions (`rgb(0, 0, 0)` stays one layer). Each
+ * returned layer is trimmed; empty layers (e.g. trailing comma) are dropped.
  */
-function hasTopLevelComma(value: string): boolean {
+export function splitTopLevelCommas(value: string): string[] {
+  const out: string[] = []
   let depth = 0
-  for (const ch of value) {
+  let start = 0
+  for (let i = 0; i < value.length; i++) {
+    const ch = value[i] ?? ''
     if (ch === '(') depth++
     else if (ch === ')') depth--
-    else if (ch === ',' && depth === 0) return true
+    else if (ch === ',' && depth === 0) {
+      const layer = value.slice(start, i).trim()
+      if (layer !== '') out.push(layer)
+      start = i + 1
+    }
   }
-  return false
+  const last = value.slice(start).trim()
+  if (last !== '') out.push(last)
+  return out
 }
 
 /**

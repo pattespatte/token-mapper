@@ -243,9 +243,30 @@ describe('parseCss — type inference', () => {
     expect(tokens.get('n')?.type).toBe('number')
   })
 
-  it('infers $type=shadow for a box-shadow value', () => {
+  it('infers $type=shadow and parses the string into a structured layer', () => {
     const { tokens } = parseCss('t.css', ':root { --sh: 0 0 20px rgba(0,0,0,0.3); }')
-    expect(tokens.get('sh')?.type).toBe('shadow')
+    const sh = tokens.get('sh')
+    expect(sh?.type).toBe('shadow')
+    // The raw CSS string is parsed into the structured DTCG layer shape.
+    expect(sh?.rawValue).toEqual({
+      offsetX: '0',
+      offsetY: '0',
+      blur: '20px',
+      color: 'rgba(0,0,0,0.3)',
+    })
+    // The original CSS string is preserved for display.
+    expect(sh?.originalCssValue).toBe('0 0 20px rgba(0,0,0,0.3)')
+  })
+
+  it('parses a multi-layer CSS shadow into an array of layers', () => {
+    const { tokens } = parseCss('t.css', ':root { --sh: 0 0 1px red, 0 0 2px blue; }')
+    const sh = tokens.get('sh')
+    expect(sh?.type).toBe('shadow')
+    expect(sh?.rawValue).toEqual([
+      { offsetX: '0', offsetY: '0', blur: '1px', color: 'red' },
+      { offsetX: '0', offsetY: '0', blur: '2px', color: 'blue' },
+    ])
+    expect(sh?.originalCssValue).toBe('0 0 1px red, 0 0 2px blue')
   })
 
   it('infers $type=duration for a time value', () => {

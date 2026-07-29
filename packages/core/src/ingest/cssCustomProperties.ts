@@ -29,6 +29,7 @@ import type { ValidationIssue } from '../types/validation'
 import type { ParseResult } from '../pipeline/parse'
 import { joinPath } from '../utils/path'
 import { inferType } from '../utils/cssTypeInference'
+import { parseCssShadow } from '../utils/shadowParse'
 
 /** Regex for `/* … *​/` block comments — stripped before scanning. */
 const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g
@@ -132,6 +133,13 @@ export function parseCss(_name: string, content: string): ParseResult {
   // undefined — the validator's MISSING_TYPE warning surfaces it.
   applyAliasTypeInheritance(tokens)
 
+  // Pass 3: shadow strings → structured DTCG layer objects. A CSS box-shadow
+  // value (`0 0 20px rgba(0,0,0,0.3)`) carries `$type: 'shadow'` but its value
+  // is a raw string; the ShadowPreview renderer (and the validator's shape
+  // check) expect the structured `{ offsetX, offsetY, blur, color }` form. The
+  // original CSS string is preserved on `originalCssValue` for display.
+  applyShadowParsing(tokens)
+
   return { tokens, issues }
 }
 
@@ -170,6 +178,35 @@ function applyAliasTypeInheritance(tokens: TokenMap): void {
     if (target?.type !== undefined) {
       token.type = target.type
     }
+  }
+}
+
+/**
+ * Pass 3: for every token inferred as `$type: 'shadow'` whose value is still a
+ * raw CSS string, parse the string into the structured DTCG layer shape (single
+ * object or array of objects) that the ShadowPreview renderer and the validator
+ * expect. The original CSS string is preserved on `originalCssValue` so the
+ * renderer can show the source alongside the structured form.
+ *
+ * Tokens whose value isn't a string, or whose string doesn't parse as a shadow,
+ * are left untouched — the latter keeps the string and falls back to the
+ * generic renderer (same as before this pass existed). Runs after type
+ * inference (pass 1) and alias-type inheritance (pass 2) so aliases that
+ * inherit `shadow` type also get parsed.
+ */
+function applyShadowParsing(tokens: TokenMap): void {
+  for (const token of tokens.values()) {
+    if (token.type !== 'shadow') continue
+    if (typeof token.rawValue !== 'string') continue
+    const parsed = parseCssShadow(token.rawValue)
+    if (parsed === null) continue
+    token.originalCssValue = token.rawValue
+    // Single-layer shadows become the bare object (matches the JSON demo form
+    // the renderer already handles); multi-layer become the array. Cast to
+    // RawValue: a ShadowLayer is structurally a {key: string} object (all its
+    // fields are strings), but the ShadowLayer | ShadowLayer[] union doesn't
+    // narrow onto RawValue's object|array arms without the assertion.
+    token.rawValue = (parsed.length === 1 ? parsed[0]! : parsed) as RawValue
   }
 }
 

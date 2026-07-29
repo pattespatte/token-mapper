@@ -224,8 +224,13 @@ describe('isValidShadow', () => {
     expect(isValidShadow('0 0 2cqh black')).toBe(true)
   })
 
-  it('rejects multi-layer (comma-separated) shadows', () => {
-    expect(isValidShadow('0 0 1px red, 0 0 2px blue')).toBe(false)
+  it('accepts multi-layer (comma-separated) shadows', () => {
+    expect(isValidShadow('0 0 1px red, 0 0 2px blue')).toBe(true)
+    expect(isValidShadow('0 1px 3px #000, inset 0 2px 3px rgba(0,0,0,0.1)')).toBe(true)
+  })
+
+  it('rejects a multi-layer value where one layer is invalid', () => {
+    expect(isValidShadow('0 0 1px red, not a shadow')).toBe(false)
   })
 
   it('rejects a single length (that is a dimension, not a shadow)', () => {

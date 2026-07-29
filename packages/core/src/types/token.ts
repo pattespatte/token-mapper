@@ -50,6 +50,14 @@ export interface NormalizedToken {
   type?: DtcgType
   /** `$description` if present. */
   description?: string
+  /**
+   * The original CSS-source string, set by the CSS importer when it parses a
+   * CSS-specific string value into a structured DTCG shape (e.g. a CSS
+   * box-shadow string → `{ offsetX, offsetY, blur, color }` object). Undefined
+   * for JSON-sourced tokens (their `$value` arrives in final shape). Preserved
+   * so renderers can show the raw CSS alongside the structured form.
+   */
+  originalCssValue?: string
 }
 
 /**

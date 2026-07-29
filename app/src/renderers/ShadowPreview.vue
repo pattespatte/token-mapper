@@ -17,10 +17,17 @@
 
 import { computed } from 'vue'
 import type { RawValue, ResolvedToken } from '@dtcg-mapper/core'
+import { pathToDisplayName } from '@dtcg-mapper/core'
 
 const props = defineProps<{
   token: ResolvedToken
 }>()
+
+/** A friendly name derived from the token path (e.g. 'Box modal' for 'f.box.modal.shadow'). */
+const displayName = computed(() => pathToDisplayName(props.token.path))
+
+/** The original CSS-source string, when this token was parsed from CSS. */
+const rawCss = computed(() => props.token.originalCssValue ?? '')
 
 /** Per-layer shape expected by the W3C DTCG draft. */
 interface ShadowLayer {
@@ -108,6 +115,7 @@ function isLength(v: RawValue | undefined): v is string | number {
 
 <template>
   <div class="dtm-shadow">
+    <p v-if="displayName !== ''" class="dtm-shadow__name">{{ displayName }}</p>
     <template v-if="isRenderable">
       <div
         class="dtm-shadow__preview"
@@ -130,6 +138,7 @@ function isLength(v: RawValue | undefined): v is string | number {
           </dl>
         </li>
       </ul>
+      <p v-if="rawCss !== ''" class="dtm-shadow__raw">{{ rawCss }}</p>
     </template>
     <pre v-else class="dtm-shadow__fallback"><code>{{ jsonDump }}</code></pre>
   </div>
@@ -140,6 +149,14 @@ function isLength(v: RawValue | undefined): v is string | number {
   display: flex;
   flex-direction: column;
   gap: var(--dtm-spacing-sm);
+}
+
+/* Derived display name — the friendly heading above the preview. */
+.dtm-shadow__name {
+  margin: 0;
+  font-size: var(--dtm-font-size-md);
+  font-weight: var(--dtm-font-weight-semibold);
+  color: var(--dtm-color-text);
 }
 
 .dtm-shadow__preview {
@@ -214,5 +231,15 @@ function isLength(v: RawValue | undefined): v is string | number {
   color: var(--dtm-color-text);
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* The original CSS-source string, shown subtly below the parsed layers so the
+   source is visible alongside the structured form. CSS-sourced tokens only. */
+.dtm-shadow__raw {
+  margin: 0;
+  font-family: var(--dtm-font-family-mono);
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
+  word-break: break-all;
 }
 </style>

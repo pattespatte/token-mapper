@@ -44,6 +44,9 @@ export {
   rgbDistance,
 } from './utils/color'
 export { weightKeywordToNumber, primaryFontFamily } from './utils/font'
+export { pathToDisplayName } from './utils/name'
+export { parseCssShadow, type ShadowLayer } from './utils/shadowParse'
+export { splitTopLevelCommas } from './utils/cssTypeInference'
 export { joinPath, parseReference, findEmbeddedReferences } from './utils/path'
 export type { EmbeddedReference } from './utils/path'
 
