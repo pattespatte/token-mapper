@@ -43,6 +43,7 @@ export {
   rgbToHsl,
   rgbDistance,
 } from './utils/color'
+export { weightKeywordToNumber, primaryFontFamily } from './utils/font'
 export { joinPath, parseReference } from './utils/path'
 
 // Types
