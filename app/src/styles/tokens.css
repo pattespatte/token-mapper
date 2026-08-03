@@ -96,6 +96,18 @@
   --dtm-color-text-subtle: #a4a7ae;
   --dtm-color-accent: #f5d0d8;
   --dtm-color-accent-muted: #2a1a1e;
+
+  /* Semantic colors — brighter mid-tones that pass both:
+   *   (a) text on --surface (#181d27): WCAG AA ≥4.5:1
+   *   (b) white text on the color as background: WCAG AA-large ≥3.0:1
+   * The light-mode values (#166534 / #854d0e / #991b1b / #1e40af) drop to
+   * ~2:1 against the dark surface, so validation messages, success notes,
+   * error text, and DiffBadge/FilterBar active fills all became unreadable
+   * when Tier 5 added the dark theme. These four overrides close that gap. */
+  --dtm-color-success: #1ca048;
+  --dtm-color-warning: #ba8221;
+  --dtm-color-error: #e36363;
+  --dtm-color-info: #528de0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -110,6 +122,12 @@
     --dtm-color-text-subtle: #a4a7ae;
     --dtm-color-accent: #f5d0d8;
     --dtm-color-accent-muted: #2a1a1e;
+
+    /* Mirrors :root[data-theme='dark'] above — see comment there. */
+    --dtm-color-success: #1ca048;
+    --dtm-color-warning: #ba8221;
+    --dtm-color-error: #e36363;
+    --dtm-color-info: #528de0;
   }
 }
 
