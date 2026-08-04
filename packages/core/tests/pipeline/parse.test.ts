@@ -118,6 +118,16 @@ describe('parseFiles', () => {
     expect(result.issues[0]?.path).toBe('x.y')
   })
 
+  it('attaches a spec reference URL to DUPLICATE_PATH issues', () => {
+    const result = parseFiles([
+      file('a.json', JSON.stringify({ x: { y: { $value: '1' } } })),
+      file('b.json', JSON.stringify({ x: { y: { $value: '2' } } })),
+    ])
+    expect(result.issues[0]?.reference).toBe(
+      'https://tr.designtokens.org/format/#character-restrictions'
+    )
+  })
+
   it('emits INVALID_JSON for a malformed file and still parses others', () => {
     const result = parseFiles([
       file('bad.json', '{ not valid json'),
@@ -130,6 +140,13 @@ describe('parseFiles', () => {
     expect(result.issues[0]?.severity).toBe('error')
     expect(result.issues[0]?.path).toBe('bad.json')
     expect(result.issues[0]?.message).toMatch(/bad\.json/)
+  })
+
+  it('attaches a spec reference URL to INVALID_JSON issues', () => {
+    const result = parseFiles([file('bad.json', '{ not valid json')])
+    expect(result.issues[0]?.reference).toBe(
+      'https://tr.designtokens.org/format/#file-format'
+    )
   })
 
   it('rejects top-level JSON arrays with INVALID_JSON', () => {

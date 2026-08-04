@@ -30,6 +30,7 @@ import type { ParseResult } from '../pipeline/parse'
 import { joinPath } from '../utils/path'
 import { inferType } from '../utils/cssTypeInference'
 import { parseCssShadow } from '../utils/shadowParse'
+import { SPEC_REFERENCE } from '../pipeline/references'
 
 /** Regex for `/* … *​/` block comments — stripped before scanning. */
 const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g
@@ -114,6 +115,7 @@ export function parseCss(_name: string, content: string): ParseResult {
           severity: 'warning',
           code: 'DUPLICATE_PATH',
           message: `Duplicate token path "${path}" — earlier definition kept.`,
+          reference: SPEC_REFERENCE.DUPLICATE_PATH,
         })
         continue
       }

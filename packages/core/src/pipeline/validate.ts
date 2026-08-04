@@ -22,6 +22,7 @@ import type { NormalizedToken, RawValue, TokenMap } from '../types/token'
 import type { ValidationIssue } from '../types/validation'
 import { parseReference } from '../utils/path'
 import { isValidColor, isValidDimension } from '../utils/cssTypeInference'
+import { SPEC_REFERENCE } from './references'
 
 /** Maximum reference-chain depth before we declare a cycle. */
 const MAX_REFERENCE_DEPTH = 32
@@ -63,6 +64,7 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
         severity: 'warning',
         code: 'MISSING_TYPE',
         message: `Token "${token.path}" has no $type — value cannot be validated or rendered specifically.`,
+        reference: SPEC_REFERENCE.MISSING_TYPE,
       })
       // Without a type we can't do shape checks; references still get checked.
     } else if (!KNOWN_TYPES.has(token.type)) {
@@ -71,6 +73,7 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
         severity: 'warning',
         code: 'UNKNOWN_TYPE',
         message: `Token "${token.path}" has unknown $type "${token.type}" — will render via the generic fallback.`,
+        reference: SPEC_REFERENCE.UNKNOWN_TYPE,
       })
     } else {
       // 2. value-shape check (only when type is known and value isn't a ref)
@@ -82,6 +85,7 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
             severity: 'warning',
             code: 'INVALID_VALUE_FOR_TYPE',
             message: `Token "${token.path}" of $type "${token.type}" has a value that doesn't match the expected shape.`,
+            reference: SPEC_REFERENCE.INVALID_VALUE_FOR_TYPE,
           })
         }
       }
@@ -95,6 +99,7 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
           severity: 'error',
           code: 'DANGLING_REFERENCE',
           message: `Token "${token.path}" references "${refPath}" which does not exist.`,
+          reference: SPEC_REFERENCE.DANGLING_REFERENCE,
         })
       }
     }
@@ -109,6 +114,7 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
           severity: 'error',
           code: 'CYCLIC_REFERENCE',
           message: `Token "${token.path}" is part of a reference cycle: ${cycleResult.loop.join(' → ')}.`,
+          reference: SPEC_REFERENCE.CYCLIC_REFERENCE,
         })
       } else {
         issues.push({
@@ -116,6 +122,7 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
           severity: 'warning',
           code: 'REFERENCE_TOO_DEEP',
           message: `Token "${token.path}" has a reference chain longer than ${MAX_REFERENCE_DEPTH} hops; treated as suspicious (possibly a cycle that the detector could not prove).`,
+          reference: SPEC_REFERENCE.REFERENCE_TOO_DEEP,
         })
       }
     }

@@ -18,6 +18,7 @@ import { parseFiles, type InputFile, type ParseResult } from '@dtcg-mapper/core'
 import { parseCss } from '@dtcg-mapper/core'
 import { validate } from '@dtcg-mapper/core'
 import { resolve } from '@dtcg-mapper/core'
+import { SPEC_REFERENCE } from '@dtcg-mapper/core'
 import type { TokenMap, TokenSet } from '@dtcg-mapper/core'
 import type { ValidationIssue } from '@dtcg-mapper/core'
 // Bundled demo dataset — small, generic, non-proprietary. Imported at build
@@ -98,6 +99,7 @@ function parseInputs(inputs: readonly InputFile[]): ParseResult {
         severity: 'error',
         code: 'UNSUPPORTED_FILE_TYPE',
         message: `${input.name}: unsupported file type ".${ext}". Only .json and .css are accepted.`,
+        reference: SPEC_REFERENCE.UNSUPPORTED_FILE_TYPE,
       })
       continue
     }
@@ -110,6 +112,7 @@ function parseInputs(inputs: readonly InputFile[]): ParseResult {
           severity: 'warning',
           code: 'DUPLICATE_PATH',
           message: `Duplicate token path "${path}" — earlier definition kept.`,
+          reference: SPEC_REFERENCE.DUPLICATE_PATH,
         })
       } else {
         tokens.set(path, token)

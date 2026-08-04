@@ -4,7 +4,8 @@
  *
  * Shown after the visual gallery (per the PRD). Toggled open/closed via a
  * prop; the parent controls visibility. Issues are grouped by severity —
- * errors first, then warnings — and each row shows path, code, and message.
+ * errors first, then warnings — and each row shows path, code, message, and
+ * (when the issue carries a `reference`) a "Spec ↗" link into the W3C rule.
  *
  * Reads the set named by the `setId` prop directly from `useTokenSets`, so
  * the same panel serves both modes:
@@ -101,6 +102,15 @@ function toggle(): void {
         <code class="dtm-validation__path">{{ issue.path }}</code>
         <span class="dtm-validation__code">{{ issue.code }}</span>
         <span class="dtm-validation__message">{{ issue.message }}</span>
+        <a
+          v-if="issue.reference"
+          class="dtm-validation__reference"
+          :href="issue.reference"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="`Read the spec for ${issue.code}`"
+          >Spec ↗</a
+        >
       </li>
     </ol>
   </section>
@@ -187,7 +197,7 @@ function toggle(): void {
 
 .dtm-validation__row {
   display: grid;
-  grid-template-columns: auto auto auto 1fr;
+  grid-template-columns: auto auto auto 1fr auto;
   gap: var(--dtm-spacing-xs);
   align-items: baseline;
   padding: var(--dtm-spacing-xs) var(--dtm-spacing-md);
@@ -225,5 +235,17 @@ function toggle(): void {
 
 .dtm-validation__message {
   color: var(--dtm-color-text-muted);
+}
+
+.dtm-validation__reference {
+  font-size: var(--dtm-font-size-sm);
+  color: var(--dtm-color-text-subtle);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.dtm-validation__reference:hover {
+  text-decoration: underline;
+  color: var(--dtm-color-text);
 }
 </style>

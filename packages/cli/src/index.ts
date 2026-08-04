@@ -27,6 +27,7 @@ import {
   explainDiff,
   toMarkdownDiffReport,
   toJsonDiffReport,
+  SPEC_REFERENCE,
   type InputFile,
   type ParseResult,
   type ReportMeta,
@@ -147,6 +148,7 @@ function mergeResults(results: ParseResult[]): { tokens: TokenMap; issues: Valid
           severity: 'warning',
           code: 'DUPLICATE_PATH',
           message: `Duplicate token path "${path}" — earlier definition kept.`,
+          reference: SPEC_REFERENCE.DUPLICATE_PATH,
         })
       } else {
         tokens.set(path, token)

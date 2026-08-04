@@ -21,6 +21,7 @@ export {
   toJsonDiffReport,
   type ReportMeta,
 } from './pipeline/exportDiff'
+export { SPEC_REFERENCE } from './pipeline/references'
 
 // Ingest
 export { parseCss } from './ingest/cssCustomProperties'

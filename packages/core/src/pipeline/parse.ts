@@ -19,6 +19,7 @@ import { isDtcgToken, type DtcgFile, type DtcgType } from '../types/dtcg'
 import type { NormalizedToken, TokenMap } from '../types/token'
 import type { ValidationIssue } from '../types/validation'
 import { joinPath } from '../utils/path'
+import { SPEC_REFERENCE } from './references'
 
 /** A single uploaded file as the parser sees it. */
 export interface InputFile {
@@ -57,6 +58,7 @@ export function parseFiles(files: readonly InputFile[]): ParseResult {
         severity: 'error',
         code: 'INVALID_JSON',
         message: `Could not parse ${file.name}: ${message}`,
+        reference: SPEC_REFERENCE.INVALID_JSON,
       })
       continue
     }
@@ -68,6 +70,7 @@ export function parseFiles(files: readonly InputFile[]): ParseResult {
         message: `${file.name}: top-level JSON must be an object, got ${
           Array.isArray(data) ? 'array' : typeof data
         }.`,
+        reference: SPEC_REFERENCE.INVALID_JSON,
       })
       continue
     }
@@ -113,6 +116,7 @@ function walk(
           severity: 'warning',
           code: 'DUPLICATE_PATH',
           message: `Duplicate token path "${path}" — earlier definition kept.`,
+          reference: SPEC_REFERENCE.DUPLICATE_PATH,
         })
         continue
       }

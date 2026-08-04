@@ -381,4 +381,68 @@ describe('validate', () => {
     const { tokens } = tokensOf(JSON.stringify({}))
     expect(validate(tokens)).toEqual([])
   })
+
+  /* --------------------------- spec references ------------------------------ */
+  describe('spec reference URLs', () => {
+    /** Spec base URL — every code's reference must start with this. */
+    const SPEC_BASE = 'https://tr.designtokens.org/format/'
+
+    it('attaches a reference to MISSING_TYPE issues', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ color: { red: { $value: '#ff0000' } } })
+      )
+      const issue = issueWithCode(validate(tokens), 'MISSING_TYPE')
+      expect(issue?.reference).toBe(`${SPEC_BASE}#type-0`)
+    })
+
+    it('attaches a reference to UNKNOWN_TYPE issues', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ x: { y: { $value: 'z', $type: 'magic' } } })
+      )
+      const issue = issueWithCode(validate(tokens), 'UNKNOWN_TYPE')
+      expect(issue?.reference).toBe(`${SPEC_BASE}#types`)
+    })
+
+    it('attaches a reference to INVALID_VALUE_FOR_TYPE issues', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ color: { x: { $value: 42, $type: 'color' } } })
+      )
+      const issue = issueWithCode(validate(tokens), 'INVALID_VALUE_FOR_TYPE')
+      expect(issue?.reference).toBe(`${SPEC_BASE}#types`)
+    })
+
+    it('attaches a reference to DANGLING_REFERENCE issues', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({
+          a: { $value: '{nope}', $type: 'color' },
+        })
+      )
+      const issue = issueWithCode(validate(tokens), 'DANGLING_REFERENCE')
+      expect(issue?.reference).toBe(`${SPEC_BASE}#aliases-references`)
+    })
+
+    it('attaches a reference to CYCLIC_REFERENCE issues', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({
+          a: { $value: '{b}', $type: 'color' },
+          b: { $value: '{a}', $type: 'color' },
+        })
+      )
+      const issue = issueWithCode(validate(tokens), 'CYCLIC_REFERENCE')
+      expect(issue?.reference).toBe(`${SPEC_BASE}#aliases-references`)
+    })
+
+    it('attaches a reference to REFERENCE_TOO_DEEP issues', () => {
+      // A 36-link acyclic chain exceeds the 32-hop cap and emits a warning.
+      const chain: Record<string, unknown> = {
+        end: { $value: '#000', $type: 'color' },
+      }
+      for (let i = 35; i > 0; i--) {
+        chain[`t${i}`] = { $value: `{t${i + 1}}`, $type: 'color' }
+      }
+      const { tokens } = tokensOf(JSON.stringify(chain))
+      const issue = issueWithCode(validate(tokens), 'REFERENCE_TOO_DEEP')
+      expect(issue?.reference).toBe(`${SPEC_BASE}#aliases-references`)
+    })
+  })
 })

@@ -47,4 +47,12 @@ export interface ValidationIssue {
   code: ValidationCode
   /** Human-readable explanation, safe to show in the UI. */
   message: string
+  /**
+   * URL of the W3C spec section this issue relates to (anchor scheme
+   * `https://tr.designtokens.org/format/#<section>`). Optional because legacy
+   * callers and test fixtures may construct issues without it; the UI renders
+   * a "Spec ↗" link only when present. Looked up from `SPEC_REFERENCE` in
+   * `pipeline/references.ts`.
+   */
+  reference?: string
 }
