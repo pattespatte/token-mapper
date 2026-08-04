@@ -22,6 +22,11 @@ export {
   type ReportMeta,
 } from './pipeline/exportDiff'
 export { SPEC_REFERENCE } from './pipeline/references'
+export {
+  serializeTokens,
+  type SerializeValue,
+  type SerializeOptions,
+} from './pipeline/serialize'
 
 // Ingest
 export { parseCss } from './ingest/cssCustomProperties'

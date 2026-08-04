@@ -17,6 +17,7 @@ import { useTokenSets } from '@/composables/useTokenSets'
 import { usePersistence } from '@/composables/usePersistence'
 import Dropzone from './Dropzone.vue'
 import ShareMenu from './ShareMenu.vue'
+import DownloadMenu from './DownloadMenu.vue'
 
 const { loadDemo, clearSet, setA, setB } = useTokenSets()
 const { clearState } = usePersistence()
@@ -94,6 +95,7 @@ function modeStatus(): string {
     <div class="dtm-toolbar__slots">
       <div class="dtm-toolbar__slot">
         <Dropzone set-id="A" hint="your design system" />
+        <DownloadMenu v-if="setA !== null" set-id="A" />
         <button
           v-if="setA !== null"
           type="button"
@@ -105,6 +107,7 @@ function modeStatus(): string {
 
       <div class="dtm-toolbar__slot">
         <Dropzone set-id="B" hint="base design system" />
+        <DownloadMenu v-if="setB !== null" set-id="B" />
         <button
           v-if="setB !== null"
           type="button"
