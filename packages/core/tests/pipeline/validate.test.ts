@@ -468,11 +468,22 @@ describe('validate', () => {
       expect(issue?.path).toBe('fw')
     })
 
-    it('reports INVALID_DURATION for a value without the ms suffix', () => {
+    it('reports INVALID_DURATION for a value with no time unit', () => {
+      // '2s' is valid (spec permits s and ms); a bare number is not.
       const { tokens } = tokensOf(
-        JSON.stringify({ d: { $value: '2s', $type: 'duration' } })
+        JSON.stringify({ d: { $value: '200', $type: 'duration' } })
       )
       expect(issueWithCode(validate(tokens), 'INVALID_DURATION')).toBeDefined()
+    })
+
+    it('accepts both s and ms units for duration (spec-permitted)', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({
+          a: { $value: '200ms', $type: 'duration' },
+          b: { $value: '0.3s', $type: 'duration' },
+        })
+      )
+      expect(issueWithCode(validate(tokens), 'INVALID_DURATION')).toBeUndefined()
     })
 
     it('reports INVALID_NUMBER for NaN', () => {

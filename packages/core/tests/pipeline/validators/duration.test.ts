@@ -21,11 +21,14 @@ describe('validateDuration', () => {
     expect(reports).toEqual([])
   })
 
-  it('rejects a value ending in s (not ms)', () => {
-    const { reports, ctx } = makeCtx()
-    validateDuration('2s', ctx)
-    expect(reports).toHaveLength(1)
-    expect(reports[0]?.code).toBe('INVALID_DURATION')
+  it('accepts seconds (s) as well as milliseconds (ms) — both are spec-permitted', () => {
+    // The spec allows unit 'ms' or 's', and the DurationSample renderer
+    // normalises between them. Phase 4 loosened the validator from ms-only.
+    for (const v of ['2s', '0.3s', '1500s']) {
+      const { reports, ctx } = makeCtx()
+      validateDuration(v, ctx)
+      expect(reports, `${v} should be valid`).toEqual([])
+    }
   })
 
   it('rejects a bare number', () => {

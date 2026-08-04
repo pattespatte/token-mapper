@@ -59,11 +59,9 @@ export const STROKE_STYLE_VALUES = [
 export const LINE_CAP_VALUES = ['butt', 'round', 'square'] as const
 
 /**
- * Numeric range for a `cubicBezier` control-point component. Per spec each of
- * the four numbers may be any real number, but the *first and third* (the
- * horizontal control points) must lie in `[0, 1]`. We apply the range to all
- * four for a conservative check — see {@link validateCubicBezier} for the
- * nuance and the deliberate choice.
+ * Numeric range for the x-coordinates of a `cubicBezier` (indices 0 and 2).
+ * Per spec the y-coordinates (indices 1 and 3) may be any real number, but
+ * the x-coordinates are constrained to `[0, 1]`. See {@link validateCubicBezier}.
  */
 export const CUBIC_BEZIER_RANGE = { min: 0, max: 1 } as const
 
