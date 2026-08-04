@@ -29,6 +29,18 @@ export type ValidationCode =
   | 'UNKNOWN_TYPE'
   // Per-token value-shape
   | 'INVALID_VALUE_FOR_TYPE'
+  // Per-token value-shape — granular (Phase 2 validator registry). Emitted by
+  // the per-type validators in `pipeline/validators/` instead of the catch-all
+  // `INVALID_VALUE_FOR_TYPE`, which is retained for types that have no dedicated
+  // validator and as a fallback.
+  | 'INVALID_FONT_WEIGHT'
+  | 'INVALID_STROKE_STYLE'
+  | 'INVALID_CUBIC_BEZIER'
+  | 'INVALID_CUBIC_BEZIER_RANGE'
+  | 'INVALID_DURATION'
+  | 'INVALID_NUMBER'
+  | 'INVALID_GRADIENT'
+  | 'INVALID_COMPOSITE_FIELD'
   // Reference-level
   | 'DANGLING_REFERENCE'
   | 'CYCLIC_REFERENCE'

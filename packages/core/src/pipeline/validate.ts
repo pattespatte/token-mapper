@@ -21,8 +21,8 @@ import type { DtcgType } from '../types/dtcg'
 import type { NormalizedToken, RawValue, TokenMap } from '../types/token'
 import type { ValidationIssue } from '../types/validation'
 import { parseReference } from '../utils/path'
-import { isValidColor, isValidDimension } from '../utils/cssTypeInference'
 import { SPEC_REFERENCE } from './references'
+import { validateValue, type FieldCtx } from './validators'
 
 /** Maximum reference-chain depth before we declare a cycle. */
 const MAX_REFERENCE_DEPTH = 32
@@ -76,18 +76,27 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
         reference: SPEC_REFERENCE.UNKNOWN_TYPE,
       })
     } else {
-      // 2. value-shape check (only when type is known and value isn't a ref)
+      // 2. value-shape check (only when type is known and value isn't a ref).
+      //    Dispatches to the per-type validator registry; the validators call
+      //    `report` for each spec violation with a granular code (e.g.
+      //    INVALID_FONT_WEIGHT) and a field-aware path.
       if (!isReferenceValue(token.rawValue)) {
-        const shapeOk = checkValueShape(token.type, token.rawValue)
-        if (!shapeOk) {
-          issues.push({
-            path: token.path,
-            severity: 'warning',
-            code: 'INVALID_VALUE_FOR_TYPE',
-            message: `Token "${token.path}" of $type "${token.type}" has a value that doesn't match the expected shape.`,
-            reference: SPEC_REFERENCE.INVALID_VALUE_FOR_TYPE,
-          })
+        const fieldCtx: FieldCtx = {
+          path: token.path,
+          report: ({ path, code, message }) => {
+            issues.push({
+              path,
+              severity: 'warning',
+              code,
+              message,
+              reference: SPEC_REFERENCE[code],
+            })
+          },
         }
+        // Returns false only for types with no registered validator; we don't
+        // emit a fallback in that case (UNKNOWN_TYPE already covers genuinely
+        // unknown types, and valid known types simply report nothing).
+        validateValue(token.type, token.rawValue, fieldCtx)
       }
     }
 
@@ -129,60 +138,6 @@ export function validate(tokens: TokenMap): ValidationIssue[] {
   }
 
   return issues
-}
-
-/* -------------------------------------------------------------------------- */
-/* Value-shape checks                                                         */
-/* -------------------------------------------------------------------------- */
-
-/**
- * True if `value` matches the expected shape for the given `$type`.
- *
- * Conservative by design: returns `true` when in doubt so the validator
- * doesn't generate false-positive noise on edge cases. The goal is to catch
- * obvious mistakes (a color token whose value is a number, a typography token
- * whose value is a string), not to enforce every nuance of the spec.
- */
-function checkValueShape(type: DtcgType, value: RawValue): boolean {
-  switch (type) {
-    case 'color':
-      return isValidColor(value)
-    case 'dimension':
-      return isValidDimension(value)
-    case 'fontFamily':
-      return typeof value === 'string' || Array.isArray(value)
-    case 'fontWeight':
-      return typeof value === 'number' || typeof value === 'string'
-    case 'duration':
-      return isValidDuration(value)
-    case 'number':
-      return typeof value === 'number'
-    case 'cubicBezier':
-      return Array.isArray(value) && value.length === 4
-    case 'typography':
-      return typeof value === 'object' && value !== null && !Array.isArray(value)
-    case 'border':
-      return typeof value === 'object' && value !== null && !Array.isArray(value)
-    case 'transition':
-      return typeof value === 'object' && value !== null && !Array.isArray(value)
-    case 'shadow':
-      // Shadow can be a single object or an array of objects (layered shadows).
-      return typeof value === 'object' && value !== null
-    case 'gradient':
-      return Array.isArray(value)
-    case 'strokeStyle':
-      return typeof value === 'object' && value !== null && !Array.isArray(value)
-    default:
-      // Unknown type — already flagged separately, accept the value.
-      return true
-  }
-}
-
-/** Duration: a number or a string ending in s/ms. */
-function isValidDuration(value: RawValue): boolean {
-  if (typeof value === 'number') return true
-  if (typeof value !== 'string') return false
-  return /^[-+]?\d*\.?\d+(?:e[-+]?\d+)?\s*(?:s|ms)$/i.test(value)
 }
 
 /* -------------------------------------------------------------------------- */

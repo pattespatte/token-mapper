@@ -445,4 +445,122 @@ describe('validate', () => {
       expect(issue?.reference).toBe(`${SPEC_BASE}#aliases-references`)
     })
   })
+
+  /* --------------------- Phase 2: granular value codes ----------------------- */
+  describe('per-type validator registry', () => {
+    it('rejects a typography token whose $value is a number (INVALID_COMPOSITE_FIELD)', () => {
+      // This is the bug Phase 2 fixes: previously the shallow "is it an object"
+      // check let a bare number through.
+      const { tokens } = tokensOf(
+        JSON.stringify({ type: { body: { $value: 42, $type: 'typography' } } })
+      )
+      const issue = issueWithCode(validate(tokens), 'INVALID_COMPOSITE_FIELD')
+      expect(issue).toBeDefined()
+      expect(issue?.path).toBe('type.body')
+    })
+
+    it('reports INVALID_FONT_WEIGHT for an out-of-range fontWeight', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ fw: { $value: 9999, $type: 'fontWeight' } })
+      )
+      const issue = issueWithCode(validate(tokens), 'INVALID_FONT_WEIGHT')
+      expect(issue).toBeDefined()
+      expect(issue?.path).toBe('fw')
+    })
+
+    it('reports INVALID_DURATION for a value without the ms suffix', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ d: { $value: '2s', $type: 'duration' } })
+      )
+      expect(issueWithCode(validate(tokens), 'INVALID_DURATION')).toBeDefined()
+    })
+
+    it('reports INVALID_NUMBER for NaN', () => {
+      // JSON doesn't allow NaN, but the validator should still reject it if it
+      // arrives (e.g. via the JS API or a future input format).
+      const { tokens } = tokensOf(
+        JSON.stringify({ n: { $value: 42, $type: 'number' } })
+      )
+      // Patch the parsed token to NaN to simulate the edge case.
+      const token = tokens.get('n')
+      if (token) token.rawValue = NaN
+      expect(issueWithCode(validate(tokens), 'INVALID_NUMBER')).toBeDefined()
+    })
+
+    it('reports INVALID_GRADIENT for an empty gradient array', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ g: { $value: [], $type: 'gradient' } })
+      )
+      const issue = issueWithCode(validate(tokens), 'INVALID_GRADIENT')
+      expect(issue?.message).toMatch(/no stops/)
+    })
+
+    it('reports a field-level path for a bad typography sub-field', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({
+          type: {
+            body: {
+              $type: 'typography',
+              $value: { fontFamily: 'Inter', fontSize: 'big' },
+            },
+          },
+        })
+      )
+      const issues = validate(tokens)
+      const bad = issues.find((i) => i.path === 'type.body.fontSize')
+      expect(bad).toBeDefined()
+      expect(bad?.code).toBe('INVALID_VALUE_FOR_TYPE')
+    })
+
+    it('reports a field-level path for a bad shadow color', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({
+          shadow: {
+            md: {
+              $type: 'shadow',
+              $value: {
+                color: 'notacolor',
+                offsetX: '0px',
+                offsetY: '4px',
+              },
+            },
+          },
+        })
+      )
+      const issues = validate(tokens)
+      const bad = issues.find((i) => i.path === 'shadow.md.color')
+      expect(bad).toBeDefined()
+    })
+
+    it('reports each bad sub-field independently in a single validate() call', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({
+          t: {
+            $type: 'typography',
+            $value: { fontSize: 'big', fontWeight: 9999, lineHeight: 2 },
+          },
+        })
+      )
+      const paths = validate(tokens)
+        .filter((i) => i.path.startsWith('t.'))
+        .map((i) => i.path)
+      expect(paths.sort()).toEqual(['t.fontSize', 't.fontWeight'])
+      // lineHeight 2 is a valid number → not reported.
+    })
+
+    it('still accepts a valid color token via the registry (INVALID_VALUE_FOR_TYPE absent)', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ c: { $value: '#ff0000', $type: 'color' } })
+      )
+      expect(issueWithCode(validate(tokens), 'INVALID_VALUE_FOR_TYPE')).toBeUndefined()
+    })
+
+    it('attaches a spec reference to INVALID_FONT_WEIGHT issues', () => {
+      const { tokens } = tokensOf(
+        JSON.stringify({ fw: { $value: 9999, $type: 'fontWeight' } })
+      )
+      const issue = issueWithCode(validate(tokens), 'INVALID_FONT_WEIGHT')
+      expect(issue?.reference).toBe('https://tr.designtokens.org/format/#font-weight')
+    })
+  })
 })

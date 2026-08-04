@@ -38,6 +38,15 @@ export const SPEC_REFERENCE: Record<ValidationCode, string> = {
   UNKNOWN_TYPE: `${SPEC_BASE}#types`,
   // Per-token value-shape
   INVALID_VALUE_FOR_TYPE: `${SPEC_BASE}#types`,
+  // Per-token value-shape — granular (Phase 2)
+  INVALID_FONT_WEIGHT: `${SPEC_BASE}#font-weight`,
+  INVALID_STROKE_STYLE: `${SPEC_BASE}#stroke-style`,
+  INVALID_CUBIC_BEZIER: `${SPEC_BASE}#cubic-bezier`,
+  INVALID_CUBIC_BEZIER_RANGE: `${SPEC_BASE}#cubic-bezier`,
+  INVALID_DURATION: `${SPEC_BASE}#duration`,
+  INVALID_NUMBER: `${SPEC_BASE}#number`,
+  INVALID_GRADIENT: `${SPEC_BASE}#gradient`,
+  INVALID_COMPOSITE_FIELD: `${SPEC_BASE}#types`,
   // Reference-level
   DANGLING_REFERENCE: `${SPEC_BASE}#aliases-references`,
   CYCLIC_REFERENCE: `${SPEC_BASE}#aliases-references`,
