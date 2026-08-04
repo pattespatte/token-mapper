@@ -78,7 +78,7 @@ export function parseFiles(files: readonly InputFile[]): ParseResult {
   }
 
   for (const tree of parsed) {
-    walk(tree, [], tokens, issues)
+    walk(tree, [], tokens, issues, undefined)
   }
 
   return { tokens, issues }
@@ -89,17 +89,26 @@ export function parseFiles(files: readonly InputFile[]): ParseResult {
  * group via `isDtcgToken` and either records the token or recurses into the
  * group's children.
  *
- * `inheritedType` lets a group declare `$type` once and have descendant
- * tokens inherit it (spec-allowed). We don't currently surface group-level
- * `$type` — the validator will flag tokens missing their own type — but the
- * walker is structured so adding that is a one-line change later.
+ * `inheritedType` implements the spec's group-level `$type` inheritance: a
+ * group may declare `$type` once, and every descendant token that does not
+ * declare its own `$type` inherits the group's. A descendant's explicit
+ * `$type` always wins (strict-spec semantics — no conflict warning). The
+ * top-level call passes `undefined` (the root has no inherited type).
  */
 function walk(
   node: DtcgFile,
   ancestors: string[],
   tokens: TokenMap,
-  issues: ValidationIssue[]
+  issues: ValidationIssue[],
+  inheritedType: DtcgType | undefined
 ): void {
+  // A group may declare `$type`; if so, it becomes the inherited type for the
+  // group's descendants (unless they declare their own). Computed once per
+  // node so the recursion below passes it through unchanged.
+  const nodeType = (node as Record<string, unknown>).$type
+  const typeForChildren =
+    typeof nodeType === 'string' ? (nodeType as DtcgType) : inheritedType
+
   for (const key of Object.keys(node)) {
     // Skip `$`-prefixed properties on groups (e.g. `$description`, `$type`,
     // `$extensions`) — they describe the group itself, not a child token.
@@ -120,10 +129,10 @@ function walk(
         })
         continue
       }
-      tokens.set(path, makeToken(path, childPath, child))
+      tokens.set(path, makeToken(path, childPath, child, typeForChildren))
     } else if (typeof child === 'object' && child !== null) {
-      // Group — recurse.
-      walk(child as DtcgFile, childPath, tokens, issues)
+      // Group — recurse, passing down the (possibly updated) inherited type.
+      walk(child as DtcgFile, childPath, tokens, issues, typeForChildren)
     }
     // Primitive values directly under a group (not wrapped in a $value token)
     // are silently ignored — they aren't valid DTCG, but the parser shouldn't
@@ -131,7 +140,14 @@ function walk(
   }
 }
 
-/** Build a NormalizedToken from a DtcgToken node and its path. */
+/**
+ * Build a NormalizedToken from a DtcgToken node and its path.
+ *
+ * Type resolution: an explicit `$type` on the token wins; otherwise the
+ * inherited type from the nearest declaring ancestor (if any) is applied.
+ * A token with neither stays typeless and the validator will emit
+ * `MISSING_TYPE`.
+ */
 function makeToken(
   path: string,
   segments: string[],
@@ -139,14 +155,20 @@ function makeToken(
     $value: unknown
     $type?: DtcgType
     $description?: string
-  }
+  },
+  inheritedType: DtcgType | undefined
 ): NormalizedToken {
   const token: NormalizedToken = {
     path,
     segments,
     rawValue: raw.$value as NormalizedToken['rawValue'],
   }
-  if (raw.$type !== undefined) token.type = raw.$type
+  // Explicit $type wins; fall back to the inherited group $type.
+  if (raw.$type !== undefined) {
+    token.type = raw.$type
+  } else if (inheritedType !== undefined) {
+    token.type = inheritedType
+  }
   if (raw.$description !== undefined) token.description = raw.$description
   return token
 }

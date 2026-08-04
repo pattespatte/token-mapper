@@ -267,4 +267,129 @@ describe('parseFiles', () => {
     ])
     expect(result.tokens.get('x')?.rawValue).toBe('$type')
   })
+
+  /* ----------------------- group $type inheritance -------------------------- */
+  describe('group $type inheritance', () => {
+    it('inherits $type from a parent group that declares it', () => {
+      // Two child tokens omit $type; both should inherit `color` from the group.
+      const result = parseFiles([
+        file(
+          'a.json',
+          JSON.stringify({
+            color: {
+              $type: 'color',
+              red: { $value: '#ff0000' },
+              blue: { $value: '#0000ff' },
+            },
+          })
+        ),
+      ])
+      expect(result.tokens.get('color.red')?.type).toBe('color')
+      expect(result.tokens.get('color.blue')?.type).toBe('color')
+    })
+
+    it('lets a descendant override the inherited $type', () => {
+      // The group says `color`; `red` keeps it, `wide` declares `dimension`.
+      const result = parseFiles([
+        file(
+          'a.json',
+          JSON.stringify({
+            group: {
+              $type: 'color',
+              red: { $value: '#ff0000' },
+              wide: { $value: '16px', $type: 'dimension' },
+            },
+          })
+        ),
+      ])
+      expect(result.tokens.get('group.red')?.type).toBe('color')
+      expect(result.tokens.get('group.wide')?.type).toBe('dimension')
+    })
+
+    it('does not inherit across sibling groups', () => {
+      // Two sibling groups; only `withType` declares $type. Tokens in
+      // `withoutType` should remain typeless.
+      const result = parseFiles([
+        file(
+          'a.json',
+          JSON.stringify({
+            withType: {
+              $type: 'color',
+              red: { $value: '#ff0000' },
+            },
+            withoutType: {
+              green: { $value: '#00ff00' },
+            },
+          })
+        ),
+      ])
+      expect(result.tokens.get('withType.red')?.type).toBe('color')
+      expect(result.tokens.get('withoutType.green')?.type).toBeUndefined()
+    })
+
+    it('inherits from nested groups (outermost $type reaches the leaf)', () => {
+      // Three-deep nesting where only the outermost group declares $type.
+      const result = parseFiles([
+        file(
+          'a.json',
+          JSON.stringify({
+            outer: {
+              $type: 'dimension',
+              inner: {
+                leaf: { $value: '8px' },
+              },
+            },
+          })
+        ),
+      ])
+      expect(result.tokens.get('outer.inner.leaf')?.type).toBe('dimension')
+    })
+
+    it('a nested group $type overrides the outer inherited type', () => {
+      // Outer is `color`; inner group re-declares `dimension`; its leaves
+      // inherit `dimension`, not `color`.
+      const result = parseFiles([
+        file(
+          'a.json',
+          JSON.stringify({
+            outer: {
+              $type: 'color',
+              inner: {
+                $type: 'dimension',
+                leaf: { $value: '8px' },
+              },
+            },
+          })
+        ),
+      ])
+      expect(result.tokens.get('outer.inner.leaf')?.type).toBe('dimension')
+    })
+
+    it('a token with no inherited and no explicit $type stays typeless', () => {
+      // Regression guard: inheritance must not fabricate a type where none
+      // was declared anywhere in the ancestry.
+      const result = parseFiles([
+        file('a.json', JSON.stringify({ x: { y: { $value: '8px' } } })),
+      ])
+      expect(result.tokens.get('x.y')?.type).toBeUndefined()
+    })
+
+    it('does not treat a non-string $type as inheritable', () => {
+      // Defensive: a malformed $type that isn't a string (e.g. a number)
+      // should not propagate. The validator will flag the unknown type when
+      // it appears on a token; here we just confirm it doesn't get silently
+      // cast into something a leaf inherits.
+      const result = parseFiles([
+        file(
+          'a.json',
+          // $type as a number is malformed; the walker's type check rejects
+          // it and the leaves inherit nothing.
+          JSON.stringify({
+            group: { $type: 42, leaf: { $value: '8px' } },
+          })
+        ),
+      ])
+      expect(result.tokens.get('group.leaf')?.type).toBeUndefined()
+    })
+  })
 })
